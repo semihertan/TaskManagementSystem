@@ -1,0 +1,16 @@
+namespace TaskManagement.API.DTOs.Category;
+
+public class CategoryDto
+{
+	public Guid Id { get; set; }
+
+	public string Name { get; set; } = string.Empty;
+
+	public string? Description { get; set; }
+
+	public string Color { get; set; } = "#007bff";
+
+	public Guid UserId { get; set; }
+
+	public DateTime CreatedAt { get; set; }
+}

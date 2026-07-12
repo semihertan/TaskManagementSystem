@@ -1,0 +1,16 @@
+namespace TaskManagement.API.DTOs.Task;
+
+public class TaskFilterDto
+{
+	public int? Priority { get; set; }
+
+	public int? Status { get; set; }
+
+	public Guid? CategoryId { get; set; }
+
+	public DateTime? DueDateFrom { get; set; }
+
+	public DateTime? DueDateTo { get; set; }
+
+	public string? Search { get; set; }
+}
