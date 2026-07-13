@@ -1,12 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Data;
 using TaskManagement.API.Mappings;
+using TaskManagement.API.Services.Interfaces;
+using TaskManagement.API.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 var databaseProvider = builder.Configuration["DatabaseProvider"];
 
