@@ -11,11 +11,13 @@ public class UserService : IUserService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IJwtService _jwtService;
 
-    public UserService(ApplicationDbContext context, IMapper mapper)
+    public UserService(ApplicationDbContext context, IMapper mapper, IJwtService jwtService)
     {
         _context = context;
         _mapper = mapper;
+        _jwtService = jwtService;
     }
     public async Task<UserDto> RegisterAsync(CreateUserDto createUserDto)
     {
@@ -35,18 +37,25 @@ public class UserService : IUserService
 
         // kaydet
         await _context.Users.AddAsync(user);
-        await _context.Users.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
         return _mapper.Map<UserDto>(user);
     }
-    public Task<UserDto?> GetProfileAsync(Guid userId)
+    public async Task<UserDto?> GetProfileAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        return _mapper.Map<UserDto>(user);
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)
     {
-        var existingUser = await _context.Users
+        var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(
@@ -58,6 +67,6 @@ public class UserService : IUserService
             throw new Exception("Email veya şifre hatalı");
         }
 
-        return string.Empty;
+        return _jwtService.GenerateToken(user);
     }
 }
