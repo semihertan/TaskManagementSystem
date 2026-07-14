@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using TaskManagement.API.Data;
 using TaskManagement.API.Mappings;
 using TaskManagement.API.Services.Interfaces;
@@ -7,6 +6,7 @@ using TaskManagement.API.Services.Implementations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TaskManagement.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +52,8 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 

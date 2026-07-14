@@ -21,13 +21,13 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(CreateUserDto createUserDto)
     {
         var user = await _userService.RegisterAsync(createUserDto);
-
-        return Ok(user);
-        //return CreatedAtAction(
-        //  nameof(Profile),
-        //    new {id = user.Id},
-        //    user);
+        
+        return CreatedAtAction(
+          nameof(Profile),
+            new {id = user.Id},
+            user);
     }
+    
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
