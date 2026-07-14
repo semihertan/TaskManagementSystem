@@ -55,6 +55,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<ITaskService, TaskService>();
 
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
