@@ -7,4 +7,6 @@ public interface ITaskService
     Task<TaskItemDto> CreateAsync(CreateTaskDto createTaskDto, Guid userId);
     Task<bool> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId);
     Task<bool> DeleteAsync(Guid id, Guid userId);
+    Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId);
+    Task<IEnumerable<TaskItemDto>> GetOverdueTasksAsync(Guid userId);
 }

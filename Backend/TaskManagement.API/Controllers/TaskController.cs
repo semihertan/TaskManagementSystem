@@ -97,4 +97,15 @@ public class TasksController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("overdue")]
+    public async Task<IActionResult> GetOverdueTasks()
+    {
+        var userId = Guid.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        var tasks = await _taskService.GetOverdueTasksAsync(userId);
+
+        return Ok(tasks);
+    }
 }

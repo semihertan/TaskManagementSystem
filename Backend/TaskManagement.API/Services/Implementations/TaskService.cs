@@ -5,6 +5,8 @@ using TaskManagement.API.Data;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Entities;
 using TaskManagement.API.Responses;
+using System.Formats.Asn1;
+using TaskManagement.API.Enums;
 
 namespace TaskManagement.API.Services;
 
@@ -139,5 +141,62 @@ public class TaskService : ITaskService
         await _context.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId)
+    {
+        var totalTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId);
+
+        var pendingTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId &&
+                            x.Status == TaskItemStatus.Pending);
+
+        var inProgressTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId &&
+                            x.Status == TaskItemStatus.InProgress);
+
+        var completedTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId &&
+                            x.Status == TaskItemStatus.Completed);
+
+        var cancelledTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId &&
+                            x.Status == TaskItemStatus.Cancelled);
+
+        var overdueTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId &&
+                            x.DueDate < DateTime.UtcNow &&
+                            x.Status != TaskItemStatus.Completed);
+
+        var dueTodayTasks = await _context.Tasks
+            .CountAsync(x => x.UserId == userId &&
+                            x.DueDate.HasValue &&
+                            x.DueDate.Value.Date == DateTime.UtcNow.Date);
+
+        return new TaskStatisticsDto
+        {
+            TotalTasks = totalTasks,
+            PendingTasks = pendingTasks,
+            InProgressTasks = inProgressTasks,
+            CompletedTasks = completedTasks,
+            CancelledTasks = cancelledTasks,
+            OverdueTasks = overdueTasks,
+            DueTodayTasks = dueTodayTasks
+        };
+    }
+    public async Task<IEnumerable<TaskItemDto>> GetOverdueTasksAsync(Guid userId)
+    {
+        var tasks = await _context.Tasks
+            .Where(x =>
+                x.UserId == userId &&
+                x.DueDate.HasValue &&
+                x.DueDate.Value < DateTime.UtcNow &&
+                x.Status != TaskItemStatus.Completed &&
+                x.Status != TaskItemStatus.Cancelled)
+            .OrderBy(x => x.DueDate)
+            .ToListAsync();
+
+        return _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
     }
 }
