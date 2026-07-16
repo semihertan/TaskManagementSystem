@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Data;
+using TaskManagement.API.DTOs.Task.TaskAttachment;
 using TaskManagement.API.DTOs.TaskAttachment;
 using TaskManagement.API.Entities;
 using TaskManagement.API.Services.Interfaces;
@@ -102,12 +103,10 @@ public class TaskAttachmentService : ITaskAttachmentService
         var uniqueFileName =
             $"{Guid.NewGuid()}{Path.GetExtension(dto.File.FileName)}";
 
-        // Veritabanına kaydedilecek göreli yol
         var relativePath = Path.Combine(
             "Uploads",
             uniqueFileName);
 
-        // Diske yazılacak tam yol
         var fullPath = Path.Combine(
             Directory.GetCurrentDirectory(),
             relativePath);

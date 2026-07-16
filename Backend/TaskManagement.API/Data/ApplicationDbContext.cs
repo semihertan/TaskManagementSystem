@@ -29,8 +29,6 @@ public class ApplicationDbContext : DbContext
 
         var demoUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
-        modelBuilder.ApplyConfiguration(new TaskAttachmentConfiguration());
-
         modelBuilder.Entity<User>().HasData(new User
         {
             Id = demoUserId,

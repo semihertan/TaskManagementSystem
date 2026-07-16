@@ -31,5 +31,5 @@ public class TaskItem
 
     public ICollection<TaskAttachment> Attachments { get; set; } = new List<TaskAttachment>();
 
-    public ICollection<TaskComment> Comments { get; set; }
+    public ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
 }

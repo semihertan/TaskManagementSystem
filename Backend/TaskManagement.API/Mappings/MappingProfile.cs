@@ -1,7 +1,7 @@
-using AutoMapper;
 using TaskManagement.API.DTOs.Category;
 using TaskManagement.API.DTOs.Task;
-using TaskManagement.API.DTOs.TaskAttachment;
+using TaskManagement.API.DTOs.Task.TaskAttachment;
+using TaskManagement.API.DTOs.Task.TaskComment;
 using TaskManagement.API.DTOs.User;
 using TaskManagement.API.Entities;
 
@@ -22,6 +22,12 @@ public class MappingProfile : AutoMapper.Profile
         CreateMap<UpdateTaskDto, TaskItem>();
         // Task Attachment
         CreateMap<TaskAttachment, TaskAttachmentDto>();
+        // Task Comment
+        CreateMap<TaskComment, TaskCommentDto>();
+
+        CreateMap<CreateTaskCommentDto, TaskComment>();
+
+        CreateMap<UpdateTaskCommentDto, TaskComment>();
 
         // Category
         CreateMap<Category, CategoryDto>();

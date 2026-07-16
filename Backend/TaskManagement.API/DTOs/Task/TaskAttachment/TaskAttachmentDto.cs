@@ -1,4 +1,4 @@
-namespace TaskManagement.API.DTOs.TaskAttachment;
+namespace TaskManagement.API.DTOs.Task.TaskAttachment;
 
 public class TaskAttachmentDto
 {

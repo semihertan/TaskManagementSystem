@@ -58,6 +58,8 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 
 builder.Services.AddScoped<ITaskAttachmentService, TaskAttachmentService>();
 
+builder.Services.AddScoped<ITaskCommentService, TaskCommentService>();
+
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();

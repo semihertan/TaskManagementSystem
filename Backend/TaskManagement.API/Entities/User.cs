@@ -24,5 +24,5 @@ public class User
 
     public ICollection<TaskItem> Tasks { get; set; }
 
-    public ICollection<TaskComment> Comments { get; set; }
+    public ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
 }
