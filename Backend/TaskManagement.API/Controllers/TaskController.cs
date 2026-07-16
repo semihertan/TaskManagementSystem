@@ -19,19 +19,19 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] TaskFilterDto filterDto)
     {
         var userId = Guid.Parse(
             User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-        var tasks = await _taskService.GetAllAsync(userId);
+        var tasks = await _taskService.GetAllAsync(userId, filterDto);
 
-    return Ok(new ApiResponse<IEnumerable<TaskItemDto>>
-    {
-        Success = true,
-        Message = "Görevler başarıyla getirildi.",
-        Data = tasks
-    });
+        return Ok(new ApiResponse<IEnumerable<TaskItemDto>>
+        {
+            Success = true,
+            Message = "Görevler başarıyla getirildi.",
+            Data = tasks
+        });
     }
 
     [HttpGet("{id:guid}")]

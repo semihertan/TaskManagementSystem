@@ -46,11 +46,44 @@ public class TaskService : ITaskService
         return true;
     }
 
-    public async Task<IEnumerable<TaskItemDto>> GetAllAsync(Guid userId)
+    public async Task<IEnumerable<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto)
     {
-        var tasks = await _context.Tasks
-        .Where(t => t.UserId == userId)
-        .ToListAsync();
+        IQueryable<TaskItem> query = _context.Tasks
+            .Where(t => t.UserId == userId);
+
+        if (filterDto.Priority.HasValue)
+        {
+            query = query.Where(t => (int)t.Priority == filterDto.Priority.Value);
+        }
+
+        if (filterDto.Status.HasValue)
+        {
+            query = query.Where(t => (int)t.Status == filterDto.Status.Value);
+        }
+
+        if (filterDto.CategoryId.HasValue)
+        {
+            query = query.Where(t => t.CategoryId == filterDto.CategoryId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterDto.Search))
+        {
+            query = query.Where(t =>
+                t.Title.Contains(filterDto.Search) ||
+                (t.Description != null && t.Description.Contains(filterDto.Search)));
+        }
+
+        if (filterDto.DueDateFrom.HasValue)
+        {
+            query = query.Where(t => t.DueDate >= filterDto.DueDateFrom.Value);
+        }
+
+        if (filterDto.DueDateTo.HasValue)
+        {
+            query = query.Where(t => t.DueDate <= filterDto.DueDateTo.Value);
+        }
+
+        var tasks = await query.ToListAsync();
 
         return _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
     }

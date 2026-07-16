@@ -5,6 +5,7 @@ namespace TaskManagement.API.Controllers;
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using TaskManagement.API.Responses;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -22,10 +23,15 @@ public class AuthController : ControllerBase
     {
         var user = await _userService.RegisterAsync(createUserDto);
         
-        return CreatedAtAction(
-          nameof(Profile),
-            new {id = user.Id},
-            user);
+    return CreatedAtAction(
+        nameof(Profile),
+        new { id = user.Id },
+        new ApiResponse<UserDto>
+        {
+            Success = true,
+            Message = "Kullanıcı başarıyla oluşturuldu.",
+            Data = user
+        });
     }
     
     [HttpPost("login")]
@@ -33,7 +39,12 @@ public class AuthController : ControllerBase
     {
         var token = await _userService.LoginAsync(loginDto);
 
-        return Ok(token);
+        return Ok(new ApiResponse<string>
+        {
+            Success = true,
+            Message = "Giriş başarılı.",
+            Data = token
+        });
     }
 
     [Authorize]
@@ -44,16 +55,31 @@ public class AuthController : ControllerBase
 
         if (!Guid.TryParse(userId, out Guid id))
         {
-            return Unauthorized();
+            return Unauthorized(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Geçersiz kullanıcı bilgisi.",
+                Data = null
+            });
         }
 
         var user = await _userService.GetProfileAsync(id);
 
         if (user == null)
         {
-            return NotFound();
+            return NotFound(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Kullanıcı bulunamadı.",
+                Data = null
+            });
         }
 
-        return Ok(user);
+        return Ok(new ApiResponse<UserDto>
+        {
+            Success = true,
+            Message = "Profil başarıyla getirildi.",
+            Data = user
+        });
     }
 }
