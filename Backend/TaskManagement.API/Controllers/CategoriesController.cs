@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using TaskManagement.API.DTOs.Category;
+using TaskManagement.API.Responses;
 
 namespace TaskManagement.API.Controllers;
 
@@ -25,7 +26,12 @@ public class CategoriesController : ControllerBase
 
         var categories = await _categoryService.GetAllAsync(userId);
 
-        return Ok(categories);
+    return Ok(new ApiResponse<IEnumerable<CategoryDto>>
+    {
+        Success = true,
+        Message = "Kategoriler başarıyla getirildi.",
+        Data = categories
+    });
     }
 
     [HttpGet("{id:guid}")]
@@ -35,8 +41,15 @@ public class CategoriesController : ControllerBase
 
         var category = await _categoryService.GetByIdAsync(id, userId);
 
-        if (category == null)
-            return NotFound();
+    if (category == null)
+    {
+        return NotFound(new ApiResponse<object>
+        {
+            Success = false,
+            Message = "Kategori bulunamadı.",
+            Data = null
+        });
+    }
 
         return Ok(category);
     }
@@ -48,10 +61,15 @@ public class CategoriesController : ControllerBase
 
         var createdCategory = await _categoryService.CreateAsync(createCategoryDto, userId);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = createdCategory.Id },
-            createdCategory);
+    return CreatedAtAction(
+        nameof(GetById),
+        new { id = createdCategory.Id },
+        new ApiResponse<CategoryDto>
+        {
+            Success = true,
+            Message = "Kategori başarıyla oluşturuldu.",
+            Data = createdCategory
+        });
     }
 
     [HttpPut("{id:guid}")]

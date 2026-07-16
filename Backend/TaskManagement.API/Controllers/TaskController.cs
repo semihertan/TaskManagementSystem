@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using TaskManagement.API.DTOs.Task;
+using TaskManagement.API.Responses;
 
 namespace TaskManagement.API.Controllers;
 
@@ -25,7 +26,12 @@ public class TasksController : ControllerBase
 
         var tasks = await _taskService.GetAllAsync(userId);
 
-        return Ok(tasks);
+    return Ok(new ApiResponse<IEnumerable<TaskItemDto>>
+    {
+        Success = true,
+        Message = "Görevler başarıyla getirildi.",
+        Data = tasks
+    });
     }
 
     [HttpGet("{id:guid}")]
@@ -35,8 +41,15 @@ public class TasksController : ControllerBase
 
         var task = await _taskService.GetByIdAsync(id, userId);
 
-        if (task == null)
-            return NotFound();
+    if (task == null)
+    {
+        return NotFound(new ApiResponse<object>
+        {
+            Success = false,
+            Message = "Görev bulunamadı.",
+            Data = null
+        });
+    }
 
         return Ok(task);
     }
@@ -51,7 +64,12 @@ public class TasksController : ControllerBase
         return CreatedAtAction(
             nameof(GetById),
             new { id = createdTask.Id },
-            createdTask);
+            new ApiResponse<TaskItemDto>
+            {
+                Success = true,
+                Message = "Görev başarıyla oluşturuldu.",
+                Data = createdTask
+            });
     }
 
     [HttpPut("{id:guid}")]
