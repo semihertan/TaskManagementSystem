@@ -17,10 +17,6 @@ public class TaskAttachmentConfiguration : IEntityTypeConfiguration<TaskAttachme
             .HasMaxLength(255);
 
         builder.Property(x => x.FilePath)
-            .IsRequired()
-            .HasMaxLength(500);
-
-        builder.Property(x => x.FileSize)
             .IsRequired();
 
         builder.Property(x => x.ContentType)

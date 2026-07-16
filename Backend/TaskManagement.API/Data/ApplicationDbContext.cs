@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.API.Data.Configurations;
 using TaskManagement.API.Entities;
 
 namespace TaskManagement.API.Data;
@@ -27,6 +28,8 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
         var demoUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+        modelBuilder.ApplyConfiguration(new TaskAttachmentConfiguration());
 
         modelBuilder.Entity<User>().HasData(new User
         {

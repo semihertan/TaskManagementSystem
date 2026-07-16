@@ -1,6 +1,7 @@
 using AutoMapper;
 using TaskManagement.API.DTOs.Category;
 using TaskManagement.API.DTOs.Task;
+using TaskManagement.API.DTOs.TaskAttachment;
 using TaskManagement.API.DTOs.User;
 using TaskManagement.API.Entities;
 
@@ -19,6 +20,8 @@ public class MappingProfile : AutoMapper.Profile
         CreateMap<TaskItem, TaskItemDto>();
         CreateMap<CreateTaskDto, TaskItem>();
         CreateMap<UpdateTaskDto, TaskItem>();
+        // Task Attachment
+        CreateMap<TaskAttachment, TaskAttachmentDto>();
 
         // Category
         CreateMap<Category, CategoryDto>();

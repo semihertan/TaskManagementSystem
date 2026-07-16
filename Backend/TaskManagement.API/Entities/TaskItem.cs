@@ -29,7 +29,7 @@ public class TaskItem
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public ICollection<TaskAttachment> Attachments { get; set; }
+    public ICollection<TaskAttachment> Attachments { get; set; } = new List<TaskAttachment>();
 
     public ICollection<TaskComment> Comments { get; set; }
 }
