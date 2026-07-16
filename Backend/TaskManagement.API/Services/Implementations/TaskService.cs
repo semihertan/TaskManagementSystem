@@ -4,6 +4,7 @@ using AutoMapper;
 using TaskManagement.API.Data;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Entities;
+using TaskManagement.API.Responses;
 
 namespace TaskManagement.API.Services;
 
@@ -11,6 +12,8 @@ public class TaskService : ITaskService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private int totalCount;
+
     public TaskService(ApplicationDbContext context, IMapper mapper)
     {
         _context = context;
@@ -46,7 +49,7 @@ public class TaskService : ITaskService
         return true;
     }
 
-    public async Task<IEnumerable<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto)
+    public async Task<PagedResponse<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto)
     {
         IQueryable<TaskItem> query = _context.Tasks
             .Where(t => t.UserId == userId);
@@ -83,9 +86,30 @@ public class TaskService : ITaskService
             query = query.Where(t => t.DueDate <= filterDto.DueDateTo.Value);
         }
 
+        if (filterDto.Page < 1)
+            filterDto.Page = 1;
+
+        if (filterDto.PageSize < 1)
+            filterDto.PageSize = 10;
+        
+        var totalCount = await query.CountAsync();
+
+        query = query
+            .Skip((filterDto.Page - 1) * filterDto.PageSize)
+            .Take(filterDto.PageSize);
+
         var tasks = await query.ToListAsync();
 
-        return _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
+        var taskDtos = _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
+
+        return new PagedResponse<TaskItemDto>
+        {
+            Items = taskDtos,
+            Page = filterDto.Page,
+            PageSize = filterDto.PageSize,
+            TotalCount = totalCount,
+            TotalPages = (int)Math.Ceiling((double)totalCount / filterDto.PageSize)
+        };
     }
 
     public async Task<TaskItemDto?> GetByIdAsync(Guid id, Guid userId)

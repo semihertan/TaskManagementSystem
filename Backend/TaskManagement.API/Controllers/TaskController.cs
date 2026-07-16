@@ -26,7 +26,7 @@ public class TasksController : ControllerBase
 
         var tasks = await _taskService.GetAllAsync(userId, filterDto);
 
-        return Ok(new ApiResponse<IEnumerable<TaskItemDto>>
+        return Ok(new ApiResponse<PagedResponse<TaskItemDto>>
         {
             Success = true,
             Message = "Görevler başarıyla getirildi.",

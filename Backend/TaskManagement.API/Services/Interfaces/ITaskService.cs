@@ -1,7 +1,8 @@
 using TaskManagement.API.DTOs.Task;
+using TaskManagement.API.Responses;
 public interface ITaskService
 {
-    Task<IEnumerable<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto);
+    Task<PagedResponse<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto);
     Task<TaskItemDto?> GetByIdAsync(Guid id, Guid userId);
     Task<TaskItemDto> CreateAsync(CreateTaskDto createTaskDto, Guid userId);
     Task<bool> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId);
