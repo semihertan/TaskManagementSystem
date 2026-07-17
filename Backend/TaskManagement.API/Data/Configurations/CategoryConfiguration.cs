@@ -25,6 +25,8 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(x => x.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+        builder.HasIndex(x => x.UserId);
+
         builder.HasOne(x => x.User)
             .WithMany(x => x.Categories)
             .HasForeignKey(x => x.UserId)

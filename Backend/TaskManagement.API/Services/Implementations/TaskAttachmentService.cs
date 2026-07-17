@@ -77,6 +77,7 @@ public class TaskAttachmentService : ITaskAttachmentService
     public async Task<IEnumerable<TaskAttachmentDto>> GetByTaskIdAsync(Guid taskId, Guid userId)
     {
         var attachments = await _context.TaskAttachments
+            .AsNoTracking()
             .Include(x => x.Task)
             .Where(x => x.TaskId == taskId && x.Task.UserId == userId)
             .ToListAsync();

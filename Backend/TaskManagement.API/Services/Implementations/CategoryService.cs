@@ -70,6 +70,7 @@ public class CategoryService : ICategoryService
     public async Task<IEnumerable<CategoryDto>> GetAllAsync(Guid userId)
     {
         var categories = await _context.Categories
+        .AsNoTracking()
         .Where(c => c.UserId == userId)
         .ToListAsync();
 
@@ -78,8 +79,9 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryDto?> GetByIdAsync(Guid id, Guid userId)
     {
-            var category = await _context.Categories
-        .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+        var category = await _context.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
         if (category == null)
             return null;

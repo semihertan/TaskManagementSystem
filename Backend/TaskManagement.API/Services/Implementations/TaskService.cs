@@ -75,6 +75,7 @@ public class TaskService : ITaskService
     public async Task<PagedResponse<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto)
     {
         IQueryable<TaskItem> query = _context.Tasks
+            .AsNoTracking()
             .Where(t => t.UserId == userId);
 
         if (filterDto.Priority.HasValue)
@@ -139,8 +140,9 @@ public class TaskService : ITaskService
     {
         _logger.LogInformation("Getting task with id: {TaskId}", id);
 
-        var task = await _context.Tasks.
-            FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+        var task = await _context.Tasks
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
         if(task == null)
         {
@@ -183,49 +185,45 @@ public class TaskService : ITaskService
 
     public async Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId)
     {
-        var totalTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId);
+        var today = DateTime.UtcNow.Date;
+        var now = DateTime.UtcNow;
 
-        var pendingTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId &&
-                            x.Status == TaskItemStatus.Pending);
+        var statistics = await _context.Tasks
+            .Where(x => x.UserId == userId)
+            .GroupBy(x => 1)
+            .Select(g => new TaskStatisticsDto
+            {
+                TotalTasks = g.Count(),
 
-        var inProgressTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId &&
-                            x.Status == TaskItemStatus.InProgress);
+                PendingTasks = g.Count(x =>
+                    x.Status == TaskItemStatus.Pending),
 
-        var completedTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId &&
-                            x.Status == TaskItemStatus.Completed);
+                InProgressTasks = g.Count(x =>
+                    x.Status == TaskItemStatus.InProgress),
 
-        var cancelledTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId &&
-                            x.Status == TaskItemStatus.Cancelled);
+                CompletedTasks = g.Count(x =>
+                    x.Status == TaskItemStatus.Completed),
 
-        var overdueTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId &&
-                            x.DueDate < DateTime.UtcNow &&
-                            x.Status != TaskItemStatus.Completed);
+                CancelledTasks = g.Count(x =>
+                    x.Status == TaskItemStatus.Cancelled),
 
-        var dueTodayTasks = await _context.Tasks
-            .CountAsync(x => x.UserId == userId &&
-                            x.DueDate.HasValue &&
-                            x.DueDate.Value.Date == DateTime.UtcNow.Date);
+                OverdueTasks = g.Count(x =>
+                    x.DueDate < now &&
+                    x.Status != TaskItemStatus.Completed),
 
-        return new TaskStatisticsDto
-        {
-            TotalTasks = totalTasks,
-            PendingTasks = pendingTasks,
-            InProgressTasks = inProgressTasks,
-            CompletedTasks = completedTasks,
-            CancelledTasks = cancelledTasks,
-            OverdueTasks = overdueTasks,
-            DueTodayTasks = dueTodayTasks
-        };
+                DueTodayTasks = g.Count(x =>
+                    x.DueDate.HasValue &&
+                    x.DueDate.Value.Date == today)
+            })
+            .FirstOrDefaultAsync();
+
+        return statistics ?? new TaskStatisticsDto();
     }
+    
     public async Task<IEnumerable<TaskItemDto>> GetOverdueTasksAsync(Guid userId)
     {
         var tasks = await _context.Tasks
+            .AsNoTracking()
             .Where(x =>
                 x.UserId == userId &&
                 x.DueDate.HasValue &&

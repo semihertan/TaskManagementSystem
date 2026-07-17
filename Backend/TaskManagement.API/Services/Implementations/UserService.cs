@@ -27,10 +27,13 @@ public class UserService : IUserService
             "Registering user: {Email}",
             createUserDto.Email);
 
-        var existingUser = await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == createUserDto.Email || x.Username == createUserDto.Username);
-        
-        if(existingUser != null)
+        var exists = await _context.Users
+            .AsNoTracking()
+            .AnyAsync(x =>
+                x.Email == createUserDto.Email ||
+                x.Username == createUserDto.Username);
+
+        if (exists)
         {
             throw new Exception("Bu Email'e kayıtlı başka bir hesap bulunmaktadır!");
         }
@@ -52,7 +55,9 @@ public class UserService : IUserService
     }
     public async Task<UserDto?> GetProfileAsync(Guid userId)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _context.Users
+        .AsNoTracking()
+        .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null)
         {
@@ -69,7 +74,17 @@ public class UserService : IUserService
             loginDto.Email);
 
         var user = await _context.Users
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Email == loginDto.Email);
+
+        if (user == null)
+        {
+            _logger.LogWarning(
+                "Login failed. User not found: {Email}",
+                loginDto.Email);
+
+            throw new Exception("Email veya şifre hatalı.");
+        }
 
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(
             loginDto.Password,

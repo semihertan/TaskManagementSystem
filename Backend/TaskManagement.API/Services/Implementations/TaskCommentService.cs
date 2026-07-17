@@ -63,6 +63,7 @@ public class TaskCommentService : ITaskCommentService
     public async Task<IEnumerable<TaskCommentDto>> GetByTaskIdAsync(Guid taskId, Guid userId)
     {
         var task = await _context.Tasks
+            .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == taskId && x.UserId == userId);
 
         if (task == null)

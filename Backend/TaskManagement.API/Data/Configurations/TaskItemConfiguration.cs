@@ -9,7 +9,12 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
 {
     public void Configure(EntityTypeBuilder<TaskItem> builder)
     {
-        builder.ToTable("Tasks");
+        builder.ToTable("Tasks", table =>
+        {
+            table.HasCheckConstraint(
+                "CK_Tasks_Priority",
+                "\"Priority\" BETWEEN 1 AND 5");
+        });
 
         builder.HasKey(x => x.Id);
 
@@ -31,10 +36,13 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Property(x => x.UpdatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.HasCheckConstraint(
-            "CK_Tasks_Priority",
-            "\"Priority\" BETWEEN 1 AND 5"
-        );
+        builder.HasIndex(x => x.UserId);
+
+        builder.HasIndex(x => x.CategoryId);
+
+        builder.HasIndex(x => x.Status);
+
+        builder.HasIndex(x => x.Priority);
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.Tasks)
