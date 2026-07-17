@@ -14,15 +14,18 @@ public class TaskService : ITaskService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
-    private int totalCount;
+    private readonly ILogger<TaskService> _logger;
 
-    public TaskService(ApplicationDbContext context, IMapper mapper)
+    public TaskService(ApplicationDbContext context, IMapper mapper, ILogger<TaskService> logger)
     {
         _context = context;
         _mapper = mapper;
+        _logger = logger;
     }
     public async Task<TaskItemDto> CreateAsync(CreateTaskDto createTaskDto, Guid userId)
     {
+        _logger.LogInformation("Creating task: {Title}", createTaskDto.Title);
+
         var task = _mapper.Map<TaskItem>(createTaskDto);
 
         task.UserId = userId;
@@ -33,20 +36,38 @@ public class TaskService : ITaskService
 
         await _context.SaveChangesAsync();
 
+            _logger.LogInformation(
+        "Task created successfully. Id: {TaskId}",
+        task.Id);
+
         return _mapper.Map<TaskItemDto>(task);
     }
 
     public async Task<bool> DeleteAsync(Guid id, Guid userId)
     {
+        _logger.LogInformation(
+            "Deleting task with id: {TaskId}",
+            id);
+
         var task = await _context.Tasks
             .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
         if (task == null)
+        {
+            _logger.LogWarning(
+            "Task not found for delete. Id: {TaskId}",
+            id);
+
             return false;
+        }
 
         _context.Tasks.Remove(task);
 
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Task deleted successfully. Id: {TaskId}",
+            id);
 
         return true;
     }
@@ -116,29 +137,46 @@ public class TaskService : ITaskService
 
     public async Task<TaskItemDto?> GetByIdAsync(Guid id, Guid userId)
     {
+        _logger.LogInformation("Getting task with id: {TaskId}", id);
+
         var task = await _context.Tasks.
             FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
         if(task == null)
         {
-            return null;
+            _logger.LogWarning("Task not found. Id: {TaskId}", id);
+            throw new KeyNotFoundException("Task bulunamadı.");
         }
         return _mapper.Map<TaskItemDto>(task);
     }
 
     public async Task<bool> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId)
     {
+        _logger.LogInformation(
+            "Updating task. Id: {TaskId}",
+            id);
+
         var task = await _context.Tasks
             .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
         if (task == null)
+        {
+            _logger.LogWarning(
+            "Task not found for update. Id: {TaskId}",
+            id);
+
             return false;
+        }
 
         _mapper.Map(updateTaskDto, task);
 
         task.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Task updated successfully. Id: {TaskId}",
+            id);
 
         return true;
     }

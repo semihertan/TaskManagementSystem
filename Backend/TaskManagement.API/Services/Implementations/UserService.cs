@@ -12,16 +12,21 @@ public class UserService : IUserService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IJwtService _jwtService;
+    private readonly ILogger<UserService> _logger;
 
-    public UserService(ApplicationDbContext context, IMapper mapper, IJwtService jwtService)
+    public UserService(ApplicationDbContext context, IMapper mapper, IJwtService jwtService, ILogger<UserService> logger)
     {
         _context = context;
         _mapper = mapper;
         _jwtService = jwtService;
+        _logger = logger;
     }
     public async Task<UserDto> RegisterAsync(CreateUserDto createUserDto)
     {
-        // kayıtlı var mı kontrolü
+        _logger.LogInformation(
+            "Registering user: {Email}",
+            createUserDto.Email);
+
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(x => x.Email == createUserDto.Email || x.Username == createUserDto.Username);
         
@@ -39,6 +44,10 @@ public class UserService : IUserService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
+        _logger.LogInformation(
+            "User registered successfully. Id: {UserId}",
+            user.Id);
+
         return _mapper.Map<UserDto>(user);
     }
     public async Task<UserDto?> GetProfileAsync(Guid userId)
@@ -55,6 +64,10 @@ public class UserService : IUserService
 
     public async Task<string> LoginAsync(LoginDto loginDto)
     {
+        _logger.LogInformation(
+            "Login attempt for {Email}",
+            loginDto.Email);
+
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Email == loginDto.Email);
 
@@ -64,8 +77,15 @@ public class UserService : IUserService
 
         if (!isPasswordValid)
         {
+            _logger.LogWarning(
+                "Login failed. Invalid password for {Email}",
+                loginDto.Email);
             throw new Exception("Email veya şifre hatalı");
         }
+
+        _logger.LogInformation(
+            "User logged in successfully. {Email}",
+            loginDto.Email);
 
         return _jwtService.GenerateToken(user);
     }
