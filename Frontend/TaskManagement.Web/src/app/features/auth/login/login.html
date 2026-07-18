@@ -1,1 +1,78 @@
-<p>login works!</p>
+<div class="login-container">
+  <mat-card class="login-card" appearance="outlined">
+    <!-- Card Header -->
+    <div class="card-header">
+      <div class="logo-wrapper">
+        <mat-icon class="logo-icon">playlist_add_check</mat-icon>
+      </div>
+      <h1 class="title">Task Management</h1>
+      <p class="subtitle">Sign in to continue</p>
+    </div>
+
+    <!-- Login Form (Reactive Forms compatible) -->
+    <form class="login-form"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()" >
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Email Address</mat-label>
+        <input 
+          matInput 
+          type="email" 
+          formControlName="email" 
+          placeholder="name@example.com" 
+          required 
+          autocomplete="username"
+          aria-required="true"
+        >
+        <mat-icon matPrefix>mail_outline</mat-icon>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+          Email address is required
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+          Please enter a valid email address
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Password</mat-label>
+        <input 
+          matInput 
+          type="password" 
+          formControlName="password" 
+          placeholder="••••••••" 
+          required 
+          autocomplete="current-password"
+          aria-required="true"
+        >
+        <mat-icon matPrefix>lock_outline</mat-icon>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+          Password is required
+        </mat-error>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button 
+          mat-flat-button 
+          class="submit-btn" 
+          type="submit" 
+          [disabled]="loginForm.invalid"
+        >
+          <span *ngIf="!isLoading">Sign In</span>
+          <mat-spinner 
+            *ngIf="isLoading" 
+            diameter="20" 
+            class="btn-spinner"
+            role="status"
+            aria-live="polite"
+          ></mat-spinner>
+        </button>
+      </div>
+    </form>
+
+    <!-- Card Footer -->
+    <div class="card-footer">
+      <span class="prompt-text">Don't have an account?</span>
+      <a class="register-link" routerLink="/register">Register</a>
+    </div>
+  </mat-card>
+</div>

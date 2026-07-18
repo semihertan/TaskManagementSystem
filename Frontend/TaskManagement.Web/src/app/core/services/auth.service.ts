@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-import { User } from '../../shared/interfaces/user.interface';
-import { LoginRequest } from '../../shared/interfaces/login.interface';
-import { RegisterRequest } from '../../shared/interfaces/register.interface';
+import { User } from '../../shared/interfaces/auth/user.interface';
+import { LoginRequest } from '../../shared/interfaces/auth/login.interface';
+import { RegisterRequest } from '../../shared/interfaces/auth/register.interface';
 import { ApiResponse } from '../../shared/interfaces/api-response.interface';
 
 @Injectable({
