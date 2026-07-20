@@ -6,6 +6,7 @@ import { TaskItem } from '../../shared/interfaces/task/task.interface';
 import { CreateTask } from '../../shared/interfaces/task/create-task.interface';
 import { UpdateTask } from '../../shared/interfaces/task/update-task.interface';
 import { ApiResponse } from '../../shared/interfaces/api-response.interface';
+import { PagedData } from '../../shared/interfaces/paged-data.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class TaskService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/tasks`;
 
-  getTasks(): Observable<ApiResponse<TaskItem[]>> {
-    return this.http.get<ApiResponse<TaskItem[]>>(this.apiUrl);
+  getTasks(): Observable<ApiResponse<PagedData<TaskItem>>> {
+    return this.http.get<ApiResponse<PagedData<TaskItem>>>(this.apiUrl);
   }
 
   getTaskById(id: string): Observable<ApiResponse<TaskItem>> {

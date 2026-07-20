@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { ErrorHandlingService } from '../../../core/services/error-handling.service';
 
 @Component({
   selector: 'app-register',
@@ -23,7 +24,8 @@ import { AuthService } from '../../../core/services/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './register.html',
   styleUrl: './register.scss'
@@ -32,7 +34,11 @@ import { AuthService } from '../../../core/services/auth.service';
 export class Register {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private errorHandlingService = inject(ErrorHandlingService);
   private router = inject(Router);
+
+  isLoading = false;
+  errorMessage = '';
 
   registerForm = this.fb.nonNullable.group({
   username: ['', [Validators.required]],
@@ -43,31 +49,32 @@ export class Register {
   });
 
   onSubmit(): void {
-
   if (this.registerForm.invalid) {
     this.registerForm.markAllAsTouched();
     return;
   }
 
+  this.isLoading = true;
+  this.errorMessage = '';
+
   const registerData = this.registerForm.getRawValue();
 
   this.authService.register(registerData).subscribe({
-
     next: (response) => {
-
       console.log(response);
 
+      this.isLoading = false;
       this.router.navigate(['/login']);
-
     },
 
     error: (error) => {
+      this.isLoading = false;
 
+      this.errorMessage =
+        this.errorHandlingService.getErrorMessage(error);
+      console.log('Ekrana yazılacak mesaj:', this.errorMessage);
       console.error(error);
-
     }
-
   });
-
   }
 }

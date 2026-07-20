@@ -1,1 +1,25 @@
-<p>tasks works!</p>
+<div class="tasks-container">
+  <h1>Görevlerim</h1>
+
+  <p *ngIf="isLoading">
+    Görevler yükleniyor...
+  </p>
+
+  <p *ngIf="errorMessage">
+    {{ errorMessage }}
+  </p>
+
+  <p *ngIf="!isLoading && !errorMessage && tasks.length === 0">
+    Henüz görev bulunmuyor.
+  </p>
+
+  <div *ngFor="let task of tasks">
+    <h3>{{ task.title }}</h3>
+
+    <p>
+      {{ task.description }}
+    </p>
+
+    <hr>
+  </div>
+</div>

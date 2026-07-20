@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -5,15 +6,55 @@ import { Injectable } from '@angular/core';
 })
 export class ErrorHandlingService {
 
-  constructor() { }
+  getErrorMessage(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return error instanceof Error
+        ? error.message
+        : 'Beklenmeyen bir hata oluştu.';
+    }
 
-  handleError(error: any): string {
-    if (error && error.error && error.error.message) {
-      return error.error.message;
+    if (error.status === 0) {
+      return 'Sunucuya bağlanılamadı. Backend uygulamasının çalıştığını kontrol edin.';
     }
-    if (error && error.message) {
-      return error.message;
+
+    if (typeof error.error === 'object' && error.error !== null) {
+      const backendMessage =
+        error.error.message ??
+        error.error.Message;
+
+      if (
+        typeof backendMessage === 'string' &&
+        backendMessage.trim()
+      ) {
+        return backendMessage;
+      }
     }
-    return 'An unexpected error occurred. Please try again.';
+
+    if (typeof error.error === 'string' && error.error.trim()) {
+      return error.error;
+    }
+
+    switch (error.status) {
+      case 400:
+        return 'Gönderilen bilgiler geçersiz.';
+
+      case 401:
+        return 'Email veya şifre hatalı.';
+
+      case 403:
+        return 'Bu işlem için yetkiniz bulunmuyor.';
+
+      case 404:
+        return 'İstenen kaynak bulunamadı.';
+
+      case 409:
+        return 'Bu kayıt zaten mevcut.';
+
+      case 500:
+        return 'Sunucuda beklenmeyen bir hata oluştu.';
+
+      default:
+        return `Bir hata oluştu. Hata kodu: ${error.status}`;
+    }
   }
 }

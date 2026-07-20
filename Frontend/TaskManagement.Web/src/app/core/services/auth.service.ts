@@ -8,6 +8,7 @@ import { User } from '../../shared/interfaces/auth/user.interface';
 import { LoginRequest } from '../../shared/interfaces/auth/login.interface';
 import { RegisterRequest } from '../../shared/interfaces/auth/register.interface';
 import { ApiResponse } from '../../shared/interfaces/api-response.interface';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -53,6 +54,33 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return this.getToken() !== null;
+
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      return false;
+    }
+
+    try {
+
+      const decoded: any = jwtDecode(token);
+
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp < currentTime) {
+
+        this.logout();
+
+        return false;
+      }
+
+      return true;
+
+    } catch {
+
+      this.logout();
+
+      return false;
+    }
   }
 }

@@ -66,6 +66,13 @@
             aria-live="polite"
           ></mat-spinner>
         </button>
+        @if(errorMessage){
+
+          <p class="error-message">
+            {{ errorMessage }}
+          </p>
+
+        }
       </div>
     </form>
 

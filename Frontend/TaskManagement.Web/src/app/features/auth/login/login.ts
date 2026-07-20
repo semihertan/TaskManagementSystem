@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { ErrorHandlingService } from '../../../core/services/error-handling.service';
 
 @Component({
   selector: 'app-login',
@@ -31,10 +32,13 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class Login {
   isLoading = false;
+  errorMessage = '';
+
   private fb = inject(FormBuilder);
 
   private authService = inject(AuthService);
-
+  private errorHandlingService = inject(ErrorHandlingService);
+  
   private router = inject(Router);
 
   loginForm = this.fb.nonNullable.group({
@@ -59,8 +63,11 @@ onSubmit(): void {
     },
 
     error: (error) => {
-      console.error('Login failed:', error);
       this.isLoading = false;
+
+      this.errorMessage = this.errorHandlingService.getErrorMessage(error);
+
+      console.error(error);
     },
 
     complete: () => {
