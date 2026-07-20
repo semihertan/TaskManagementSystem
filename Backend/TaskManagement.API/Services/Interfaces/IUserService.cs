@@ -9,4 +9,6 @@ public interface IUserService
     Task<string> LoginAsync(LoginDto loginDto);
 
     Task<UserDto?> GetProfileAsync(Guid userId);
+
+    Task<bool> UserExistsAsync(string email, string username);
 }

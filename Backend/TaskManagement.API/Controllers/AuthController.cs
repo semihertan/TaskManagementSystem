@@ -19,19 +19,34 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(CreateUserDto createUserDto)
+    public async Task<IActionResult> Register(
+        CreateUserDto createUserDto)
     {
-        var user = await _userService.RegisterAsync(createUserDto);
-        
-    return CreatedAtAction(
-        nameof(Profile),
-        new { id = user.Id },
-        new ApiResponse<UserDto>
+        var userExists = await _userService.UserExistsAsync(
+            createUserDto.Email,
+            createUserDto.Username);
+
+        if (userExists)
         {
-            Success = true,
-            Message = "Kullanıcı başarıyla oluşturuldu.",
-            Data = user
-        });
+            return Conflict(new ApiResponse<object>
+            {
+                Success = false,
+                Message =
+                    "Bu email veya kullanıcı adına kayıtlı başka bir hesap bulunmaktadır.",
+                Data = null
+            });
+        }
+
+        var user = await _userService.RegisterAsync(createUserDto);
+
+        return StatusCode(
+            StatusCodes.Status201Created,
+            new ApiResponse<UserDto>
+            {
+                Success = true,
+                Message = "Kullanıcı başarıyla oluşturuldu.",
+                Data = user
+            });
     }
     
     [HttpPost("login")]

@@ -32,11 +32,6 @@ public class UserService : IUserService
             .AnyAsync(x =>
                 x.Email == createUserDto.Email ||
                 x.Username == createUserDto.Username);
-
-        if (exists)
-        {
-            throw new Exception("Bu Email'e kayıtlı başka bir hesap bulunmaktadır!");
-        }
          
         // entity oluşturma
         var user = _mapper.Map<User>(createUserDto);
@@ -103,5 +98,16 @@ public class UserService : IUserService
             loginDto.Email);
 
         return _jwtService.GenerateToken(user);
+    }
+
+    public async Task<bool> UserExistsAsync(
+    string email,
+    string username)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .AnyAsync(x =>
+                x.Email == email ||
+                x.Username == username);
     }
 }
