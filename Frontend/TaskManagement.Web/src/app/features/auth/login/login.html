@@ -13,18 +13,17 @@
     <form class="login-form"
     [formGroup]="loginForm"
     (ngSubmit)="onSubmit()" >
-      <mat-form-field appearance="outline" class="form-field">
+      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
         <mat-label>Email Address</mat-label>
+        <mat-icon matPrefix>mail_outline</mat-icon>
         <input 
           matInput 
           type="email" 
           formControlName="email" 
-          placeholder="name@example.com" 
           required 
           autocomplete="username"
           aria-required="true"
         >
-        <mat-icon matPrefix>mail_outline</mat-icon>
         <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
           Email address is required
         </mat-error>
@@ -33,18 +32,17 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
+      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
         <mat-label>Password</mat-label>
+        <mat-icon matPrefix>lock_outline</mat-icon>
         <input 
           matInput 
           type="password" 
           formControlName="password" 
-          placeholder="••••••••" 
           required 
           autocomplete="current-password"
           aria-required="true"
         >
-        <mat-icon matPrefix>lock_outline</mat-icon>
         <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
           Password is required
         </mat-error>

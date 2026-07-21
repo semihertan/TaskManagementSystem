@@ -11,18 +11,17 @@
 
     <!-- Register Form (Reactive Forms compatible) -->
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-      <mat-form-field appearance="outline" class="form-field">
+      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
         <mat-label>Username</mat-label>
+        <mat-icon matPrefix>person_outline</mat-icon>
         <input 
           matInput 
           type="text" 
           formControlName="username" 
-          placeholder="username" 
           required 
           autocomplete="username"
           aria-required="true"
         >
-        <mat-icon matPrefix>person_outline</mat-icon>
         <mat-error *ngIf="registerForm.get('username')?.hasError('required')">
           Username is required
         </mat-error>
@@ -30,53 +29,50 @@
 
       <!-- First Name & Last Name (Responsive Row) -->
       <div class="name-row">
-        <mat-form-field appearance="outline" class="form-field">
+        <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
           <mat-label>First Name</mat-label>
+          <mat-icon matPrefix>badge</mat-icon>
           <input 
             matInput 
             type="text" 
             formControlName="firstName" 
-            placeholder="John" 
             required 
             autocomplete="given-name"
             aria-required="true"
           >
-          <mat-icon matPrefix>badge</mat-icon>
           <mat-error *ngIf="registerForm.get('firstName')?.hasError('required')">
             First name is required
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="form-field">
+        <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
           <mat-label>Last Name</mat-label>
+          <mat-icon matPrefix>badge</mat-icon>
           <input 
             matInput 
             type="text" 
             formControlName="lastName" 
-            placeholder="Doe" 
             required 
             autocomplete="family-name"
             aria-required="true"
           >
-          <mat-icon matPrefix>badge</mat-icon>
           <mat-error *ngIf="registerForm.get('lastName')?.hasError('required')">
             Last name is required
           </mat-error>
         </mat-form-field>
       </div>
 
-      <mat-form-field appearance="outline" class="form-field">
+      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
         <mat-label>Email Address</mat-label>
+        <mat-icon matPrefix>mail_outline</mat-icon>
         <input 
           matInput 
           type="email" 
           formControlName="email" 
-          placeholder="name@example.com" 
           required 
           autocomplete="email"
           aria-required="true"
         >
-        <mat-icon matPrefix>mail_outline</mat-icon>
         <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
           Email address is required
         </mat-error>
@@ -85,18 +81,17 @@
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
+      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
         <mat-label>Password</mat-label>
+        <mat-icon matPrefix>lock_outline</mat-icon>
         <input 
           matInput 
           type="password" 
           formControlName="password" 
-          placeholder="••••••••" 
           required 
           autocomplete="new-password"
           aria-required="true"
         >
-        <mat-icon matPrefix>lock_outline</mat-icon>
         <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
           Password is required
         </mat-error>
@@ -117,11 +112,9 @@
         </button>
         
         @if(errorMessage){
-
           <p class="error-message">
             {{ errorMessage }}
           </p>
-
         }
       </div>
     </form>
@@ -133,3 +126,4 @@
     </div>
   </mat-card>
 </div>
+

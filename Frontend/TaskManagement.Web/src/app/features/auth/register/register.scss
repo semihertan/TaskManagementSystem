@@ -84,6 +84,11 @@ $primary-color: var(--mat-sys-primary);
     gap: 1rem;
     width: 100%;
 
+    .form-field {
+      flex: 1;
+      min-width: 0;
+    }
+
     @media (max-width: 480px) {
       flex-direction: column;
       gap: 1rem;
@@ -100,12 +105,21 @@ $primary-color: var(--mat-sys-primary);
     --mdc-outlined-text-field-hover-outline-color: var(--mat-sys-outline);
     --mdc-outlined-text-field-focus-outline-color: var(--mat-sys-primary);
 
-    // Style prefix icons natively as direct content children
+    // Style prefix icons natively with clean spacing and vertical alignment
     mat-icon[matPrefix] {
       color: var(--mat-sys-on-surface-variant);
-      margin-right: 8px;
+      margin-right: 12px;
+      margin-left: 4px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
     }
   }
+
 
   .form-actions {
     margin-top: 0.5rem;
