@@ -6,7 +6,11 @@
       <p>Tüm görevlerini buradan takip edebilirsin.</p>
     </div>
 
-    <button class="new-task-button">
+    <button 
+      mat-flat-button
+      type="button"
+      (click)="openCreateTaskDialog()"
+    >
       Yeni Görev
     </button>
   </div>

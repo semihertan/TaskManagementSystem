@@ -5,11 +5,17 @@ import { TaskService } from '../../core/services/task.service';
 import { TaskItem } from '../../shared/interfaces/task/task.interface';
 import { TaskCard } from '../../shared/components/task-card/task-card';
 
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { TaskForm } from './task-form/task-form';
+
 @Component({
   selector: 'app-tasks',
   imports: [
     CommonModule,
-    TaskCard
+    TaskCard,
+    MatDialogModule,
+    MatButtonModule
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
@@ -17,6 +23,7 @@ import { TaskCard } from '../../shared/components/task-card/task-card';
 export class Tasks implements OnInit {
   private taskService = inject(TaskService);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   tasks: TaskItem[] = [];
   isLoading = false;
@@ -39,10 +46,10 @@ export class Tasks implements OnInit {
         this.tasks = response.data.items;
         this.isLoading = false;
 
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
 
         console.log('Component tasks:', this.tasks);
-},
+      },
 
       error: (error) => {
         console.error('Görevler alınamadı:', error);
@@ -50,8 +57,24 @@ export class Tasks implements OnInit {
         this.errorMessage = 'Görevler yüklenirken bir hata oluştu.';
         this.isLoading = false;
 
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
+    });
+  }
+
+  openCreateTaskDialog(): void {
+    const dialogRef = this.dialog.open(TaskForm, {
+      width: '600px',
+      maxWidth: '95vw',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((createdTask: TaskItem | undefined) => {
+      if(!createdTask)
+        return;
+
+      this.tasks = [createdTask, ...this.tasks];
+      this.cdr.markForCheck();
     });
   }
 }

@@ -1,0 +1,27 @@
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(520px, 75vw);
+  padding-top: 8px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.error-message {
+  padding: 12px;
+  border-radius: 10px;
+  background: #feecec;
+  color: #b42318;
+  font-size: 14px;
+}
+
+mat-dialog-actions {
+  padding: 8px 24px 20px;
+}
+
+button mat-spinner {
+  display: inline-block;
+}
