@@ -1,4 +1,6 @@
-<h2 mat-dialog-title>Yeni Görev Oluştur</h2>
+<h2 mat-dialog-title>
+  {{ isEditMode ? 'Görevi Düzenle' : 'Yeni Görev Oluştur' }}
+</h2>
 
 <mat-dialog-content>
   <form
@@ -112,7 +114,7 @@
     ></mat-spinner>
 
     <span *ngIf="!isSaving">
-      Kaydet
+      {{ isEditMode ? 'Güncelle' : 'Kaydet' }}
     </span>
   </button>
 </mat-dialog-actions>

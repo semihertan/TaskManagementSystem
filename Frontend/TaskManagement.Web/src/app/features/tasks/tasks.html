@@ -30,6 +30,7 @@
     <app-task-card
       *ngFor="let task of tasks"
       [task]="task"
+      (editTask)="openEditTaskDialog($event)"
     ></app-task-card>
   </div>
 

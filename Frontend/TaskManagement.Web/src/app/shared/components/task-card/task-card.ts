@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 import { TaskItem } from '../../interfaces/task/task.interface';
 
@@ -13,7 +14,8 @@ import { TaskItem } from '../../interfaces/task/task.interface';
     CommonModule,
     MatCardModule,
     MatChipsModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './task-card.html',
   styleUrl: './task-card.scss',
@@ -22,6 +24,13 @@ export class TaskCard {
 
   @Input({ required: true })
   task!: TaskItem;
+
+  @Output()
+  editTask = new EventEmitter<TaskItem>();
+
+  onEdit(): void {
+    this.editTask.emit(this.task);
+  }
 
   getPriorityText(): string {
     switch (this.task.priority) {

@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogContent,
   MatDialogRef,
@@ -21,6 +22,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { TaskService } from '../../../core/services/task.service';
+import { TaskItem } from '../../../shared/interfaces/task/task.interface';
 
 @Component({
   selector: 'app-task-form',
@@ -50,6 +52,12 @@ export class TaskForm {
   private taskService = inject(TaskService);
   private dialogRef = inject(MatDialogRef<TaskForm>);
 
+  task = inject<TaskItem | null>(MAT_DIALOG_DATA, {
+    optional: true
+  });
+
+  isEditMode = !!this.task;
+  
   isSaving = false;
   errorMessage = '';
 
@@ -66,6 +74,21 @@ export class TaskForm {
     dueDate: [null as Date | null]
   });
 
+  constructor() {
+    if (!this.task) {
+      return;
+    }
+
+    this.taskForm.patchValue({
+      title: this.task.title,
+      description: this.task.description ?? '',
+      priority: this.task.priority,
+      dueDate: this.task.dueDate
+        ? new Date(this.task.dueDate)
+        : null
+    });
+  }
+
   save(): void {
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
@@ -81,11 +104,22 @@ export class TaskForm {
       title: formValue.title!,
       description: formValue.description || undefined,
       priority: formValue.priority!,
+      status: this.task?.status ?? 0,
+      categoryId: this.task?.categoryId,
       dueDate: formValue.dueDate
         ? formValue.dueDate.toISOString()
         : undefined
     };
 
+    if (this.isEditMode && this.task) {
+      this.updateTask(request);
+      return;
+    }
+
+    this.createTask(request);
+  }
+
+  private createTask(request: any): void {
     this.taskService.createTask(request).subscribe({
       next: (response) => {
         this.dialogRef.close(response.data);
@@ -97,6 +131,31 @@ export class TaskForm {
         this.errorMessage =
           error?.error?.message ??
           'Görev oluşturulurken bir hata oluştu.';
+
+        this.isSaving = false;
+      }
+    });
+  }
+
+  private updateTask(request: any): void {
+    if (!this.task) {
+      return;
+    }
+
+    this.taskService.updateTask(
+      this.task.id,
+      request
+    ).subscribe({
+      next: (response) => {
+        this.dialogRef.close(response.data);
+      },
+
+      error: (error) => {
+        console.error('Görev güncellenemedi:', error);
+
+        this.errorMessage =
+          error?.error?.message ??
+          'Görev güncellenirken bir hata oluştu.';
 
         this.isSaving = false;
       }

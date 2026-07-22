@@ -77,4 +77,33 @@ export class Tasks implements OnInit {
       this.cdr.markForCheck();
     });
   }
+
+  openEditTaskDialog(task: TaskItem): void {
+    const dialogRef = this.dialog.open<
+      TaskForm,
+      TaskItem,
+      TaskItem
+    >(TaskForm, {
+      width: '600px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: task
+    });
+
+    dialogRef.afterClosed().subscribe(
+      (updatedTask: TaskItem | undefined) => {
+        if (!updatedTask) {
+          return;
+        }
+
+        this.tasks = this.tasks.map((currentTask) =>
+          currentTask.id === updatedTask.id
+            ? updatedTask
+            : currentTask
+        );
+
+        this.cdr.markForCheck();
+      }
+    );
+  }
 }
