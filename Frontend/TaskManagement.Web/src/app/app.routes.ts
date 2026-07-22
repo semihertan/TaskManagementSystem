@@ -2,36 +2,63 @@ import { Routes } from '@angular/router';
 
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
-import { Tasks } from './features/tasks/tasks';
 
+import { AppLayout } from './shared/components/app-layout/app-layout';
 import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
 
   {
     path: 'login',
-    component: Login
+    component: Login,
   },
 
   {
     path: 'register',
-    component: Register
+    component: Register,
   },
 
   {
-    path: 'tasks',
+    path: '',
+    component: AppLayout,
     canActivate: [authGuard],
-    loadComponent: ()=>
-      import('./features/tasks/tasks').then(m => m.Tasks)
+    children: [
+      {
+      path: '',
+      redirectTo: 'dashboard',
+      pathMatch: 'full'
+      },
+      
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard')
+            .then((m) => m.Dashboard),
+      },
+
+      {
+        path: 'tasks',
+        loadComponent: () =>
+          import('./features/tasks/tasks')
+            .then((m) => m.Tasks),
+      },
+
+      {
+        path: 'categories',
+        loadComponent: () =>
+          import('./features/categories/categories')
+            .then((m) => m.Categories),
+      },
+    ],
   },
 
   {
     path: '**',
-    redirectTo: 'login'
-  }
+    redirectTo: 'login',
+  },
 ];

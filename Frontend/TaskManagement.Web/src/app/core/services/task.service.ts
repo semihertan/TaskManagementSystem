@@ -7,6 +7,7 @@ import { CreateTask } from '../../shared/interfaces/task/create-task.interface';
 import { UpdateTask } from '../../shared/interfaces/task/update-task.interface';
 import { ApiResponse } from '../../shared/interfaces/api-response.interface';
 import { PagedData } from '../../shared/interfaces/paged-data.interface';
+import { TaskStatistics } from '../../shared/interfaces/task/task-statistics.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +34,9 @@ export class TaskService {
 
   deleteTask(id: string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+  }
+
+  getStatistics(): Observable<ApiResponse<TaskStatistics>> {
+    return this.http.get<ApiResponse<TaskStatistics>>(`${this.apiUrl}/statistics`);
   }
 }

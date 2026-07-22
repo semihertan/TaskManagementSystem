@@ -1,0 +1,135 @@
+<section class="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Görevlerinin genel durumunu buradan takip edebilirsin.</p>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>İstatistikler yükleniyor...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage && !isLoading">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div
+    class="statistics-grid"
+    *ngIf="statistics && !isLoading && !errorMessage"
+  >
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon total">
+          <mat-icon>assignment</mat-icon>
+        </div>
+
+        <div class="stat-info">
+          <span class="stat-label">Toplam Görev</span>
+          <strong>{{ statistics.totalTasks }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon pending">
+          <mat-icon>schedule</mat-icon>
+        </div>
+
+        <div class="stat-info">
+          <span class="stat-label">Bekleyen</span>
+          <strong>{{ statistics.pendingTasks }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon progress">
+          <mat-icon>autorenew</mat-icon>
+        </div>
+
+        <div class="stat-info">
+          <span class="stat-label">Devam Eden</span>
+          <strong>{{ statistics.inProgressTasks }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon completed">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+
+        <div class="stat-info">
+          <span class="stat-label">Tamamlanan</span>
+          <strong>{{ statistics.completedTasks }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon cancelled">
+          <mat-icon>cancel</mat-icon>
+        </div>
+
+        <div class="stat-info">
+          <span class="stat-label">İptal Edilen</span>
+          <strong>{{ statistics.cancelledTasks }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon overdue">
+          <mat-icon>warning</mat-icon>
+        </div>
+
+        <div class="stat-info">
+          <span class="stat-label">Vadesi Geçen</span>
+          <strong>{{ statistics.overdueTasks }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card
+    class="progress-card"
+    *ngIf="statistics && !isLoading && !errorMessage"
+  >
+    <mat-card-content>
+      <div class="progress-header">
+        <div>
+          <h2>Tamamlanma Oranı</h2>
+          <p>Tamamlanan görevlerin toplam görevlere oranı</p>
+        </div>
+
+        <strong>
+          {{
+            statistics.totalTasks > 0
+              ? ((statistics.completedTasks / statistics.totalTasks) * 100
+                | number: '1.0-0')
+              : 0
+          }}%
+        </strong>
+      </div>
+
+      <div class="progress-bar">
+        <div
+          class="progress-value"
+          [style.width.%]="
+            statistics.totalTasks > 0
+              ? (statistics.completedTasks / statistics.totalTasks) * 100
+              : 0
+          "
+        ></div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</section>

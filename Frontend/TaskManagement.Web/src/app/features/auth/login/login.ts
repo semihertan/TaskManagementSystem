@@ -59,7 +59,7 @@ onSubmit(): void {
   this.authService.login(loginData).subscribe({
     next: (response) => {
       this.authService.saveToken(response.data);
-      this.router.navigate(['/tasks']);
+      this.router.navigate(['/dashboard']);
     },
 
     error: (error) => {

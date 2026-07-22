@@ -4,12 +4,12 @@ export interface TaskItem {
   description?: string;
   priority: number;
   status: number;
-  dueDate?: Date;
-  completedAt?: Date;
+  dueDate?: string;
+  completedAt?: string;
 
   userId: string;
   categoryId?: string;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -1,25 +1,39 @@
-<div class="tasks-container">
-  <h1>Görevlerim</h1>
+<section class="tasks-page">
 
-  <p *ngIf="isLoading">
-    Görevler yükleniyor...
-  </p>
+  <div class="tasks-header">
+    <div>
+      <h1>Görevlerim</h1>
+      <p>Tüm görevlerini buradan takip edebilirsin.</p>
+    </div>
 
-  <p *ngIf="errorMessage">
-    {{ errorMessage }}
-  </p>
-
-  <p *ngIf="!isLoading && !errorMessage && tasks.length === 0">
-    Henüz görev bulunmuyor.
-  </p>
-
-  <div *ngFor="let task of tasks">
-    <h3>{{ task.title }}</h3>
-
-    <p>
-      {{ task.description }}
-    </p>
-
-    <hr>
+    <button class="new-task-button">
+      Yeni Görev
+    </button>
   </div>
-</div>
+
+  <div class="loading-container" *ngIf="isLoading">
+    <p>Görevler yükleniyor...</p>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage && !isLoading">
+    {{ errorMessage }}
+  </div>
+
+  <div
+    class="task-grid"
+    *ngIf="!isLoading && !errorMessage && tasks.length > 0"
+  >
+    <app-task-card
+      *ngFor="let task of tasks"
+      [task]="task"
+    ></app-task-card>
+  </div>
+
+  <div
+    class="empty-state"
+    *ngIf="!isLoading && !errorMessage && tasks.length === 0"
+  >
+    Henüz görev bulunmuyor.
+  </div>
+
+</section>

@@ -1,0 +1,153 @@
+.task-card {
+  height: 100%;
+  border-radius: 16px;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  }
+}
+
+mat-card-header {
+  display: block;
+  padding: 20px 20px 0;
+}
+
+.task-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 650;
+    color: #1f2937;
+  }
+}
+
+.category-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  color: #667085;
+  font-size: 14px;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.priority-chip {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+mat-card-content {
+  padding: 18px 20px 20px;
+}
+
+.description {
+  min-height: 42px;
+  margin: 0 0 18px;
+  color: #475467;
+  line-height: 1.5;
+
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.task-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #eaecf0;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #667085;
+  font-size: 13px;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.status {
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.priority-very-low {
+  background: #f2f4f7;
+  color: #667085;
+}
+
+.priority-low {
+  background: #e8f0fe;
+  color: #2563eb;
+}
+
+.priority-normal {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.priority-high {
+  background: #fff7e6;
+  color: #d97706;
+}
+
+.priority-very-high {
+  background: #feecec;
+  color: #dc2626;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #b54708;
+}
+
+.status-progress {
+  background: #e8f0fe;
+  color: #175cd3;
+}
+
+.status-completed {
+  background: #e8f8ee;
+  color: #067647;
+}
+
+.status-cancelled {
+  background: #f2f4f7;
+  color: #667085;
+}
+
+@media (max-width: 600px) {
+  .task-header {
+    flex-direction: column;
+  }
+
+  .task-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

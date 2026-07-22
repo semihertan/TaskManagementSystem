@@ -1,0 +1,176 @@
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #667085;
+  }
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  border-radius: 16px;
+
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px;
+  }
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.total {
+  background: #e8f0fe;
+  color: #2563eb;
+}
+
+.pending {
+  background: #fff7e6;
+  color: #f59e0b;
+}
+
+.progress {
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.completed {
+  background: #e8f8ee;
+  color: #16a34a;
+}
+
+.cancelled {
+  background: #f2f4f7;
+  color: #667085;
+}
+
+.overdue {
+  background: #feecec;
+  color: #dc2626;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  strong {
+    font-size: 28px;
+    line-height: 1;
+  }
+}
+
+.stat-label {
+  color: #667085;
+  font-size: 14px;
+}
+
+.loading-container {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #feecec;
+  color: #b42318;
+}
+
+.progress-card {
+  margin-top: 24px;
+  border-radius: 16px;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    margin: 0;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: #667085;
+  }
+
+  strong {
+    font-size: 28px;
+  }
+}
+
+.progress-bar {
+  height: 12px;
+  margin-top: 20px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.progress-value {
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+  transition: width 300ms ease;
+}
+
+@media (max-width: 900px) {
+  .statistics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header h1 {
+    font-size: 26px;
+  }
+
+  .progress-header {
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
