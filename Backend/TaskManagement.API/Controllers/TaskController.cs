@@ -35,23 +35,18 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<ActionResult<ApiResponse<TaskItemDto>>> GetById(Guid id)
     {
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         var task = await _taskService.GetByIdAsync(id, userId);
 
-    if (task == null)
-    {
-        return NotFound(new ApiResponse<object>
+        return Ok(new ApiResponse<TaskItemDto>
         {
-            Success = false,
-            Message = "Görev bulunamadı.",
-            Data = null
+            Success = true,
+            Message = "Görev başarıyla getirildi.",
+            Data = task
         });
-    }
-
-        return Ok(task);
     }
 
     [HttpPost]
@@ -79,10 +74,12 @@ public class TasksController : ControllerBase
 
         var updated = await _taskService.UpdateAsync(id, updateTaskDto, userId);
 
-        if (!updated)
-            return NotFound();
-
-        return NoContent();
+        return Ok(new ApiResponse<TaskItemDto>
+        {
+            Success = true,
+            Message = "Görev başarıyla güncellendi.",
+            Data = updated
+        });
     }
 
     [HttpDelete("{id:guid}")]
@@ -96,6 +93,22 @@ public class TasksController : ControllerBase
             return NotFound();
 
         return NoContent();
+    }
+
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetStatistics()
+    {
+        var userId = Guid.Parse(
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        var statistics = await _taskService.GetStatisticsAsync(userId);
+
+        return Ok(new ApiResponse<TaskStatisticsDto>
+        {
+            Success = true,
+            Message = "Görev istatistikleri başarıyla getirildi.",
+            Data = statistics
+        });
     }
 
     [HttpGet("overdue")]

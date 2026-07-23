@@ -95,19 +95,41 @@ public class TaskService : ITaskService
 
         if (!string.IsNullOrWhiteSpace(filterDto.Search))
         {
+            var searchPattern =
+                $"%{filterDto.Search.Trim()}%";
+
             query = query.Where(t =>
-                t.Title.Contains(filterDto.Search) ||
-                (t.Description != null && t.Description.Contains(filterDto.Search)));
+                EF.Functions.ILike(
+                    t.Title,
+                    searchPattern
+                ) ||
+                (
+                    t.Description != null &&
+                    EF.Functions.ILike(
+                        t.Description,
+                        searchPattern
+                    )
+                ));
         }
 
         if (filterDto.DueDateFrom.HasValue)
         {
-            query = query.Where(t => t.DueDate >= filterDto.DueDateFrom.Value);
+            var dueDateFrom =
+                filterDto.DueDateFrom.Value.Date;
+
+            query = query.Where(
+                t => t.DueDate >= dueDateFrom
+            );
         }
 
         if (filterDto.DueDateTo.HasValue)
         {
-            query = query.Where(t => t.DueDate <= filterDto.DueDateTo.Value);
+            var dueDateToExclusive =
+                filterDto.DueDateTo.Value.Date.AddDays(1);
+
+            query = query.Where(
+                t => t.DueDate < dueDateToExclusive
+            );
         }
 
         if (filterDto.Page < 1)
@@ -119,6 +141,8 @@ public class TaskService : ITaskService
         var totalCount = await query.CountAsync();
 
         query = query
+            .OrderByDescending(t => t.UpdatedAt)
+            .ThenByDescending(t => t.CreatedAt)
             .Skip((filterDto.Page - 1) * filterDto.PageSize)
             .Take(filterDto.PageSize);
 
@@ -146,41 +170,61 @@ public class TaskService : ITaskService
 
         if(task == null)
         {
-            _logger.LogWarning("Task not found. Id: {TaskId}", id);
             throw new KeyNotFoundException("Task bulunamadı.");
         }
         return _mapper.Map<TaskItemDto>(task);
     }
 
-    public async Task<bool> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId)
+    public async Task<TaskItemDto> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId)
     {
         _logger.LogInformation(
             "Updating task. Id: {TaskId}",
             id);
 
         var task = await _context.Tasks
-            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            .FirstOrDefaultAsync(t =>
+                t.Id == id &&
+                t.UserId == userId);
 
         if (task == null)
         {
             _logger.LogWarning(
-            "Task not found for update. Id: {TaskId}",
-            id);
+                "Task not found for update. Id: {TaskId}",
+                id);
 
-            return false;
+            throw new KeyNotFoundException(
+                "Görev bulunamadı."
+            );
         }
 
         _mapper.Map(updateTaskDto, task);
 
+        task.Priority =
+            (Priority)updateTaskDto.Priority;
+
+        task.Status =
+            (TaskItemStatus)updateTaskDto.Status;
+
+        if (task.Status == TaskItemStatus.Completed)
+        {
+            task.CompletedAt ??= DateTime.UtcNow;
+        }
+        else
+        {
+            task.CompletedAt = null;
+        }
+
         task.UpdatedAt = DateTime.UtcNow;
+
+        _logger.LogInformation(
+            "Task status before save. Id: {TaskId}, Status: {Status}, StatusValue: {StatusValue}",
+            task.Id,
+            task.Status,
+            (int)task.Status);
 
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation(
-            "Task updated successfully. Id: {TaskId}",
-            id);
-
-        return true;
+        return _mapper.Map<TaskItemDto>(task);
     }
 
     public async Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId)
