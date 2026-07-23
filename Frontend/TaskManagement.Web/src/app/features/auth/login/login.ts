@@ -52,6 +52,7 @@ onSubmit(): void {
     return;
   }
 
+  this.errorMessage = '';
   this.isLoading = true;
 
   const loginData = this.loginForm.getRawValue();
