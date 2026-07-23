@@ -29,6 +29,11 @@ $primary-color: var(--mat-sys-primary);
   align-items: stretch;
   gap: 2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  @media (max-width: 600px) {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
 }
 
 .card-header {
@@ -89,7 +94,7 @@ $primary-color: var(--mat-sys-primary);
       min-width: 0;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       flex-direction: column;
       gap: 1rem;
     }

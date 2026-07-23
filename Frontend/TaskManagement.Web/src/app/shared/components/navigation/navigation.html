@@ -7,24 +7,49 @@
 
   <span class="spacer"></span>
 
-  <button mat-button routerLink="/dashboard">
-    <mat-icon>dashboard</mat-icon>
-    Dashboard
-  </button>
+  <div class="nav-links">
+    <button mat-button routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </button>
 
-  <button mat-button routerLink="/tasks">
-    <mat-icon>assignment</mat-icon>
-    Tasks
-  </button>
+    <button mat-button routerLink="/tasks">
+      <mat-icon>assignment</mat-icon>
+      Tasks
+    </button>
 
-  <button mat-button routerLink="/categories">
-    <mat-icon>folder</mat-icon>
-    Categories
-  </button>
+    <button mat-button routerLink="/categories">
+      <mat-icon>folder</mat-icon>
+      Categories
+    </button>
 
-  <button mat-button>
-    <mat-icon>logout</mat-icon>
-    Logout
+    <button mat-button>
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  </div>
+
+  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="menu">
+    <mat-icon>menu</mat-icon>
   </button>
+  
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      <span>Dashboard</span>
+    </button>
+    <button mat-menu-item routerLink="/tasks">
+      <mat-icon>assignment</mat-icon>
+      <span>Tasks</span>
+    </button>
+    <button mat-menu-item routerLink="/categories">
+      <mat-icon>folder</mat-icon>
+      <span>Categories</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
 
 </mat-toolbar>

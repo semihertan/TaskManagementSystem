@@ -3,4 +3,11 @@
   padding: 24px;
   box-sizing: border-box;
   background-color: #f5f7fb;
+
+  @media (max-width: 900px) {
+    padding: 16px;
+  }
+  @media (max-width: 600px) {
+    padding: 12px;
+  }
 }

@@ -19,3 +19,17 @@ mat-toolbar {
 button mat-icon {
   margin-right: 5px;
 }
+
+.mobile-menu-btn {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: block;
+  }
+}
