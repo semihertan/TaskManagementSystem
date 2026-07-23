@@ -28,8 +28,22 @@ export class TaskCard {
   @Output()
   editTask = new EventEmitter<TaskItem>();
 
+  @Output()
+  deleteTask = new EventEmitter<TaskItem>();
+
+  @Output()
+  viewTask = new EventEmitter<TaskItem>();
+
   onEdit(): void {
     this.editTask.emit(this.task);
+  }
+
+  onDelete(): void {
+    this.deleteTask.emit(this.task);
+  }
+
+  onView(): void {
+    this.viewTask.emit(this.task);
   }
 
   getPriorityText(): string {

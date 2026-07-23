@@ -1,0 +1,85 @@
+<section class="task-detail-page">
+
+  <button
+    mat-button
+    type="button"
+    class="back-button"
+    (click)="goBack()"
+  >
+    <mat-icon>arrow_back</mat-icon>
+    Görevlere Dön
+  </button>
+
+  <div
+    *ngIf="isLoading"
+    class="loading-container"
+  >
+    <mat-spinner diameter="42"></mat-spinner>
+    <p>Görev detayı yükleniyor...</p>
+  </div>
+
+  <div
+    *ngIf="!isLoading && errorMessage"
+    class="error-message"
+  >
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <mat-card
+    *ngIf="!isLoading && task"
+    class="detail-card"
+  >
+    <mat-card-header>
+      <mat-card-title>
+        {{ task.title }}
+      </mat-card-title>
+
+      <mat-card-subtitle>
+        Görev Detayı
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <div class="detail-item">
+        <span class="label">Açıklama</span>
+        <p>{{ task.description || 'Açıklama bulunmuyor.' }}</p>
+      </div>
+
+      <div class="detail-grid">
+
+        <div class="detail-item">
+          <span class="label">Öncelik</span>
+          <span>{{ task.priority }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">Durum</span>
+          <span>{{ task.status }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">Son Tarih</span>
+          <span>
+            {{
+              task.dueDate
+                ? (task.dueDate | date:'dd.MM.yyyy')
+                : 'Belirtilmedi'
+            }}
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">Oluşturulma Tarihi</span>
+          <span>
+            {{ task.createdAt | date:'dd.MM.yyyy HH:mm' }}
+          </span>
+        </div>
+
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+</section>

@@ -54,6 +54,41 @@
   color: #b42318;
 }
 
+.task-filters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 56px;
+}
+
+@media (max-width: 1100px) {
+  .task-filters {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .task-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    width: 100%;
+  }
+
+  .filter-actions button {
+    flex: 1;
+  }
+}
+
 @media (max-width: 950px) {
   .task-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -1,21 +1,38 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { TaskService } from '../../core/services/task.service';
 import { TaskItem } from '../../shared/interfaces/task/task.interface';
 import { TaskCard } from '../../shared/components/task-card/task-card';
+import { TaskFilter } from '../../shared/interfaces/task/task-filter.interface';
+import { TaskForm } from './task-form/task-form';
 
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { TaskForm } from './task-form/task-form';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-tasks',
   imports: [
     CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     TaskCard,
     MatDialogModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSnackBarModule
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
@@ -24,10 +41,32 @@ export class Tasks implements OnInit {
   private taskService = inject(TaskService);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
 
   tasks: TaskItem[] = [];
   isLoading = false;
   errorMessage = '';
+  searchText = '';
+  selectedPriority: number | null = null;
+  selectedStatus: number | null = null;
+  dueDateFrom: Date | null = null;
+  dueDateTo: Date | null = null;
+
+  priorities = [
+    { value: 1, label: 'Çok Düşük' },
+    { value: 2, label: 'Düşük' },
+    { value: 3, label: 'Normal' },
+    { value: 4, label: 'Yüksek' },
+    { value: 5, label: 'Çok Yüksek' }
+  ];
+
+  statuses = [
+    { value: 0, label: 'Bekliyor' },
+    { value: 1, label: 'Devam Ediyor' },
+    { value: 2, label: 'Tamamlandı' },
+    { value: 3, label: 'İptal Edildi' }
+  ];
 
   ngOnInit(): void {
     this.loadTasks();
@@ -37,31 +76,50 @@ export class Tasks implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.taskService.getTasks().subscribe({
-      next: (response) => {
-        console.log('Tam cevap:', response);
-        console.log('Items:', response.data.items);
-        console.log('Items uzunluğu:', response.data.items.length);
+    const filter: TaskFilter = {
+      search: this.searchText.trim() || undefined,
 
+      priority:
+        this.selectedPriority !== null
+          ? this.selectedPriority
+          : undefined,
+
+      status:
+        this.selectedStatus !== null
+          ? this.selectedStatus
+          : undefined,
+
+      dueDateFrom: this.dueDateFrom
+        ? this.toDateString(this.dueDateFrom)
+        : undefined,
+
+      dueDateTo: this.dueDateTo
+        ? this.toDateString(this.dueDateTo)
+        : undefined,
+
+      page: 1,
+      pageSize: 10
+    };
+
+    this.taskService.getTasks(filter).subscribe({
+      next: (response) => {
         this.tasks = response.data.items;
         this.isLoading = false;
-
         this.cdr.markForCheck();
-
-        console.log('Component tasks:', this.tasks);
       },
 
       error: (error) => {
         console.error('Görevler alınamadı:', error);
 
-        this.errorMessage = 'Görevler yüklenirken bir hata oluştu.';
-        this.isLoading = false;
+        this.errorMessage =
+          error?.error?.message ??
+          'Görevler yüklenirken bir hata oluştu.';
 
+        this.isLoading = false;
         this.cdr.markForCheck();
       }
     });
   }
-
   openCreateTaskDialog(): void {
     const dialogRef = this.dialog.open(TaskForm, {
       width: '600px',
@@ -74,6 +132,9 @@ export class Tasks implements OnInit {
         return;
 
       this.tasks = [createdTask, ...this.tasks];
+
+      this.showSuccess('Görev başarıyla oluşturuldu.');
+
       this.cdr.markForCheck();
     });
   }
@@ -102,8 +163,91 @@ export class Tasks implements OnInit {
             : currentTask
         );
 
+        this.showSuccess('Görev başarıyla düzenlendi.');
+
         this.cdr.markForCheck();
       }
     );
   }
+
+  deleteTask(task: TaskItem): void {
+    const confirmed = confirm(
+      `"${task.title}" görevini silmek istediğinize emin misiniz?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.taskService.deleteTask(task.id).subscribe({
+      next: () => {
+        this.tasks = this.tasks.filter(
+          (currentTask) => currentTask.id !== task.id
+        );
+
+        this.showSuccess('Görev başarıyla silindi.');
+        this.cdr.markForCheck();
+      },
+
+      error: (error) => {
+        console.error('Görev silinemedi:', error);
+
+        this.errorMessage =
+          error?.error?.message ??
+          'Görev silinirken bir hata oluştu.';
+
+        this.showError(this.errorMessage);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  openTaskDetail(task: TaskItem): void {
+    this.router.navigate(['/tasks', task.id]);
+  }
+
+  private showSuccess(message: string): void {
+    this.snackBar.open(message, 'Kapat', {
+      duration: 3000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
+  }
+
+  private showError(message: string): void {
+    this.snackBar.open(message, 'Kapat', {
+      duration: 4000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+      panelClass: ['error-snackbar']
+    });
+  }
+
+  private toDateString(date: Date): string {
+    const year = date.getFullYear();
+
+    const month = String(
+      date.getMonth() + 1
+    ).padStart(2, '0');
+
+    const day = String(
+      date.getDate()
+    ).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  applyFilters(): void {
+  this.loadTasks();
+}
+
+clearFilters(): void {
+  this.searchText = '';
+  this.selectedPriority = null;
+  this.selectedStatus = null;
+  this.dueDateFrom = null;
+  this.dueDateTo = null;
+
+  this.loadTasks();
+}
 }

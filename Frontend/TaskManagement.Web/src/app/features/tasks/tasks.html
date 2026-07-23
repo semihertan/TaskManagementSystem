@@ -23,6 +23,105 @@
     {{ errorMessage }}
   </div>
 
+  <section class="task-filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Görev ara</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="searchText"
+        placeholder="Başlık veya açıklama"
+        (keyup.enter)="applyFilters()"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Öncelik</mat-label>
+
+      <mat-select [(ngModel)]="selectedPriority">
+        <mat-option [value]="null">
+          Tümü
+        </mat-option>
+
+        <mat-option
+          *ngFor="let priority of priorities"
+          [value]="priority.value"
+        >
+          {{ priority.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Durum</mat-label>
+
+      <mat-select [(ngModel)]="selectedStatus">
+        <mat-option [value]="null">
+          Tümü
+        </mat-option>
+
+        <mat-option
+          *ngFor="let status of statuses"
+          [value]="status.value"
+        >
+          {{ status.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Başlangıç tarihi</mat-label>
+
+      <input
+        matInput
+        [matDatepicker]="fromPicker"
+        [(ngModel)]="dueDateFrom"
+      />
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="fromPicker"
+      ></mat-datepicker-toggle>
+
+      <mat-datepicker #fromPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Bitiş tarihi</mat-label>
+
+      <input
+        matInput
+        [matDatepicker]="toPicker"
+        [(ngModel)]="dueDateTo"
+      />
+
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="toPicker"
+      ></mat-datepicker-toggle>
+
+      <mat-datepicker #toPicker></mat-datepicker>
+    </mat-form-field>
+
+    <div class="filter-actions">
+      <button
+        mat-flat-button
+        type="button"
+        (click)="applyFilters()"
+      >
+        Filtrele
+      </button>
+
+      <button
+        mat-button
+        type="button"
+        (click)="clearFilters()"
+      >
+        Temizle
+      </button>
+    </div>
+  </section>
+
   <div
     class="task-grid"
     *ngIf="!isLoading && !errorMessage && tasks.length > 0"
@@ -30,7 +129,9 @@
     <app-task-card
       *ngFor="let task of tasks"
       [task]="task"
+      (viewTask)="openTaskDetail($event)"
       (editTask)="openEditTaskDialog($event)"
+      (deleteTask)="deleteTask($event)"
     ></app-task-card>
   </div>
 

@@ -71,8 +71,17 @@ export class TaskForm {
 
     priority: [3, Validators.required],
 
+    status: [0, Validators.required],
+
     dueDate: [null as Date | null]
   });
+
+  statuses = [
+    { value: 0, label: 'Bekliyor' },
+    { value: 1, label: 'Devam Ediyor' },
+    { value: 2, label: 'Tamamlandı' },
+    { value: 3, label: 'İptal Edildi' }
+  ];
 
   constructor() {
     if (!this.task) {
@@ -83,6 +92,7 @@ export class TaskForm {
       title: this.task.title,
       description: this.task.description ?? '',
       priority: this.task.priority,
+      status: this.task.status,
       dueDate: this.task.dueDate
         ? new Date(this.task.dueDate)
         : null
@@ -104,7 +114,7 @@ export class TaskForm {
       title: formValue.title!,
       description: formValue.description || undefined,
       priority: formValue.priority!,
-      status: this.task?.status ?? 0,
+      status: this.taskForm.value.status ?? 0,
       categoryId: this.task?.categoryId,
       dueDate: formValue.dueDate
         ? formValue.dueDate.toISOString()

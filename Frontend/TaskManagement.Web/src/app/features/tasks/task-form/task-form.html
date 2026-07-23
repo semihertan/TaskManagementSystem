@@ -7,6 +7,22 @@
     class="task-form"
     [formGroup]="taskForm"
   >
+    <mat-form-field
+  *ngIf="isEditMode"
+  appearance="outline"
+>
+  <mat-label>Durum</mat-label>
+
+  <mat-select formControlName="status">
+    <mat-option
+      *ngFor="let status of statuses"
+      [value]="status.value"
+    >
+      {{ status.label }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
     <mat-form-field appearance="outline">
       <mat-label>Görev başlığı</mat-label>
 
