@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>
+  <mat-icon>warning</mat-icon>
+  {{ data.title }}
+</h2>
+
+<mat-dialog-content>
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    [mat-dialog-close]="false"
+  >
+    {{ data.cancelText ?? 'Vazgeç' }}
+  </button>
+
+  <button
+    mat-flat-button
+    type="button"
+    color="warn"
+    [mat-dialog-close]="true"
+  >
+    <mat-icon>delete</mat-icon>
+    {{ data.confirmText ?? 'Sil' }}
+  </button>
+</mat-dialog-actions>

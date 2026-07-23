@@ -19,6 +19,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
+import {
+  ConfirmDialog,
+  ConfirmDialogData
+} from '../../shared/components/confirm-dialog/confirm-dialog';
+
 @Component({
   selector: 'app-tasks',
   imports: [
@@ -171,34 +176,59 @@ export class Tasks implements OnInit {
   }
 
   deleteTask(task: TaskItem): void {
-    const confirmed = confirm(
-      `"${task.title}" görevini silmek istediğinize emin misiniz?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    this.taskService.deleteTask(task.id).subscribe({
-      next: () => {
-        this.tasks = this.tasks.filter(
-          (currentTask) => currentTask.id !== task.id
-        );
-
-        this.showSuccess('Görev başarıyla silindi.');
-        this.cdr.markForCheck();
-      },
-
-      error: (error) => {
-        console.error('Görev silinemedi:', error);
-
-        this.errorMessage =
-          error?.error?.message ??
-          'Görev silinirken bir hata oluştu.';
-
-        this.showError(this.errorMessage);
-        this.cdr.markForCheck();
+    const dialogRef = this.dialog.open<
+      ConfirmDialog,
+      ConfirmDialogData,
+      boolean
+    >(ConfirmDialog, {
+      width: '420px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        title: 'Görevi Sil',
+        message:
+          `"${task.title}" görevini silmek istediğinize emin misiniz?`,
+        confirmText: 'Sil',
+        cancelText: 'Vazgeç'
       }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+
+      this.taskService.deleteTask(task.id).subscribe({
+        next: () => {
+          this.tasks = this.tasks.filter(
+            (currentTask) =>
+              currentTask.id !== task.id
+          );
+
+          this.showSuccess(
+            'Görev başarıyla silindi.'
+          );
+
+          this.cdr.markForCheck();
+        },
+
+        error: (error) => {
+          console.error(
+            'Görev silinemedi:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ??
+            'Görev silinirken bir hata oluştu.';
+
+          this.showError(
+            this.errorMessage
+          );
+
+          this.cdr.markForCheck();
+        }
+      });
     });
   }
 
