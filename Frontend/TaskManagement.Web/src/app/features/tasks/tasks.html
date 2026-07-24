@@ -175,24 +175,189 @@
     </div>
   </section>
 
-  <div
-    class="task-grid"
-    *ngIf="!isLoading && !errorMessage && tasks.length > 0"
-  >
-    <app-task-card
-      *ngFor="let task of tasks"
-      [task]="task"
-      (viewTask)="openTaskDetail($event)"
-      (editTask)="openEditTaskDialog($event)"
-      (deleteTask)="deleteTask($event)"
-    ></app-task-card>
-  </div>
+  <div class="kanban-board">
 
-  <div
-    class="empty-state"
-    *ngIf="!isLoading && !errorMessage && tasks.length === 0"
-  >
-    Henüz görev bulunmuyor.
+    <!-- Bekliyor -->
+
+    <section class="kanban-column">
+      <div class="column-header pending-header">
+        <h2>Bekliyor</h2>
+
+        <span class="task-count">
+          {{ pendingTasks.length }}
+        </span>
+      </div>
+
+      <div
+        class="task-drop-list"
+        cdkDropList
+        id="pendingList"
+        [cdkDropListData]="pendingTasks"
+        [cdkDropListConnectedTo]="[
+          'inProgressList',
+          'completedList',
+          'cancelledList'
+        ]"
+        (cdkDropListDropped)="dropTask($event, 0)">
+
+        <div
+          class="drag-task"
+          *ngFor="let task of pendingTasks"
+          cdkDrag>
+
+          <app-task-card
+            [task]="task"
+            (edit)="openEditTaskDialog(task)"
+            (delete)="deleteTask(task)"
+            (details)="openTaskDetail(task)">
+          </app-task-card>
+
+          <div
+            class="drag-placeholder"
+            *cdkDragPlaceholder>
+          </div>
+        </div>
+
+        <div
+          class="empty-column"
+          *ngIf="pendingTasks.length === 0">
+          Görev bulunmuyor
+        </div>
+      </div>
+    </section>
+
+    <!-- Devam Ediyor -->
+
+    <section class="kanban-column">
+      <div class="column-header progress-header">
+        <h2>Devam Ediyor</h2>
+
+        <span class="task-count">
+          {{ inProgressTasks.length }}
+        </span>
+      </div>
+
+      <div
+        class="task-drop-list"
+        cdkDropList
+        id="inProgressList"
+        [cdkDropListData]="inProgressTasks"
+        [cdkDropListConnectedTo]="[
+          'pendingList',
+          'completedList',
+          'cancelledList'
+        ]"
+        (cdkDropListDropped)="dropTask($event, 1)">
+
+        <div
+          class="drag-task"
+          *ngFor="let task of inProgressTasks"
+          cdkDrag>
+
+          <app-task-card
+            [task]="task"
+            (edit)="openEditTaskDialog(task)"
+            (delete)="deleteTask(task)"
+            (details)="openTaskDetail(task)">
+          </app-task-card>
+        </div>
+
+        <div
+          class="empty-column"
+          *ngIf="inProgressTasks.length === 0">
+          Görev bulunmuyor
+        </div>
+      </div>
+    </section>
+
+    <!-- Tamamlandı -->
+
+    <section class="kanban-column">
+      <div class="column-header completed-header">
+        <h2>Tamamlandı</h2>
+
+        <span class="task-count">
+          {{ completedTasks.length }}
+        </span>
+      </div>
+
+      <div
+        class="task-drop-list"
+        cdkDropList
+        id="completedList"
+        [cdkDropListData]="completedTasks"
+        [cdkDropListConnectedTo]="[
+          'pendingList',
+          'inProgressList',
+          'cancelledList'
+        ]"
+        (cdkDropListDropped)="dropTask($event, 2)">
+
+        <div
+          class="drag-task"
+          *ngFor="let task of completedTasks"
+          cdkDrag>
+
+          <app-task-card
+            [task]="task"
+            (edit)="openEditTaskDialog(task)"
+            (delete)="deleteTask(task)"
+            (details)="openTaskDetail(task)">
+          </app-task-card>
+        </div>
+
+        <div
+          class="empty-column"
+          *ngIf="completedTasks.length === 0">
+          Görev bulunmuyor
+        </div>
+      </div>
+    </section>
+
+    <!-- İptal Edildi -->
+
+    <section class="kanban-column">
+      <div class="column-header cancelled-header">
+        <h2>İptal Edildi</h2>
+
+        <span class="task-count">
+          {{ cancelledTasks.length }}
+        </span>
+      </div>
+
+      <div
+        class="task-drop-list"
+        cdkDropList
+        id="cancelledList"
+        [cdkDropListData]="cancelledTasks"
+        [cdkDropListConnectedTo]="[
+          'pendingList',
+          'inProgressList',
+          'completedList'
+        ]"
+        (cdkDropListDropped)="dropTask($event, 3)">
+
+        <div
+          class="drag-task"
+          *ngFor="let task of cancelledTasks"
+          cdkDrag>
+
+          <app-task-card
+            [task]="task"
+            (edit)="openEditTaskDialog(task)"
+            (delete)="deleteTask(task)"
+            (details)="openTaskDetail(task)">
+          </app-task-card>
+        </div>
+
+        <div
+          class="empty-column"
+          *ngIf="cancelledTasks.length === 0">
+          Görev bulunmuyor
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <mat-paginator

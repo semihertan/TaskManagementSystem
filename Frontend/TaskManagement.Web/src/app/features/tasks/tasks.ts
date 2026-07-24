@@ -25,6 +25,14 @@ import {
   ConfirmDialogData
 } from '../../shared/components/confirm-dialog/confirm-dialog';
 
+import {
+  CdkDragDrop,
+  DragDropModule,
+  transferArrayItem
+} from '@angular/cdk/drag-drop';
+
+import { UpdateTask } from '../../shared/interfaces/task/update-task.interface';
+
 @Component({
   selector: 'app-tasks',
   imports: [
@@ -39,7 +47,8 @@ import {
     MatDialogModule,
     MatButtonModule,
     MatSnackBarModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    DragDropModule
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
@@ -81,6 +90,11 @@ export class Tasks implements OnInit {
     { value: 3, label: 'İptal Edildi' }
   ];
 
+  pendingTasks: TaskItem[] = [];
+  inProgressTasks: TaskItem[] = [];
+  completedTasks: TaskItem[] = [];
+  cancelledTasks: TaskItem[] = [];
+
   ngOnInit(): void {
     this.loadTasks();
   }
@@ -113,6 +127,8 @@ export class Tasks implements OnInit {
       next: (response) => {
         this.tasks = response.data.items;
         this.totalCount = response.data.totalCount;
+
+        this.distributeTasksByStatus();
 
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -301,5 +317,98 @@ export class Tasks implements OnInit {
     this.pageSize = event.pageSize;
 
     this.loadTasks();
+  }
+
+  getTasksByStatus(status: number): TaskItem[] {
+    return this.tasks.filter((task) => task.status === status);
+  }
+
+  private distributeTasksByStatus(): void {
+    this.pendingTasks = this.tasks.filter(
+      (task) => task.status === 0
+    );
+
+    this.inProgressTasks = this.tasks.filter(
+      (task) => task.status === 1
+    );
+
+    this.completedTasks = this.tasks.filter(
+      (task) => task.status === 2
+    );
+
+    this.cancelledTasks = this.tasks.filter(
+      (task) => task.status === 3
+    );
+  }
+
+  dropTask(
+    event: CdkDragDrop<TaskItem[]>,
+    newStatus: number
+  ): void {
+    const task = event.previousContainer.data[event.previousIndex];
+
+    if (task.status === newStatus) {
+      return;
+    }
+
+    const oldStatus = task.status;
+
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    task.status = newStatus;
+
+    const request: UpdateTask = {
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      status: newStatus,
+      dueDate: task.dueDate
+        ? new Date(task.dueDate).toISOString()
+        : undefined,
+      categoryId: task.categoryId
+    };
+
+    this.taskService.updateTask(task.id, request).subscribe({
+      next: (response) => {
+        const updatedTask = response.data;
+
+        this.tasks = this.tasks.map((currentTask) =>
+          currentTask.id === updatedTask.id
+            ? updatedTask
+            : currentTask
+        );
+
+        this.distributeTasksByStatus();
+
+        this.showSuccess(
+          'Görev durumu başarıyla güncellendi.'
+        );
+
+        this.cdr.markForCheck();
+      },
+
+      error: (error) => {
+        console.error(
+          'Görev durumu güncellenemedi:',
+          error
+        );
+
+        task.status = oldStatus;
+
+        this.distributeTasksByStatus();
+
+        this.showError(
+          error?.error?.message ??
+          'Görev durumu güncellenemedi.'
+        );
+
+        this.cdr.markForCheck();
+      }
+    });
   }
 }
