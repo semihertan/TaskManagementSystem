@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TaskService } from '../../../core/services/task.service';
 import { TaskItem } from '../../../shared/interfaces/task/task.interface';
+import { PriorityBadge } from '../../../shared/components/priority-badge/priority-badge';
 
 @Component({
   selector: 'app-task-detail',
@@ -23,7 +24,8 @@ import { TaskItem } from '../../../shared/interfaces/task/task.interface';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    PriorityBadge
   ],
   templateUrl: './task-detail.html',
   styleUrl: './task-detail.scss'

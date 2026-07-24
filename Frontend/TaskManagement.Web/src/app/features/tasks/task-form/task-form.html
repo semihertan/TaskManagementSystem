@@ -89,24 +89,11 @@
       <mat-label>Öncelik</mat-label>
 
       <mat-select formControlName="priority">
-        <mat-option [value]="1">
-          Çok Düşük
-        </mat-option>
-
-        <mat-option [value]="2">
-          Düşük
-        </mat-option>
-
-        <mat-option [value]="3">
-          Normal
-        </mat-option>
-
-        <mat-option [value]="4">
-          Yüksek
-        </mat-option>
-
-        <mat-option [value]="5">
-          Çok Yüksek
+        <mat-option
+          *ngFor="let priority of priorities"
+          [value]="priority.value"
+        >
+          {{ priority.label }}
         </mat-option>
       </mat-select>
     </mat-form-field>

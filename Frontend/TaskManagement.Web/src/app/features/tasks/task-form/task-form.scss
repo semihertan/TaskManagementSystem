@@ -15,8 +15,8 @@ mat-form-field {
 .error-message {
   padding: 12px;
   border-radius: 10px;
-  background: #feecec;
-  color: #b42318;
+  background: var(--surface-error);
+  color: var(--danger-color);
   font-size: 14px;
 }
 

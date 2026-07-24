@@ -7,7 +7,7 @@
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 10px 25px var(--shadow-color);
   }
 }
 
@@ -26,7 +26,7 @@ mat-card-header {
     margin: 0;
     font-size: 20px;
     font-weight: 650;
-    color: #1f2937;
+    color: var(--text-primary);
     word-break: break-word;
   }
 }
@@ -36,7 +36,7 @@ mat-card-header {
   align-items: center;
   gap: 5px;
   margin-top: 8px;
-  color: #667085;
+  color: var(--text-secondary);
   font-size: 14px;
 
   mat-icon {
@@ -46,12 +46,6 @@ mat-card-header {
   }
 }
 
-.priority-chip {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 600;
-}
-
 mat-card-content {
   padding: 18px 20px 20px;
 }
@@ -59,7 +53,7 @@ mat-card-content {
 .description {
   min-height: 42px;
   margin: 0 0 18px;
-  color: #475467;
+  color: var(--text-secondary);
   line-height: 1.5;
   word-break: break-word;
 
@@ -75,14 +69,14 @@ mat-card-content {
   justify-content: space-between;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid #eaecf0;
+  border-top: 1px solid var(--border-color);
 }
 
 .info-item {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #667085;
+  color: var(--text-secondary);
   font-size: 13px;
 
   mat-icon {
@@ -98,49 +92,24 @@ mat-card-content {
   font-weight: 600;
 }
 
-.priority-very-low {
-  background: #f2f4f7;
-  color: #667085;
-}
-
-.priority-low {
-  background: #e8f0fe;
-  color: #2563eb;
-}
-
-.priority-normal {
-  background: #eef2ff;
-  color: #6366f1;
-}
-
-.priority-high {
-  background: #fff7e6;
-  color: #d97706;
-}
-
-.priority-very-high {
-  background: #feecec;
-  color: #dc2626;
-}
-
 .status-pending {
-  background: #fff7e6;
-  color: #b54708;
+  background: var(--status-pending-background);
+  color: var(--status-pending-text);
 }
 
 .status-progress {
-  background: #e8f0fe;
-  color: #175cd3;
+  background: var(--status-progress-background);
+  color: var(--status-progress-text);
 }
 
 .status-completed {
-  background: #e8f8ee;
-  color: #067647;
+  background: var(--status-completed-background);
+  color: var(--status-completed-text);
 }
 
 .status-cancelled {
-  background: #f2f4f7;
-  color: #667085;
+  background: var(--status-cancelled-background);
+  color: var(--status-cancelled-text);
 }
 
 @media (max-width: 600px) {
@@ -163,7 +132,7 @@ mat-card-content {
 
   mat-card-actions {
     padding: 12px;
-    border-top: 1px solid #eaecf0;
+    border-top: 1px solid var(--border-color);
     flex-direction: column;
     align-items: stretch;
     gap: 8px;

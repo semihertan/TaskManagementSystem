@@ -2,7 +2,8 @@
   min-height: calc(100vh - 64px);
   padding: 24px;
   box-sizing: border-box;
-  background-color: #f5f7fb;
+  background-color: var(--app-background);
+  color: var(--text-primary);
 
   @media (max-width: 900px) {
     padding: 16px;

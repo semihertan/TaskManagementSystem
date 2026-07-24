@@ -6,12 +6,7 @@
         <h2>{{ task.title }}</h2>
       </div>
 
-      <mat-chip
-        class="priority-chip"
-        [ngClass]="getPriorityClass()"
-      >
-        {{ getPriorityText() }}
-      </mat-chip>
+      <app-priority-badge [priority]="task.priority"></app-priority-badge>
     </div>
   </mat-card-header>
 

@@ -1,6 +1,10 @@
-mat-toolbar {
+.app-toolbar {
   display: flex;
   align-items: center;
+  min-height: 64px;
+  background: var(--navigation-background);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .logo {
@@ -20,6 +24,10 @@ button mat-icon {
   margin-right: 5px;
 }
 
+.theme-toggle {
+  margin-left: 4px;
+}
+
 .mobile-menu-btn {
   display: none;
 }
@@ -31,5 +39,9 @@ button mat-icon {
   
   .mobile-menu-btn {
     display: block;
+  }
+
+  .app-toolbar {
+    min-height: 56px;
   }
 }

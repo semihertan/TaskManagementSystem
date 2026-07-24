@@ -1,4 +1,4 @@
-<mat-toolbar color="primary">
+<mat-toolbar class="app-toolbar">
 
   <span class="logo">
     <mat-icon>task_alt</mat-icon>
@@ -27,12 +27,29 @@
       <mat-icon>logout</mat-icon>
       Logout
     </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="theme-toggle"
+      [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+      [attr.title]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+      (click)="toggleTheme()">
+      <mat-icon>
+        {{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}
+      </mat-icon>
+    </button>
   </div>
 
-  <button mat-icon-button class="mobile-menu-btn" [matMenuTriggerFor]="menu">
+  <button
+    mat-icon-button
+    class="mobile-menu-btn"
+    type="button"
+    aria-label="Open navigation menu"
+    [matMenuTriggerFor]="menu">
     <mat-icon>menu</mat-icon>
   </button>
-  
+
   <mat-menu #menu="matMenu">
     <button mat-menu-item routerLink="/dashboard">
       <mat-icon>dashboard</mat-icon>
@@ -49,6 +66,16 @@
     <button mat-menu-item>
       <mat-icon>logout</mat-icon>
       <span>Logout</span>
+    </button>
+    <button
+      mat-menu-item
+      type="button"
+      (click)="toggleTheme()"
+      [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'">
+      <mat-icon>
+        {{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}
+      </mat-icon>
+      <span>{{ themeService.currentTheme() === 'dark' ? 'Light theme' : 'Dark theme' }}</span>
     </button>
   </mat-menu>
 

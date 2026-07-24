@@ -22,9 +22,10 @@
   align-items: center;
   gap: 10px;
   padding: 16px;
-  border: 1px solid #f2b8b5;
+  border: 1px solid var(--danger-color);
   border-radius: 10px;
-  background: #fff4f4;
+  background: var(--surface-error);
+  color: var(--danger-color);
 }
 
 .detail-card {
@@ -51,7 +52,7 @@ mat-card-content {
 .label {
   font-size: 13px;
   font-weight: 600;
-  color: #667085;
+  color: var(--text-secondary);
 }
 
 .detail-item p {

@@ -26,6 +26,7 @@ import { TaskItem } from '../../../shared/interfaces/task/task.interface';
 import { CategoryService } from '../../../core/services/category.service';
 import { Category } from '../../../shared/interfaces/category/category.interface';
 import { finalize } from 'rxjs';
+import { PRIORITY_OPTIONS } from '../../../shared/constants/priority.constants';
 
 @Component({
   selector: 'app-task-form',
@@ -98,6 +99,8 @@ export class TaskForm {
     { value: 2, label: 'Tamamlandı' },
     { value: 3, label: 'İptal Edildi' }
   ];
+
+  priorities = PRIORITY_OPTIONS;
 
   constructor() {
     this.loadCategories();

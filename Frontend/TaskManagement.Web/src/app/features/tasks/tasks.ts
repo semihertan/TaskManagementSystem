@@ -32,6 +32,7 @@ import {
 } from '@angular/cdk/drag-drop';
 
 import { UpdateTask } from '../../shared/interfaces/task/update-task.interface';
+import { PRIORITY_OPTIONS } from '../../shared/constants/priority.constants';
 
 @Component({
   selector: 'app-tasks',
@@ -75,13 +76,7 @@ export class Tasks implements OnInit {
   totalCount = 0;
   pageSizeOptions = [5, 10, 20, 50];
 
-  priorities = [
-    { value: 1, label: 'Çok Düşük' },
-    { value: 2, label: 'Düşük' },
-    { value: 3, label: 'Normal' },
-    { value: 4, label: 'Yüksek' },
-    { value: 5, label: 'Çok Yüksek' }
-  ];
+  priorities = PRIORITY_OPTIONS;
 
   statuses = [
     { value: 0, label: 'Bekliyor' },

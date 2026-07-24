@@ -13,6 +13,24 @@
       rel="stylesheet"
     />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script>
+      (() => {
+        const storageKey = 'theme';
+        let savedTheme = null;
+        try {
+          savedTheme = window.localStorage.getItem(storageKey);
+        } catch {
+          // Fall back to the operating system preference.
+        }
+
+        const theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

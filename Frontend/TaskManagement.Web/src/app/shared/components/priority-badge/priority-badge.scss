@@ -1,0 +1,48 @@
+:host {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.priority-low {
+  background-color: var(--priority-low-bg);
+  color: var(--priority-low-text);
+}
+
+.priority-normal {
+  background-color: var(--priority-normal-bg);
+  color: var(--priority-normal-text);
+}
+
+.priority-high {
+  background-color: var(--priority-high-bg);
+  color: var(--priority-high-text);
+}
+
+.priority-urgent {
+  background-color: var(--priority-urgent-bg);
+  color: var(--priority-urgent-text);
+}
+
+.priority-critical {
+  background-color: var(--priority-critical-bg);
+  color: var(--priority-critical-text);
+}
+
+.priority-unknown {
+  background-color: var(--surface-hover);
+  color: var(--text-secondary);
+}

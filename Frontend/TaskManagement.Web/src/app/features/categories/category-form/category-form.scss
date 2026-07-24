@@ -32,7 +32,7 @@ mat-form-field {
   width: 54px;
   height: 42px;
   padding: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   background: transparent;
   cursor: pointer;
@@ -41,7 +41,7 @@ mat-form-field {
 .color-preview {
   width: 30px;
   height: 30px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
   border-radius: 50%;
 }
 
@@ -52,14 +52,14 @@ mat-form-field {
 
 .color-error {
   font-size: 12px;
-  color: #f44336;
+  color: var(--danger-color);
 }
 
 .error-message {
   padding: 12px;
   border-radius: 6px;
-  background: rgba(244, 67, 54, 0.1);
-  color: #b71c1c;
+  background: var(--surface-error);
+  color: var(--danger-color);
 }
 
 mat-dialog-actions {

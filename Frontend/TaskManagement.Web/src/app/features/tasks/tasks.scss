@@ -18,7 +18,7 @@
 
   p {
     margin: 7px 0 0;
-    color: #667085;
+    color: var(--text-secondary);
   }
 }
 
@@ -26,8 +26,8 @@
   border: 0;
   border-radius: 10px;
   padding: 11px 18px;
-  background: #2563eb;
-  color: white;
+  background: var(--primary-color);
+  color: var(--on-primary);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -45,14 +45,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #667085;
+  color: var(--text-secondary);
 }
 
 .error-message {
   padding: 16px;
   border-radius: 12px;
-  background: #feecec;
-  color: #b42318;
+  background: var(--surface-error);
+  color: var(--danger-color);
 }
 
 .task-filters {
@@ -130,7 +130,7 @@
 .kanban-column {
   min-width: 280px;
   border-radius: 14px;
-  background: #f4f6f8;
+  background: var(--surface-secondary);
   overflow: hidden;
 }
 
@@ -148,19 +148,19 @@
 }
 
 .pending-header {
-  border-top: 4px solid #f59e0b;
+  border-top: 4px solid var(--warning-color);
 }
 
 .progress-header {
-  border-top: 4px solid #3b82f6;
+  border-top: 4px solid var(--primary-color);
 }
 
 .completed-header {
-  border-top: 4px solid #22c55e;
+  border-top: 4px solid var(--success-color);
 }
 
 .cancelled-header {
-  border-top: 4px solid #ef4444;
+  border-top: 4px solid var(--danger-color);
 }
 
 .task-count {
@@ -170,7 +170,7 @@
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--surface-hover);
   font-size: 13px;
   font-weight: 600;
 }
@@ -192,16 +192,16 @@
 .empty-column {
   padding: 32px 12px;
   text-align: center;
-  color: #777;
-  border: 2px dashed #ccc;
+  color: var(--text-muted);
+  border: 2px dashed var(--border-color);
   border-radius: 10px;
 }
 
 .cdk-drag-preview {
   border-radius: 12px;
   box-shadow:
-    0 10px 20px rgba(0, 0, 0, 0.18),
-    0 6px 6px rgba(0, 0, 0, 0.12);
+    0 10px 20px var(--shadow-color),
+    0 6px 6px var(--shadow-color);
 }
 
 .cdk-drag-placeholder {

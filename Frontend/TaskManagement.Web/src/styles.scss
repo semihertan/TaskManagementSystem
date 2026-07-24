@@ -1,39 +1,269 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
-html {
-  height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    )
-  );
+$light-material-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$blue-palette,
+  ),
+  typography: (
+    plain-family: Roboto,
+    brand-family: Roboto,
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
+$dark-material-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$azure-palette,
+    tertiary: mat.$blue-palette,
+  ),
+  typography: (
+    plain-family: Roboto,
+    brand-family: Roboto,
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
+@mixin app-material-tokens {
+  --mat-sys-background: var(--app-background);
+  --mat-sys-surface: var(--surface-primary);
+  --mat-sys-surface-dim: var(--surface-secondary);
+  --mat-sys-surface-bright: var(--surface-primary);
+  --mat-sys-surface-container-lowest: var(--surface-primary);
+  --mat-sys-surface-container-low: var(--surface-secondary);
+  --mat-sys-surface-container: var(--surface-secondary);
+  --mat-sys-surface-container-high: var(--card-background);
+  --mat-sys-surface-container-highest: var(--card-background);
+  --mat-sys-surface-variant: var(--surface-secondary);
+  --mat-sys-on-surface: var(--text-primary);
+  --mat-sys-on-surface-variant: var(--text-secondary);
+  --mat-sys-outline: var(--border-color);
+  --mat-sys-outline-variant: var(--border-color);
+  --mat-sys-primary: var(--primary-color);
+  --mat-sys-on-primary: var(--on-primary);
+  --mat-sys-primary-container: var(--surface-info);
+  --mat-sys-on-primary-container: var(--text-primary);
+  --mat-sys-error: var(--danger-color);
+  --mat-sys-on-error: #ffffff;
+  --mat-sys-error-container: var(--surface-error);
+  --mat-sys-on-error-container: var(--danger-color);
+  --mat-sys-inverse-surface: var(--text-primary);
+  --mat-sys-inverse-on-surface: var(--app-background);
+}
+
+:root {
+  @include mat.theme($light-material-theme);
+
+  color-scheme: light;
+
+  --app-background: #f7f7f8;
+  --surface-primary: #ffffff;
+  --surface-secondary: #f8fafc;
+  --surface-hover: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --on-primary: #ffffff;
+  --danger-color: #dc2626;
+  --success-color: #16a34a;
+  --warning-color: #d97706;
+  --shadow-color: rgba(15, 23, 42, 0.12);
+  --input-background: #ffffff;
+  --navigation-background: #ffffff;
+  --card-background: #ffffff;
+  --surface-error: #fef2f2;
+  --surface-success: #f0fdf4;
+  --surface-warning: #fffbeb;
+  --surface-info: #eff6ff;
+
+  --priority-low-bg: #dcfce7;
+  --priority-low-text: #166534;
+  --priority-normal-bg: #dbeafe;
+  --priority-normal-text: #1d4ed8;
+  --priority-high-bg: #ffedd5;
+  --priority-high-text: #c2410c;
+  --priority-urgent-bg: #fee2e2;
+  --priority-urgent-text: #b91c1c;
+  --priority-critical-bg: #f3e8ff;
+  --priority-critical-text: #7e22ce;
+
+  --status-pending-background: #fffbeb;
+  --status-pending-text: #b45309;
+  --status-progress-background: #eff6ff;
+  --status-progress-text: #2563eb;
+  --status-completed-background: #f0fdf4;
+  --status-completed-text: #15803d;
+  --status-cancelled-background: #f3f4f6;
+  --status-cancelled-text: #6b7280;
+  --status-overdue-background: #fef2f2;
+  --status-overdue-text: #dc2626;
+
+  @include app-material-tokens;
+}
+
+html[data-theme='dark'] {
+  @include mat.theme($dark-material-theme);
+
+  color-scheme: dark;
+
+  --app-background: #0f1115;
+  --surface-primary: #171a21;
+  --surface-secondary: #1b1f27;
+  --surface-hover: #252a33;
+  --text-primary: #f3f4f6;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-color: #303641;
+  --primary-color: #60a5fa;
+  --primary-hover: #93c5fd;
+  --on-primary: #0f1115;
+  --danger-color: #f87171;
+  --success-color: #4ade80;
+  --warning-color: #fbbf24;
+  --shadow-color: rgba(0, 0, 0, 0.35);
+  --input-background: #171a21;
+  --navigation-background: #171a21;
+  --card-background: #1f232b;
+  --surface-error: #3a1f23;
+  --surface-success: #163321;
+  --surface-warning: #3a2c13;
+  --surface-info: #172b42;
+
+  --priority-low-bg: #153d2b;
+  --priority-low-text: #86efac;
+  --priority-normal-bg: #172b42;
+  --priority-normal-text: #93c5fd;
+  --priority-high-bg: #4a2c16;
+  --priority-high-text: #fdba74;
+  --priority-urgent-bg: #4a1f24;
+  --priority-urgent-text: #fca5a5;
+  --priority-critical-bg: #38214c;
+  --priority-critical-text: #d8b4fe;
+
+  --status-pending-background: #3a2c13;
+  --status-pending-text: #fbbf24;
+  --status-progress-background: #172b42;
+  --status-progress-text: #93c5fd;
+  --status-completed-background: #163321;
+  --status-completed-text: #86efac;
+  --status-cancelled-background: #272b33;
+  --status-cancelled-text: #d4d4d8;
+  --status-overdue-background: #3a1f23;
+  --status-overdue-text: #fca5a5;
+
+  @include app-material-tokens;
+}
+
+html,
+body {
+  min-height: 100%;
+  background-color: var(--app-background);
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
-  height: 100%;
+  font-family: Roboto, Arial, sans-serif;
+  color: var(--text-primary);
 }
-/* You can add global styles to this file, and also import other style files */
+
+app-root {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--app-background);
+  color: var(--text-primary);
+}
+
+input,
+textarea,
+select {
+  color: var(--text-primary);
+}
+
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* Material surfaces, form controls and overlays inherit the active root theme. */
+.mat-mdc-card {
+  --mdc-elevated-card-container-color: var(--card-background);
+  --mdc-outlined-card-container-color: var(--card-background);
+  --mdc-outlined-card-outline-color: var(--border-color);
+  background-color: var(--card-background);
+  color: var(--text-primary);
+}
+
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-container-color: var(--input-background);
+  --mdc-outlined-text-field-outline-color: var(--border-color);
+  --mdc-outlined-text-field-hover-outline-color: var(--text-secondary);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary-color);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
+  --mdc-outlined-text-field-label-text-color: var(--text-secondary);
+  --mdc-outlined-text-field-hover-label-text-color: var(--text-primary);
+  --mdc-outlined-text-field-focus-label-text-color: var(--primary-color);
+}
+
+.mat-mdc-text-field-wrapper {
+  background-color: var(--input-background) !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface,
+.mat-mdc-menu-panel,
+.mat-mdc-select-panel,
+.mat-datepicker-content,
+.mat-mdc-paginator,
+.mat-mdc-snack-bar-container {
+  background-color: var(--surface-primary) !important;
+  color: var(--text-primary);
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border: 1px solid var(--border-color);
+  box-shadow: 0 18px 50px var(--shadow-color);
+}
+
+.mat-mdc-menu-panel,
+.mat-mdc-select-panel,
+.mat-datepicker-content {
+  border: 1px solid var(--border-color);
+}
+
+.mat-mdc-menu-item:hover,
+.mat-mdc-option:hover,
+.mat-mdc-option.mat-mdc-option-active {
+  background-color: var(--surface-hover) !important;
+}
+
+.mat-calendar {
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
+}
+
+.mat-mdc-paginator {
+  border-top: 1px solid var(--border-color);
+}
+
+html[data-theme-ready='true'] body,
+html[data-theme-ready='true'] body * {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme-ready='true'] body,
+  html[data-theme-ready='true'] body * {
+    transition-duration: 0.01ms !important;
+  }
+}
