@@ -54,6 +54,12 @@
         rows="4"
         placeholder="Görev hakkında açıklama yazın"
       ></textarea>
+
+      <mat-error
+          *ngIf="taskForm.controls.description.hasError('maxlength')"
+        >
+          Açıklama en fazla 2000 karakter olabilir.
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -112,7 +118,7 @@
   <button
     mat-button
     type="button"
-    [disabled]="isSaving"
+    [disabled]="taskForm.invalid || isSaving"
     (click)="cancel()"
   >
     İptal

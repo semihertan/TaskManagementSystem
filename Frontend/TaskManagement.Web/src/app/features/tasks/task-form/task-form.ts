@@ -67,11 +67,18 @@ export class TaskForm {
       Validators.maxLength(200)
     ]],
 
-    description: [''],
+    description: ['', Validators.maxLength(2000)],
 
-    priority: [3, Validators.required],
+    priority: [3, 
+      Validators.required,
+      Validators.min(1),
+      Validators.max(5)
+    ],
 
-    status: [0, Validators.required],
+    status: [0, 
+      Validators.required,
+      Validators.min(0),
+      Validators.max(3)],
 
     dueDate: [null as Date | null]
   });
@@ -114,7 +121,7 @@ export class TaskForm {
       title: formValue.title!,
       description: formValue.description || undefined,
       priority: formValue.priority!,
-      status: this.taskForm.value.status ?? 0,
+      status: formValue.status!,
       categoryId: this.task?.categoryId,
       dueDate: formValue.dueDate
         ? formValue.dueDate.toISOString()

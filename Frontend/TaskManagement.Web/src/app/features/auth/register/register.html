@@ -105,10 +105,17 @@
           mat-flat-button 
           class="submit-btn" 
           type="submit" 
-          [disabled]="registerForm.invalid" 
+          [disabled]="registerForm.invalid || isLoading"
           aria-label="Create your account"
         >
-          Create Account
+          <span *ngIf="!isLoading">Create Account</span>
+          <mat-spinner
+            *ngIf="isLoading"
+            diameter="20"
+            class="btn-spinner"
+            role="status"
+            aria-live="polite
+          ></mat-spinner>
         </button>
         
         @if(errorMessage){
