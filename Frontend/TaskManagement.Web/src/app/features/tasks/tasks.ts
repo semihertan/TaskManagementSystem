@@ -18,6 +18,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 import {
   ConfirmDialog,
@@ -37,7 +38,8 @@ import {
     TaskCard,
     MatDialogModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatPaginatorModule
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
@@ -58,9 +60,11 @@ export class Tasks implements OnInit {
   dueDateFrom: Date | null = null;
   dueDateTo: Date | null = null;
   sortBy = 'createdAt';
-  sortDirection: 'asc' | 'desc' = 'desc';currentPage = 1;
+  sortDirection: 'asc' | 'desc' = 'desc';
+  currentPage = 1;
   pageSize = 10;
   totalCount = 0;
+  pageSizeOptions = [5, 10, 20, 50];
 
   priorities = [
     { value: 1, label: 'Çok Düşük' },
@@ -289,6 +293,13 @@ export class Tasks implements OnInit {
 
   onSortingChanged(): void {
     this.currentPage = 1;
+    this.loadTasks();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+
     this.loadTasks();
   }
 }

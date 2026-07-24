@@ -195,4 +195,15 @@
     Henüz görev bulunmuyor.
   </div>
 
+  <mat-paginator
+  *ngIf="totalCount > 0"
+  [length]="totalCount"
+  [pageIndex]="currentPage - 1"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  [showFirstLastButtons]="true"
+  aria-label="Görev sayfaları"
+  (page)="onPageChange($event)">
+</mat-paginator>
+
 </section>
