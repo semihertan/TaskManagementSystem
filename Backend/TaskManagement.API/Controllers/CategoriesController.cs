@@ -73,16 +73,18 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, UpdateCategoryDto updateCategoryDto)
+    public async Task<ActionResult<ApiResponse<CategoryDto>>> Update(Guid id, UpdateCategoryDto updateCategoryDto)
     {
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
         var updated = await _categoryService.UpdateAsync(id, updateCategoryDto, userId);
 
-        if (!updated)
-            return NotFound();
-
-        return NoContent();
+        return Ok(new ApiResponse<CategoryDto>
+        {
+            Success = true,
+            Message = "Kategori başarıyla güncellendi.",
+            Data = updated
+        });
     }
 
     [HttpDelete("{id:guid}")]

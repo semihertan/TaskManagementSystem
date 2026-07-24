@@ -89,7 +89,7 @@ public class CategoryService : ICategoryService
         return _mapper.Map<CategoryDto>(category);
     }
 
-    public async Task<bool> UpdateAsync(Guid id, UpdateCategoryDto updateCategoryDto, Guid userId)
+    public async Task<CategoryDto> UpdateAsync(Guid id, UpdateCategoryDto updateCategoryDto, Guid userId)
     {
         _logger.LogInformation(
             "Updating category. Id: {CategoryId}",
@@ -97,22 +97,15 @@ public class CategoryService : ICategoryService
         var category = await _context.Categories
             .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
 
-        if (category == null)
+        if (category is null)
         {
-            _logger.LogWarning(
-                "Category not found for update. Id: {CategoryId}",
-                id);
-            return false;
+            throw new KeyNotFoundException("Kategori bulunamadı.");
         }
 
         _mapper.Map(updateCategoryDto, category);
 
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation(
-            "Category updated successfully. Id: {CategoryId}",
-            id);
-
-        return true;
+        return _mapper.Map<CategoryDto>(category);
     }
 }

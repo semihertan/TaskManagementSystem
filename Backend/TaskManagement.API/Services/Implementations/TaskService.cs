@@ -80,17 +80,23 @@ public class TaskService : ITaskService
 
         if (filterDto.Priority.HasValue)
         {
-            query = query.Where(t => (int)t.Priority == filterDto.Priority.Value);
+            query = query.Where(
+                t => (int)t.Priority == filterDto.Priority.Value
+            );
         }
 
         if (filterDto.Status.HasValue)
         {
-            query = query.Where(t => (int)t.Status == filterDto.Status.Value);
+            query = query.Where(
+                t => (int)t.Status == filterDto.Status.Value
+            );
         }
 
         if (filterDto.CategoryId.HasValue)
         {
-            query = query.Where(t => t.CategoryId == filterDto.CategoryId.Value);
+            query = query.Where(
+                t => t.CategoryId == filterDto.CategoryId.Value
+            );
         }
 
         if (!string.IsNullOrWhiteSpace(filterDto.Search))
@@ -109,7 +115,8 @@ public class TaskService : ITaskService
                         t.Description,
                         searchPattern
                     )
-                ));
+                )
+            );
         }
 
         if (filterDto.DueDateFrom.HasValue)
@@ -133,22 +140,82 @@ public class TaskService : ITaskService
         }
 
         if (filterDto.Page < 1)
+        {
             filterDto.Page = 1;
+        }
 
         if (filterDto.PageSize < 1)
+        {
             filterDto.PageSize = 10;
-        
+        }
+
         var totalCount = await query.CountAsync();
 
-        query = query
-            .OrderByDescending(t => t.UpdatedAt)
-            .ThenByDescending(t => t.CreatedAt)
+        var isDescending =
+            string.Equals(
+                filterDto.SortDirection,
+                "desc",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+        query = filterDto.SortBy?.Trim().ToLowerInvariant() switch
+        {
+            "title" => isDescending
+                ? query
+                    .OrderByDescending(t => t.Title)
+                    .ThenByDescending(t => t.CreatedAt)
+                : query
+                    .OrderBy(t => t.Title)
+                    .ThenBy(t => t.CreatedAt),
+
+            "priority" => isDescending
+                ? query
+                    .OrderByDescending(t => t.Priority)
+                    .ThenByDescending(t => t.CreatedAt)
+                : query
+                    .OrderBy(t => t.Priority)
+                    .ThenBy(t => t.CreatedAt),
+
+            "status" => isDescending
+                ? query
+                    .OrderByDescending(t => t.Status)
+                    .ThenByDescending(t => t.CreatedAt)
+                : query
+                    .OrderBy(t => t.Status)
+                    .ThenBy(t => t.CreatedAt),
+
+            "duedate" => isDescending
+                ? query
+                    .OrderByDescending(t => t.DueDate)
+                    .ThenByDescending(t => t.CreatedAt)
+                : query
+                    .OrderBy(t => t.DueDate)
+                    .ThenBy(t => t.CreatedAt),
+
+            "createdat" => isDescending
+                ? query.OrderByDescending(t => t.CreatedAt)
+                : query.OrderBy(t => t.CreatedAt),
+
+            "updatedat" => isDescending
+                ? query
+                    .OrderByDescending(t => t.UpdatedAt)
+                    .ThenByDescending(t => t.CreatedAt)
+                : query
+                    .OrderBy(t => t.UpdatedAt)
+                    .ThenBy(t => t.CreatedAt),
+
+            _ => query
+                .OrderByDescending(t => t.UpdatedAt)
+                .ThenByDescending(t => t.CreatedAt)
+        };
+
+        var tasks = await query
             .Skip((filterDto.Page - 1) * filterDto.PageSize)
-            .Take(filterDto.PageSize);
+            .Take(filterDto.PageSize)
+            .ToListAsync();
 
-        var tasks = await query.ToListAsync();
-
-        var taskDtos = _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
+        var taskDtos =
+            _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
 
         return new PagedResponse<TaskItemDto>
         {
@@ -156,7 +223,9 @@ public class TaskService : ITaskService
             Page = filterDto.Page,
             PageSize = filterDto.PageSize,
             TotalCount = totalCount,
-            TotalPages = (int)Math.Ceiling((double)totalCount / filterDto.PageSize)
+            TotalPages = (int)Math.Ceiling(
+                (double)totalCount / filterDto.PageSize
+            )
         };
     }
 
