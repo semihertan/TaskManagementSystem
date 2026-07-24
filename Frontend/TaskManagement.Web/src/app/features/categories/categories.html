@@ -1,3 +1,90 @@
-<h1>Categories</h1>
+<div class="categories-container">
 
-<p>Kategori yönetimi bu sayfada olacak.</p>
+  <div class="page-header">
+    <h1>Kategoriler</h1>
+
+    <button mat-raised-button 
+            color="primary"
+            type="button"
+            (click)="openCreateDialog()"
+        >
+            + Yeni Kategori
+        </button>
+    </div>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      {{ errorMessage }}
+    </mat-card>
+  }
+
+  @if (!isLoading && categories.length === 0) {
+    <mat-card>
+      <p>Henüz kategori bulunmuyor.</p>
+    </mat-card>
+  }
+
+  @if (!isLoading && categories.length > 0) {
+
+    <div class="category-grid">
+
+      @for (category of categories; track category.id) {
+
+        <mat-card class="category-card">
+
+          <mat-card-header>
+
+            <div
+              class="color-circle"
+              [style.background]="category.color">
+            </div>
+
+            <div>
+              <mat-card-title>
+                {{ category.name }}
+              </mat-card-title>
+
+              @if(category.description){
+                <mat-card-subtitle>
+                  {{ category.description }}
+                </mat-card-subtitle>
+              }
+            </div>
+
+          </mat-card-header>
+
+          <mat-card-actions align="end">
+
+            <button mat-button 
+                    color="primary"
+                    type="button"
+                    (click)="openEditDialog(category)"
+                >
+                    Düzenle
+            </button>
+
+            <button mat-button color="warn"
+            type="button"
+            [disabled]="deletingCategoryId === category.id"
+            (click)="deleteCategory(category)"
+            >
+                 {{ deletingCategoryId === category.id ? 'Siliniyor...' : 'Sil' }}
+            </button>
+
+          </mat-card-actions>
+
+        </mat-card>
+
+      }
+
+    </div>
+
+  }
+
+</div>

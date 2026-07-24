@@ -23,6 +23,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { TaskService } from '../../../core/services/task.service';
 import { TaskItem } from '../../../shared/interfaces/task/task.interface';
+import { CategoryService } from '../../../core/services/category.service';
+import { Category } from '../../../shared/interfaces/category/category.interface';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-task-form',
@@ -51,6 +54,10 @@ export class TaskForm {
   private formBuilder = inject(FormBuilder);
   private taskService = inject(TaskService);
   private dialogRef = inject(MatDialogRef<TaskForm>);
+  private categoryService = inject(CategoryService);
+
+  categories: Category[] = [];
+  isCategoriesLoading = false;
 
   task = inject<TaskItem | null>(MAT_DIALOG_DATA, {
     optional: true
@@ -69,18 +76,20 @@ export class TaskForm {
 
     description: ['', Validators.maxLength(2000)],
 
-    priority: [3, 
+    priority: [3,[ 
       Validators.required,
       Validators.min(1),
       Validators.max(5)
-    ],
+    ]],
 
-    status: [0, 
+    status: [0, [ 
       Validators.required,
       Validators.min(0),
-      Validators.max(3)],
+      Validators.max(3)
+    ]],
 
-    dueDate: [null as Date | null]
+    dueDate: [null as Date | null],
+    categoryId: [null as string | null]
   });
 
   statuses = [
@@ -91,6 +100,8 @@ export class TaskForm {
   ];
 
   constructor() {
+    this.loadCategories();
+
     if (!this.task) {
       return;
     }
@@ -122,7 +133,7 @@ export class TaskForm {
       description: formValue.description || undefined,
       priority: formValue.priority!,
       status: formValue.status!,
-      categoryId: this.task?.categoryId,
+      categoryId: formValue.categoryId || undefined,
       dueDate: formValue.dueDate
         ? formValue.dueDate.toISOString()
         : undefined
@@ -137,7 +148,14 @@ export class TaskForm {
   }
 
   private createTask(request: any): void {
-    this.taskService.createTask(request).subscribe({
+    this.taskService
+      .createTask(request)
+      .pipe(
+        finalize(() => {
+              this.isSaving = false;
+    })
+    )
+    .subscribe({
       next: (response) => {
         this.dialogRef.close(response.data);
       },
@@ -148,8 +166,6 @@ export class TaskForm {
         this.errorMessage =
           error?.error?.message ??
           'Görev oluşturulurken bir hata oluştu.';
-
-        this.isSaving = false;
       }
     });
   }
@@ -159,27 +175,57 @@ export class TaskForm {
       return;
     }
 
-    this.taskService.updateTask(
-      this.task.id,
-      request
-    ).subscribe({
-      next: (response) => {
-        this.dialogRef.close(response.data);
-      },
+    this.taskService
+      .updateTask(this.task.id, request)
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.dialogRef.close(response.data);
+        },
 
-      error: (error) => {
-        console.error('Görev güncellenemedi:', error);
+        error: (error) => {
+          console.error('Görev güncellenemedi:', error);
 
-        this.errorMessage =
-          error?.error?.message ??
-          'Görev güncellenirken bir hata oluştu.';
-
-        this.isSaving = false;
-      }
-    });
+          this.errorMessage =
+            error?.error?.message ??
+            'Görev güncellenirken bir hata oluştu.';
+        }
+      });
   }
 
   cancel(): void {
     this.dialogRef.close();
+  }
+
+  private loadCategories(): void {
+    this.isCategoriesLoading = true;
+
+    this.taskForm.controls.categoryId.disable();
+
+    this.categoryService
+      .getCategories()
+      .pipe(
+        finalize(() => {
+          this.isCategoriesLoading = false;
+          this.taskForm.controls.categoryId.enable();
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          this.categories = response.data;
+        },
+
+        error: (error) => {
+          console.error('Kategoriler yüklenemedi:', error);
+
+          this.errorMessage =
+            error?.error?.message ??
+            'Kategoriler yüklenirken bir hata oluştu.';
+        }
+      });
   }
 }

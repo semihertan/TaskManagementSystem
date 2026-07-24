@@ -57,6 +57,10 @@ export class Tasks implements OnInit {
   selectedStatus: number | null = null;
   dueDateFrom: Date | null = null;
   dueDateTo: Date | null = null;
+  sortBy = 'createdAt';
+  sortDirection: 'asc' | 'desc' = 'desc';currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
 
   priorities = [
     { value: 1, label: 'Çok Düşük' },
@@ -81,18 +85,10 @@ export class Tasks implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const filter: TaskFilter = {
+    const filters: TaskFilter = {
       search: this.searchText.trim() || undefined,
-
-      priority:
-        this.selectedPriority !== null
-          ? this.selectedPriority
-          : undefined,
-
-      status:
-        this.selectedStatus !== null
-          ? this.selectedStatus
-          : undefined,
+      priority: this.selectedPriority ?? undefined,
+      status: this.selectedStatus ?? undefined,
 
       dueDateFrom: this.dueDateFrom
         ? this.toDateString(this.dueDateFrom)
@@ -102,13 +98,18 @@ export class Tasks implements OnInit {
         ? this.toDateString(this.dueDateTo)
         : undefined,
 
-      page: 1,
-      pageSize: 10
+      sortBy: this.sortBy,
+      sortDirection: this.sortDirection,
+
+      page: this.currentPage,
+      pageSize: this.pageSize
     };
 
-    this.taskService.getTasks(filter).subscribe({
+    this.taskService.getTasks(filters).subscribe({
       next: (response) => {
         this.tasks = response.data.items;
+        this.totalCount = response.data.totalCount;
+
         this.isLoading = false;
         this.cdr.markForCheck();
       },
@@ -125,6 +126,7 @@ export class Tasks implements OnInit {
       }
     });
   }
+
   openCreateTaskDialog(): void {
     const dialogRef = this.dialog.open(TaskForm, {
       width: '600px',
@@ -268,16 +270,25 @@ export class Tasks implements OnInit {
   }
 
   applyFilters(): void {
-  this.loadTasks();
-}
+    this.currentPage = 1;
+    this.loadTasks();
+  }
 
-clearFilters(): void {
-  this.searchText = '';
-  this.selectedPriority = null;
-  this.selectedStatus = null;
-  this.dueDateFrom = null;
-  this.dueDateTo = null;
+  clearFilters(): void {
+    this.searchText = '';
+    this.selectedPriority = null;
+    this.selectedStatus = null;
+    this.dueDateFrom = null;
+    this.dueDateTo = null;
+    this.sortBy = 'createdAt';
+    this.sortDirection = 'desc';
+    this.currentPage = 1;
 
-  this.loadTasks();
-}
+    this.loadTasks();
+  }
+
+  onSortingChanged(): void {
+    this.currentPage = 1;
+    this.loadTasks();
+  }
 }

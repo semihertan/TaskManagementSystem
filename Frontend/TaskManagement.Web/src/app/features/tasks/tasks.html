@@ -104,6 +104,58 @@
       <mat-datepicker #toPicker></mat-datepicker>
     </mat-form-field>
 
+    <mat-form-field appearance="outline">
+    <mat-label>Sırala</mat-label>
+
+    <mat-select
+      [(ngModel)]="sortBy"
+      name="sortBy"
+      (selectionChange)="onSortingChanged()"
+    >
+      <mat-option value="createdAt">
+        Oluşturulma tarihi
+      </mat-option>
+
+      <mat-option value="updatedAt">
+        Güncellenme tarihi
+      </mat-option>
+
+      <mat-option value="dueDate">
+        Son tarih
+      </mat-option>
+
+      <mat-option value="priority">
+        Öncelik
+      </mat-option>
+
+      <mat-option value="title">
+        Başlık
+      </mat-option>
+
+      <mat-option value="status">
+        Durum
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Sıralama yönü</mat-label>
+
+    <mat-select
+      [(ngModel)]="sortDirection"
+      name="sortDirection"
+      (selectionChange)="onSortingChanged()"
+    >
+      <mat-option value="asc">
+        Artan
+      </mat-option>
+
+      <mat-option value="desc">
+        Azalan
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
     <div class="filter-actions">
       <button
         mat-flat-button

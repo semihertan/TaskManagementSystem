@@ -1,0 +1,122 @@
+<h2 mat-dialog-title>
+  {{ isEditMode ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur' }}
+</h2>
+
+<mat-dialog-content>
+  <form
+    class="category-form"
+    [formGroup]="categoryForm"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Kategori adı</mat-label>
+
+      <input
+        matInput
+        formControlName="name"
+        maxlength="100"
+        placeholder="Örneğin: İş"
+      />
+
+      <mat-error
+        *ngIf="categoryForm.controls.name.hasError('required')"
+      >
+        Kategori adı zorunludur.
+      </mat-error>
+
+      <mat-error
+        *ngIf="categoryForm.controls.name.hasError('maxlength')"
+      >
+        Kategori adı en fazla 100 karakter olabilir.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Açıklama</mat-label>
+
+      <textarea
+        matInput
+        formControlName="description"
+        maxlength="500"
+        rows="4"
+        placeholder="Kategori hakkında kısa bir açıklama yazın"
+      ></textarea>
+
+      <mat-error
+        *ngIf="categoryForm.controls.description.hasError('maxlength')"
+      >
+        Açıklama en fazla 500 karakter olabilir.
+      </mat-error>
+    </mat-form-field>
+
+    <div class="color-picker-section">
+      <label
+        class="color-picker-label"
+        for="categoryColor"
+      >
+        Kategori rengi
+      </label>
+
+      <div class="color-picker-row">
+        <input
+          id="categoryColor"
+          class="color-picker"
+          type="color"
+          formControlName="color"
+        />
+
+        <span
+          class="color-preview"
+          [style.backgroundColor]="categoryForm.controls.color.value"
+        ></span>
+
+        <span class="color-code">
+          {{ categoryForm.controls.color.value }}
+        </span>
+      </div>
+
+      <div
+        class="color-error"
+        *ngIf="
+          categoryForm.controls.color.touched &&
+          categoryForm.controls.color.hasError('required')
+        "
+      >
+        Renk seçimi zorunludur.
+      </div>
+    </div>
+
+    <div
+      class="error-message"
+      *ngIf="errorMessage"
+    >
+      {{ errorMessage }}
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    [disabled]="isSaving"
+    (click)="cancel()"
+  >
+    İptal
+  </button>
+
+  <button
+    mat-flat-button
+    type="button"
+    [disabled]="categoryForm.invalid || isSaving"
+    (click)="save()"
+  >
+    <mat-spinner
+      *ngIf="isSaving"
+      diameter="20"
+    ></mat-spinner>
+
+    <span *ngIf="!isSaving">
+      {{ isEditMode ? 'Güncelle' : 'Kaydet' }}
+    </span>
+  </button>
+</mat-dialog-actions>

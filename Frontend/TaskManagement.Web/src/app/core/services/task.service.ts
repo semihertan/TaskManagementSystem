@@ -61,6 +61,20 @@ export class TaskService {
       );
     }
 
+    if (filter.sortBy) {
+      params = params.set(
+        'sortBy',
+        filter.sortBy
+      );
+    }
+
+    if (filter.sortDirection) {
+      params = params.set(
+        'sortDirection',
+        filter.sortDirection
+      );
+    }
+
     params = params.set(
       'page',
       (filter.page ?? 1).toString()

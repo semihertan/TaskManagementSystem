@@ -5,6 +5,8 @@ export interface TaskFilter {
   categoryId?: string;
   dueDateFrom?: string;
   dueDateTo?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
   page?: number;
   pageSize?: number;
 }

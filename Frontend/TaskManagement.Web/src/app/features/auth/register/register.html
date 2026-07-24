@@ -101,30 +101,32 @@
       </mat-form-field>
 
       <div class="form-actions">
-        <button 
-          mat-flat-button 
-          class="submit-btn" 
-          type="submit" 
+        <button
+          mat-flat-button
+          class="submit-btn"
+          type="submit"
           [disabled]="registerForm.invalid || isLoading"
           aria-label="Create your account"
         >
           <span *ngIf="!isLoading">Create Account</span>
+
           <mat-spinner
             *ngIf="isLoading"
             diameter="20"
             class="btn-spinner"
             role="status"
-            aria-live="polite
+            aria-live="polite"
           ></mat-spinner>
         </button>
-        
-        @if(errorMessage){
+
+        @if (errorMessage) {
           <p class="error-message">
             {{ errorMessage }}
           </p>
         }
       </div>
-    </form>
+
+      </form>
 
     <!-- Card Footer -->
     <div class="card-footer">

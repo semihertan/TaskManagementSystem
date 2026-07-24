@@ -63,6 +63,29 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
+      <mat-label>Kategori</mat-label>
+
+      <mat-select
+        formControlName="categoryId"
+      >
+        <mat-option [value]="null">
+          Kategorisiz
+        </mat-option>
+
+        <mat-option
+          *ngFor="let category of categories"
+          [value]="category.id"
+        >
+          {{ category.name }}
+        </mat-option>
+      </mat-select>
+
+      <mat-hint *ngIf="isCategoriesLoading">
+        Kategoriler yükleniyor...
+      </mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
       <mat-label>Öncelik</mat-label>
 
       <mat-select formControlName="priority">
@@ -118,7 +141,7 @@
   <button
     mat-button
     type="button"
-    [disabled]="taskForm.invalid || isSaving"
+    [disabled]="isSaving"
     (click)="cancel()"
   >
     İptal
@@ -127,7 +150,7 @@
   <button
     mat-flat-button
     type="button"
-    [disabled]="isSaving"
+    [disabled]="taskForm.invalid || isSaving"
     (click)="save()"
   >
     <mat-spinner

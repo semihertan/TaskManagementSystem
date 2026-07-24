@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Category } from '../../shared/interfaces/category/category.interface';
 import { CreateCategory } from '../../shared/interfaces/category/create-category.interface';
+import { UpdateCategory } from '../../shared/interfaces/category/update-category.interface';
 import { ApiResponse } from '../../shared/interfaces/api-response.interface';
 
 @Injectable({
@@ -25,8 +26,14 @@ export class CategoryService {
     return this.http.post<ApiResponse<Category>>(this.apiUrl, categoryData);
   }
 
-  updateCategory(id: string, categoryData: CreateCategory): Observable<ApiResponse<Category>> {
-    return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${id}`, categoryData);
+  updateCategory(
+      id: string,
+      categoryData: UpdateCategory
+  ): Observable<ApiResponse<Category>> {
+      return this.http.put<ApiResponse<Category>>(
+          `${this.apiUrl}/${id}`,
+          categoryData
+      );
   }
 
   deleteCategory(id: string): Observable<ApiResponse<void>> {
