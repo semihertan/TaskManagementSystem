@@ -207,9 +207,9 @@
 
           <app-task-card
             [task]="task"
-            (edit)="openEditTaskDialog(task)"
-            (delete)="deleteTask(task)"
-            (details)="openTaskDetail(task)">
+            (editTask)="openEditTaskDialog($event)"
+            (deleteTask)="deleteTask($event)"
+            (viewTask)="openTaskDetail($event)">
           </app-task-card>
 
           <div
@@ -256,10 +256,10 @@
 
           <app-task-card
             [task]="task"
-            (edit)="openEditTaskDialog(task)"
-            (delete)="deleteTask(task)"
-            (details)="openTaskDetail(task)">
-          </app-task-card>
+            (editTask)="openEditTaskDialog($event)"
+            (deleteTask)="deleteTask($event)"
+            (viewTask)="openTaskDetail($event)">
+          </app-task-card>  
         </div>
 
         <div
@@ -300,9 +300,9 @@
 
           <app-task-card
             [task]="task"
-            (edit)="openEditTaskDialog(task)"
-            (delete)="deleteTask(task)"
-            (details)="openTaskDetail(task)">
+            (editTask)="openEditTaskDialog($event)"
+            (deleteTask)="deleteTask($event)"
+            (viewTask)="openTaskDetail($event)">
           </app-task-card>
         </div>
 
@@ -344,9 +344,9 @@
 
           <app-task-card
             [task]="task"
-            (edit)="openEditTaskDialog(task)"
-            (delete)="deleteTask(task)"
-            (details)="openTaskDetail(task)">
+            (editTask)="openEditTaskDialog($event)"
+            (deleteTask)="deleteTask($event)"
+            (viewTask)="openTaskDetail($event)">
           </app-task-card>
         </div>
 

@@ -90,8 +90,10 @@ export class TaskService {
     >(this.apiUrl, { params });
   }
 
-  getTaskById(id: string): Observable<TaskItem> {
-    return this.http.get<TaskItem>(`${this.apiUrl}/${id}`);
+  getTaskById(id: string): Observable<ApiResponse<TaskItem>> {
+    return this.http.get<ApiResponse<TaskItem>>(
+      `${this.apiUrl}/${id}`
+    );
   }
 
   createTask(taskData: CreateTask): Observable<ApiResponse<TaskItem>> {

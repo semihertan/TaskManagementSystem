@@ -155,9 +155,9 @@ export class Tasks implements OnInit {
 
       this.tasks = [createdTask, ...this.tasks];
 
-      this.showSuccess('Görev başarıyla oluşturuldu.');
+      this.refreshTaskView();
 
-      this.cdr.markForCheck();
+      this.showSuccess('Görev başarıyla oluşturuldu.');
     });
   }
 
@@ -185,9 +185,9 @@ export class Tasks implements OnInit {
             : currentTask
         );
 
-        this.showSuccess('Görev başarıyla düzenlendi.');
+        this.refreshTaskView();
 
-        this.cdr.markForCheck();
+        this.showSuccess('Görev başarıyla düzenlendi.');
       }
     );
   }
@@ -222,11 +222,11 @@ export class Tasks implements OnInit {
               currentTask.id !== task.id
           );
 
+          this.refreshTaskView();
+          
           this.showSuccess(
             'Görev başarıyla silindi.'
           );
-
-          this.cdr.markForCheck();
         },
 
         error: (error) => {
@@ -405,5 +405,10 @@ export class Tasks implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private refreshTaskView(): void {
+    this.distributeTasksByStatus();
+    this.cdr.markForCheck();
   }
 }

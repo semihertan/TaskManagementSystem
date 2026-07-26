@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { TaskItem } from '../../interfaces/task/task.interface';
 import { PriorityBadge } from '../priority-badge/priority-badge';
@@ -15,6 +16,7 @@ import { PriorityBadge } from '../priority-badge/priority-badge';
     MatCardModule,
     MatIconModule,
     MatButtonModule,
+    MatProgressBarModule,
     PriorityBadge,
   ],
   templateUrl: './task-card.html',
@@ -65,5 +67,85 @@ export class TaskCard {
     };
 
     return statusClasses[this.task.status] ?? '';
+  }
+
+  getDueDateWarning(): {
+    text: string;
+    type: 'overdue' | 'today' | 'tomorrow' | 'soon' | 'none';
+  } {
+    if (!this.task.dueDate) {
+      return { text: '', type: 'none' };
+    }
+
+    // Tamamlandı veya iptal edildi görevlerde uyarı gösterme
+    if (this.task.status === 2 || this.task.status === 3) {
+      return { text: '', type: 'none' };
+    }
+
+    const today = new Date();
+    const dueDate = new Date(this.task.dueDate);
+
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+
+    const differenceInMilliseconds = dueDate.getTime() - today.getTime();
+    const differenceInDays = Math.round(
+      differenceInMilliseconds / (1000 * 60 * 60 * 24)
+    );
+
+    if (differenceInDays < 0) {
+      return {
+        text: 'Vadesi geçti',
+        type: 'overdue'
+      };
+    }
+
+    if (differenceInDays === 0) {
+      return {
+        text: 'Bugün son gün',
+        type: 'today'
+      };
+    }
+
+    if (differenceInDays === 1) {
+      return {
+        text: 'Yarın son gün',
+        type: 'tomorrow'
+      };
+    }
+
+    if (differenceInDays <= 3) {
+      return {
+        text: `Son tarihe ${differenceInDays} gün kaldı`,
+        type: 'soon'
+      };
+    }
+
+    return {
+      text: '',
+      type: 'none'
+    };
+  }
+
+  getProgressValue(): number {
+    const progressValues: Record<number, number> = {
+      0: 0,
+      1: 50,
+      2: 100,
+      3: 0,
+    };
+
+    return progressValues[this.task.status] ?? 0;
+  }
+
+  getProgressText(): string {
+    const progressTexts: Record<number, string> = {
+      0: 'Başlanmadı',
+      1: 'Devam ediyor',
+      2: 'Tamamlandı',
+      3: 'İptal edildi',
+    };
+
+    return progressTexts[this.task.status] ?? 'Bilinmiyor';
   }
 }
