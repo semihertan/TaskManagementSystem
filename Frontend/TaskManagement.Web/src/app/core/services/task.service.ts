@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TaskItem } from '../../shared/interfaces/task/task.interface';
 import { CreateTask } from '../../shared/interfaces/task/create-task.interface';
@@ -16,6 +16,12 @@ import { TaskFilter } from '../../shared/interfaces/task/task-filter.interface';
 export class TaskService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/tasks`;
+
+  private readonly tasksSubject =
+  new BehaviorSubject<PagedData<TaskItem> | null>(null);
+
+  readonly tasks$ =
+    this.tasksSubject.asObservable();
 
   getTasks(
     filter: TaskFilter = {}
@@ -85,9 +91,13 @@ export class TaskService {
       (filter.pageSize ?? 10).toString()
     );
 
-    return this.http.get<
-      ApiResponse<PagedData<TaskItem>>
-    >(this.apiUrl, { params });
+  return this.http.get<
+    ApiResponse<PagedData<TaskItem>>
+    >(this.apiUrl, { params }).pipe(
+      tap(response => {
+        this.tasksSubject.next(response.data);
+      })
+    );
   }
 
   getTaskById(id: string): Observable<ApiResponse<TaskItem>> {

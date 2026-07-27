@@ -91,6 +91,21 @@ export class Tasks implements OnInit {
   cancelledTasks: TaskItem[] = [];
 
   ngOnInit(): void {
+    this.taskService.tasks$
+      .subscribe(data => {
+        if (!data) {
+          return;
+        }
+
+        this.tasks = data.items;
+        this.totalCount = data.totalCount;
+        this.currentPage = data.page;
+        this.pageSize = data.pageSize;
+
+        this.distributeTasksByStatus();
+        this.cdr.markForCheck();
+      });
+
     this.loadTasks();
   }
 
@@ -119,12 +134,7 @@ export class Tasks implements OnInit {
     };
 
     this.taskService.getTasks(filters).subscribe({
-      next: (response) => {
-        this.tasks = response.data.items;
-        this.totalCount = response.data.totalCount;
-
-        this.distributeTasksByStatus();
-
+      next: () => {
         this.isLoading = false;
         this.cdr.markForCheck();
       },
