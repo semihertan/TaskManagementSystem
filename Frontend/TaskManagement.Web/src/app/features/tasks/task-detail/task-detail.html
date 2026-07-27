@@ -32,329 +32,137 @@
     </span>
   </div>
 
-  <mat-card
+  <div
     *ngIf="!isLoading && !errorMessage && task"
-    class="detail-card"
+    class="task-detail-content"
   >
 
-    <mat-card-header class="detail-header">
+    <!-- Görev Bilgileri -->
+    <mat-card class="detail-card">
 
-      <div class="title-section">
+      <mat-card-header class="detail-header">
 
-        <mat-card-title>
-          {{ task.title }}
-        </mat-card-title>
+        <div class="title-section">
 
-        <mat-card-subtitle>
-          Görev detayları ve güncel durum
-        </mat-card-subtitle>
+          <mat-card-title>
+            {{ task.title }}
+          </mat-card-title>
 
-      </div>
-
-      <app-priority-badge
-        [priority]="task.priority"
-      ></app-priority-badge>
-
-    </mat-card-header>
-
-    <mat-card-content>
-
-      <section class="description-section">
-
-        <span class="section-label">
-          Açıklama
-        </span>
-
-        <p>
-          {{ task.description || 'Açıklama bulunmuyor.' }}
-        </p>
-
-      </section>
-
-      <div class="detail-grid">
-
-        <div class="detail-item">
-
-          <mat-icon>
-            flag
-          </mat-icon>
-
-          <div class="detail-item-content">
-
-            <span class="label">
-              Durum
-            </span>
-
-            <span
-              class="status-badge"
-              [ngClass]="getStatusClass()"
-            >
-              {{ getStatusText() }}
-            </span>
-
-          </div>
+          <mat-card-subtitle>
+            Görev detayları ve güncel durum
+          </mat-card-subtitle>
 
         </div>
 
-        <div class="detail-item">
+        <app-priority-badge
+          [priority]="task.priority"
+        ></app-priority-badge>
 
-          <mat-icon>
-            event
-          </mat-icon>
+      </mat-card-header>
 
-          <div class="detail-item-content">
+      <mat-card-content>
 
-            <span class="label">
-              Son Tarih
-            </span>
+        <section class="description-section">
 
-            <span>
-              {{
-                task.dueDate
-                  ? (task.dueDate | date:'dd.MM.yyyy')
-                  : 'Belirtilmedi'
-              }}
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="detail-item">
-
-          <mat-icon>
-            schedule
-          </mat-icon>
-
-          <div class="detail-item-content">
-
-            <span class="label">
-              Oluşturulma Tarihi
-            </span>
-
-            <span>
-              {{
-                task.createdAt
-                  | date:'dd.MM.yyyy HH:mm'
-              }}
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="detail-item">
-
-          <mat-icon>
-            update
-          </mat-icon>
-
-          <div class="detail-item-content">
-
-            <span class="label">
-              Güncellenme Tarihi
-            </span>
-
-            <span>
-              {{
-                task.updatedAt
-                  | date:'dd.MM.yyyy HH:mm'
-              }}
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </mat-card-content>
-
-      <section class="attachments-section">
-
-    <div class="attachments-header">
-
-      <div class="attachments-title">
-
-        <div class="attachments-icon">
-          <mat-icon>attach_file</mat-icon>
-        </div>
-
-        <div>
-          <h3>Dosya Ekleri</h3>
+          <span class="section-label">
+            Açıklama
+          </span>
 
           <p>
-            Bu göreve ait dosyaları görüntüleyebilir ve yönetebilirsin.
+            {{ task.description || 'Açıklama bulunmuyor.' }}
           </p>
-        </div>
 
-      </div>
+        </section>
 
-      <span class="attachment-count">
-        {{ attachments.length }} dosya
-      </span>
+        <div class="detail-grid">
 
-    </div>
+          <div class="detail-item">
 
-    <div class="file-upload-area">
-
-      <input
-        #fileInput
-        type="file"
-        hidden
-        (change)="onFileSelected($event)"
-      />
-
-      <div class="upload-content">
-
-        <div class="upload-icon">
-          <mat-icon>cloud_upload</mat-icon>
-        </div>
-
-        <div class="upload-information">
-
-          <span class="upload-title">
-            Göreve dosya ekle
-          </span>
-
-          <span class="upload-description">
-            Dosya seçerek bu göreve yükleyebilirsin. En fazla 10 MB.
-          </span>
-
-        </div>
-
-      </div>
-
-      <div class="upload-actions">
-
-        <button
-          mat-stroked-button
-          type="button"
-          [disabled]="isUploading"
-          (click)="fileInput.click()"
-        >
-          <mat-icon>folder_open</mat-icon>
-          Dosya Seç
-        </button>
-
-        <button
-          mat-flat-button
-          type="button"
-          [disabled]="!selectedFile || isUploading"
-          (click)="uploadFile(fileInput)"
-        >
-          <mat-icon>
-            {{ isUploading ? 'hourglass_top' : 'upload' }}
-          </mat-icon>
-
-          {{ isUploading ? 'Yükleniyor...' : 'Yükle' }}
-        </button>
-
-      </div>
-
-    </div>
-
-    <div
-      *ngIf="selectedFile"
-      class="selected-file"
-    >
-
-      <div class="selected-file-main">
-
-        <mat-icon>draft</mat-icon>
-
-        <div class="selected-file-information">
-
-          <span class="selected-file-name">
-            {{ selectedFile.name }}
-          </span>
-
-          <span class="selected-file-size">
-            {{ formatFileSize(selectedFile.size) }}
-          </span>
-
-        </div>
-
-      </div>
-
-      <button
-        mat-icon-button
-        type="button"
-        matTooltip="Seçimi kaldır"
-        [disabled]="isUploading"
-        (click)="clearSelectedFile(fileInput)"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-
-    </div>
-
-    <div
-      *ngIf="isAttachmentsLoading"
-      class="attachments-loading"
-    >
-      <mat-spinner diameter="32"></mat-spinner>
-      <span>Dosya ekleri yükleniyor...</span>
-    </div>
-
-    <div
-      *ngIf="
-        !isAttachmentsLoading &&
-        attachments.length === 0
-      "
-      class="empty-attachments"
-    >
-      <mat-icon>folder_off</mat-icon>
-
-      <h4>Henüz dosya eklenmedi</h4>
-
-      <p>
-        Bu göreve yüklenen dosyalar burada görüntülenecek.
-      </p>
-    </div>
-
-    <div
-      *ngIf="
-        !isAttachmentsLoading &&
-        attachments.length > 0
-      "
-      class="attachments-list"
-    >
-
-      <article
-        *ngFor="let attachment of attachments"
-        class="attachment-item"
-      >
-
-        <div class="attachment-main">
-
-          <div class="file-type-icon">
             <mat-icon>
-              {{ getFileIcon(attachment) }}
+              flag
             </mat-icon>
+
+            <div class="detail-item-content">
+
+              <span class="label">
+                Durum
+              </span>
+
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass()"
+              >
+                {{ getStatusText() }}
+              </span>
+
+            </div>
+
           </div>
 
-          <div class="attachment-information">
+          <div class="detail-item">
 
-            <span
-              class="attachment-name"
-              [title]="attachment.fileName"
-            >
-              {{ attachment.fileName }}
-            </span>
+            <mat-icon>
+              event
+            </mat-icon>
 
-            <div class="attachment-metadata">
+            <div class="detail-item-content">
 
-              <span>
-                {{ formatFileSize(attachment.fileSize) }}
-              </span>
-
-              <span class="metadata-separator">
-                •
+              <span class="label">
+                Son Tarih
               </span>
 
               <span>
-                {{ attachment.uploadedAt | date:'dd.MM.yyyy HH:mm' }}
+                {{
+                  task.dueDate
+                    ? (task.dueDate | date:'dd.MM.yyyy')
+                    : 'Belirtilmedi'
+                }}
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="detail-item">
+
+            <mat-icon>
+              schedule
+            </mat-icon>
+
+            <div class="detail-item-content">
+
+              <span class="label">
+                Oluşturulma Tarihi
+              </span>
+
+              <span>
+                {{
+                  task.createdAt
+                    | date:'dd.MM.yyyy HH:mm'
+                }}
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="detail-item">
+
+            <mat-icon>
+              update
+            </mat-icon>
+
+            <div class="detail-item-content">
+
+              <span class="label">
+                Güncellenme Tarihi
+              </span>
+
+              <span>
+                {{
+                  task.updatedAt
+                    | date:'dd.MM.yyyy HH:mm'
+                }}
               </span>
 
             </div>
@@ -363,55 +171,282 @@
 
         </div>
 
-        <div class="attachment-actions">
+      </mat-card-content>
 
-          <button
-            mat-icon-button
-            type="button"
-            matTooltip="Dosyayı indir"
-            [disabled]="
-              downloadingAttachmentId === attachment.id ||
-              deletingAttachmentId === attachment.id
-            "
-            (click)="downloadAttachment(attachment)"
+    </mat-card>
+
+    <!-- Dosya Ekleri -->
+    <mat-card class="attachments-card">
+
+      <mat-card-content>
+
+        <section class="attachments-section">
+
+          <div class="attachments-header">
+
+            <div class="attachments-title">
+
+              <div class="attachments-icon">
+                <mat-icon>attach_file</mat-icon>
+              </div>
+
+              <div>
+                <h3>Dosya Ekleri</h3>
+
+                <p>
+                  Bu göreve ait dosyaları görüntüleyebilir ve yönetebilirsin.
+                </p>
+              </div>
+
+            </div>
+
+            <span class="attachment-count">
+              {{ attachments.length }} dosya
+            </span>
+
+          </div>
+
+          <div class="file-upload-area">
+
+            <input
+              #fileInput
+              type="file"
+              hidden
+              (change)="onFileSelected($event)"
+            />
+
+            <div class="upload-content">
+
+              <div class="upload-icon">
+                <mat-icon>cloud_upload</mat-icon>
+              </div>
+
+              <div class="upload-information">
+
+                <span class="upload-title">
+                  Göreve dosya ekle
+                </span>
+
+                <span class="upload-description">
+                  Dosya seçerek bu göreve yükleyebilirsin. En fazla 10 MB.
+                </span>
+
+              </div>
+
+            </div>
+
+            <div class="upload-actions">
+
+              <button
+                mat-stroked-button
+                type="button"
+                [disabled]="isUploading"
+                (click)="fileInput.click()"
+              >
+                <mat-icon>folder_open</mat-icon>
+                Dosya Seç
+              </button>
+
+              <button
+                mat-flat-button
+                type="button"
+                [disabled]="!selectedFile || isUploading"
+                (click)="uploadFile(fileInput)"
+              >
+                <mat-icon>
+                  {{ isUploading ? 'hourglass_top' : 'upload' }}
+                </mat-icon>
+
+                {{ isUploading ? 'Yükleniyor...' : 'Yükle' }}
+              </button>
+
+            </div>
+
+          </div>
+
+          <div
+            *ngIf="selectedFile"
+            class="selected-file"
           >
-            <mat-icon>
-              {{
-                downloadingAttachmentId === attachment.id
-                  ? 'hourglass_top'
-                  : 'download'
-              }}
-            </mat-icon>
-          </button>
 
-          <button
-            mat-icon-button
-            type="button"
-            class="delete-attachment-button"
-            matTooltip="Dosyayı sil"
-            [disabled]="
-              deletingAttachmentId === attachment.id ||
-              downloadingAttachmentId === attachment.id
-            "
-            (click)="deleteAttachment(attachment)"
+            <div class="selected-file-main">
+
+              <mat-icon>draft</mat-icon>
+
+              <div class="selected-file-information">
+
+                <span class="selected-file-name">
+                  {{ selectedFile.name }}
+                </span>
+
+                <span class="selected-file-size">
+                  {{ formatFileSize(selectedFile.size) }}
+                </span>
+
+              </div>
+
+            </div>
+
+            <button
+              mat-icon-button
+              type="button"
+              matTooltip="Seçimi kaldır"
+              [disabled]="isUploading"
+              (click)="clearSelectedFile(fileInput)"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+
+          </div>
+
+          <div
+            *ngIf="isAttachmentsLoading"
+            class="attachments-loading"
           >
-            <mat-icon>
-              {{
-                deletingAttachmentId === attachment.id
-                  ? 'hourglass_top'
-                  : 'delete_outline'
-              }}
-            </mat-icon>
-          </button>
+            <mat-spinner diameter="32"></mat-spinner>
 
-        </div>
+            <span>
+              Dosya ekleri yükleniyor...
+            </span>
+          </div>
 
-      </article>
+          <div
+            *ngIf="
+              !isAttachmentsLoading &&
+              attachments.length === 0
+            "
+            class="empty-attachments"
+          >
+            <mat-icon>folder_off</mat-icon>
 
-    </div>
+            <h4>
+              Henüz dosya eklenmedi
+            </h4>
 
-  </section>
+            <p>
+              Bu göreve yüklenen dosyalar burada görüntülenecek.
+            </p>
+          </div>
 
-  </mat-card>
+          <div
+            *ngIf="
+              !isAttachmentsLoading &&
+              attachments.length > 0
+            "
+            class="attachments-list"
+          >
+
+            <article
+              *ngFor="let attachment of attachments"
+              class="attachment-item"
+            >
+
+              <div class="attachment-main">
+
+                <div class="file-type-icon">
+                  <mat-icon>
+                    {{ getFileIcon(attachment) }}
+                  </mat-icon>
+                </div>
+
+                <div class="attachment-information">
+
+                  <span
+                    class="attachment-name"
+                    [title]="attachment.fileName"
+                  >
+                    {{ attachment.fileName }}
+                  </span>
+
+                  <div class="attachment-metadata">
+
+                    <span>
+                      {{ formatFileSize(attachment.fileSize) }}
+                    </span>
+
+                    <span class="metadata-separator">
+                      •
+                    </span>
+
+                    <span>
+                      {{
+                        attachment.uploadedAt
+                          | date:'dd.MM.yyyy HH:mm'
+                      }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="attachment-actions">
+
+                <button
+                  mat-icon-button
+                  type="button"
+                  matTooltip="Dosyayı indir"
+                  [disabled]="
+                    downloadingAttachmentId === attachment.id ||
+                    deletingAttachmentId === attachment.id
+                  "
+                  (click)="downloadAttachment(attachment)"
+                >
+                  <mat-icon>
+                    {{
+                      downloadingAttachmentId === attachment.id
+                        ? 'hourglass_top'
+                        : 'download'
+                    }}
+                  </mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="delete-attachment-button"
+                  matTooltip="Dosyayı sil"
+                  [disabled]="
+                    deletingAttachmentId === attachment.id ||
+                    downloadingAttachmentId === attachment.id
+                  "
+                  (click)="deleteAttachment(attachment)"
+                >
+                  <mat-icon>
+                    {{
+                      deletingAttachmentId === attachment.id
+                        ? 'hourglass_top'
+                        : 'delete_outline'
+                    }}
+                  </mat-icon>
+                </button>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </section>
+
+      </mat-card-content>
+
+    </mat-card>
+
+    <!-- Yorumlar -->
+    <mat-card class="comments-card">
+
+      <mat-card-content>
+
+        <app-comment-section
+          [taskId]="task.id"
+        ></app-comment-section>
+
+      </mat-card-content>
+
+    </mat-card>
+
+  </div>
 
 </section>

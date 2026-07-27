@@ -19,6 +19,7 @@ import { TaskAttachment } from '../../../shared/interfaces/task/task-attachment.
 import { TaskService } from '../../../core/services/task.service';
 import { TaskItem } from '../../../shared/interfaces/task/task.interface';
 import { PriorityBadge } from '../../../shared/components/priority-badge/priority-badge';
+import { CommentSection } from '../../../shared/components/comment-section/comment-section';
 
 @Component({
   selector: 'app-task-detail',
@@ -31,7 +32,8 @@ import { PriorityBadge } from '../../../shared/components/priority-badge/priorit
     MatTooltipModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    PriorityBadge
+    PriorityBadge,
+    CommentSection
   ],
   templateUrl: './task-detail.html',
   styleUrl: './task-detail.scss'
