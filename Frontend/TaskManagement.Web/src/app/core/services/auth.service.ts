@@ -9,6 +9,11 @@ import { environment } from '../../../environments/environment';
 import { User } from '../../shared/interfaces/auth/user.interface';
 import { LoginRequest } from '../../shared/interfaces/auth/login.interface';
 import { RegisterRequest } from '../../shared/interfaces/auth/register.interface';
+import {
+  ChangePasswordRequest,
+  UpdateProfileRequest,
+  UserProfile
+} from '../../shared/interfaces/auth/profile.interface';
 import { ApiResponse } from '../../shared/interfaces/api-response.interface';
 
 import { StorageService } from './storage.service';
@@ -45,10 +50,28 @@ export class AuthService {
     );
   }
 
-  getProfile(): Observable<ApiResponse<User>> {
-  return this.http.get<ApiResponse<User>>(
-    `${this.apiUrl}/profile`
-  );
+  getProfile(): Observable<ApiResponse<UserProfile>> {
+    return this.http.get<ApiResponse<UserProfile>>(
+      `${this.apiUrl}/profile`
+    );
+  }
+
+  updateProfile(
+    request: UpdateProfileRequest
+  ): Observable<ApiResponse<UserProfile>> {
+    return this.http.put<ApiResponse<UserProfile>>(
+      `${this.apiUrl}/profile`,
+      request
+    );
+  }
+
+  changePassword(
+    request: ChangePasswordRequest
+  ): Observable<ApiResponse<null>> {
+    return this.http.put<ApiResponse<null>>(
+      `${this.apiUrl}/change-password`,
+      request
+    );
   }
 
   logout(): void {
@@ -94,7 +117,7 @@ export class AuthService {
 
     try {
 
-      const decoded: any = jwtDecode<JwtPayload>(token);
+      const decoded = jwtDecode<JwtPayload>(token);
 
       if (!decoded.exp) {
         this.logout();
@@ -112,9 +135,7 @@ export class AuthService {
 
       return true;
 
-    } catch (error) {
-      console.error("Token doğrulanamadı:", error)
-
+    } catch {
       this.logout();
 
       return false;

@@ -1,152 +1,142 @@
-<h2 mat-dialog-title>
-  {{ isEditMode ? 'Görevi Düzenle' : 'Yeni Görev Oluştur' }}
-</h2>
-
-<mat-dialog-content>
-  <form
-    class="task-form"
-    [formGroup]="taskForm"
-  >
-    <mat-form-field
-  *ngIf="isEditMode"
-  appearance="outline"
->
-  <mat-label>Durum</mat-label>
-
-  <mat-select formControlName="status">
-    <mat-option
-      *ngFor="let status of statuses"
-      [value]="status.value"
-    >
-      {{ status.label }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Görev başlığı</mat-label>
-
-      <input
-        matInput
-        formControlName="title"
-        placeholder="Örneğin: Haftalık raporu hazırla"
-      />
-
-      <mat-error
-        *ngIf="taskForm.controls.title.hasError('required')"
-      >
-        Görev başlığı zorunludur.
-      </mat-error>
-
-      <mat-error
-        *ngIf="taskForm.controls.title.hasError('maxlength')"
-      >
-        Başlık en fazla 200 karakter olabilir.
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Açıklama</mat-label>
-
-      <textarea
-        matInput
-        formControlName="description"
-        rows="4"
-        placeholder="Görev hakkında açıklama yazın"
-      ></textarea>
-
-      <mat-error
-          *ngIf="taskForm.controls.description.hasError('maxlength')"
-        >
-          Açıklama en fazla 2000 karakter olabilir.
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Kategori</mat-label>
-
-      <mat-select
-        formControlName="categoryId"
-      >
-        <mat-option [value]="null">
-          Kategorisiz
-        </mat-option>
-
-        <mat-option
-          *ngFor="let category of categories"
-          [value]="category.id"
-        >
-          {{ category.name }}
-        </mat-option>
-      </mat-select>
-
-      <mat-hint *ngIf="isCategoriesLoading">
-        Kategoriler yükleniyor...
-      </mat-hint>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Öncelik</mat-label>
-
-      <mat-select formControlName="priority">
-        <mat-option
-          *ngFor="let priority of priorities"
-          [value]="priority.value"
-        >
-          {{ priority.label }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Bitiş tarihi</mat-label>
-
-      <input
-        matInput
-        [matDatepicker]="dueDatePicker"
-        formControlName="dueDate"
-      />
-
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="dueDatePicker"
-      ></mat-datepicker-toggle>
-
-      <mat-datepicker #dueDatePicker></mat-datepicker>
-    </mat-form-field>
-
-    <div
-      class="error-message"
-      *ngIf="errorMessage"
-    >
-      {{ errorMessage }}
-    </div>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button
-    mat-button
-    type="button"
-    [disabled]="isSaving"
-    (click)="cancel()"
-  >
-    İptal
-  </button>
-
-  <button
-    mat-flat-button
-    type="button"
-    [disabled]="taskForm.invalid || isSaving"
-    (click)="save()"
-  >
-    <mat-spinner
-      *ngIf="isSaving"
-      diameter="20"
-    ></mat-spinner>
-
-    <span *ngIf="!isSaving">
-      {{ isEditMode ? 'Güncelle' : 'Kaydet' }}
+<div class="task-dialog">
+  <header class="task-dialog__header" mat-dialog-title>
+    <span class="task-dialog__header-icon" aria-hidden="true">
+      <mat-icon>{{ isEditMode ? 'edit_note' : 'add_task' }}</mat-icon>
     </span>
-  </button>
-</mat-dialog-actions>
+
+    <div>
+      <h2>{{ isEditMode ? 'Görevi Düzenle' : 'Yeni Görev Oluştur' }}</h2>
+      <p>
+        {{
+          isEditMode
+            ? 'Görevin bilgilerini ve planını güncelleyin.'
+            : 'Yeni görevin ayrıntılarını ve planını belirleyin.'
+        }}
+      </p>
+    </div>
+  </header>
+
+  <mat-dialog-content class="task-dialog__content">
+    <form class="task-form" [formGroup]="taskForm" [attr.aria-busy]="isSaving">
+      <section class="form-section" aria-labelledby="task-basics-heading">
+        <div class="form-section__heading">
+          <mat-icon aria-hidden="true">subject</mat-icon>
+          <span id="task-basics-heading">Görev bilgileri</span>
+        </div>
+
+        <mat-form-field appearance="outline" class="title-field">
+          <mat-label>Görev başlığı</mat-label>
+
+          <input matInput formControlName="title" placeholder="Örneğin: Haftalık raporu hazırla" />
+
+          <mat-error *ngIf="taskForm.controls.title.hasError('required')">
+            Görev başlığı zorunludur.
+          </mat-error>
+
+          <mat-error *ngIf="taskForm.controls.title.hasError('maxlength')">
+            Başlık en fazla 200 karakter olabilir.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="description-field">
+          <mat-label>Açıklama</mat-label>
+
+          <textarea
+            matInput
+            formControlName="description"
+            rows="5"
+            placeholder="Görev hakkında açıklama yazın"
+          ></textarea>
+
+          <mat-error *ngIf="taskForm.controls.description.hasError('maxlength')">
+            Açıklama en fazla 2000 karakter olabilir.
+          </mat-error>
+        </mat-form-field>
+      </section>
+
+      <section class="form-section" aria-labelledby="task-planning-heading">
+        <div class="form-section__heading">
+          <mat-icon aria-hidden="true">event_note</mat-icon>
+          <span id="task-planning-heading">Planlama</span>
+        </div>
+
+        <div class="form-grid">
+          <mat-form-field *ngIf="isEditMode" appearance="outline">
+            <mat-label>Durum</mat-label>
+
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of statuses" [value]="status.value">
+                {{ status.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Kategori</mat-label>
+
+            <mat-select formControlName="categoryId">
+              <mat-option [value]="null">Kategorisiz</mat-option>
+
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+
+            <mat-hint *ngIf="isCategoriesLoading"> Kategoriler yükleniyor... </mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Öncelik</mat-label>
+
+            <mat-select formControlName="priority">
+              <mat-option *ngFor="let priority of priorities" [value]="priority.value">
+                {{ priority.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Bitiş tarihi</mat-label>
+
+            <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate" />
+
+            <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+
+            <mat-datepicker #dueDatePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <div class="error-message" *ngIf="errorMessage" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="task-dialog__actions">
+    <button mat-button type="button" [disabled]="isSaving" (click)="cancel()">İptal</button>
+
+    <button
+      mat-flat-button
+      class="save-button"
+      type="button"
+      [disabled]="taskForm.invalid || isSaving"
+      (click)="save()"
+    >
+      <span class="button-content">
+        <mat-spinner *ngIf="isSaving" diameter="20"></mat-spinner>
+
+        {{
+          isSaving
+            ? isEditMode
+              ? 'Güncelleniyor...'
+              : 'Kaydediliyor...'
+            : isEditMode
+              ? 'Güncelle'
+              : 'Kaydet'
+        }}
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -62,6 +62,14 @@ export const routes: Routes = [
           import('./features/categories/categories')
             .then((m) => m.Categories),
       },
+
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile')
+            .then((m) => m.Profile),
+        canActivate: [authGuard]
+      },
     ],
   },
 

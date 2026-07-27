@@ -1,10 +1,19 @@
 <section class="dashboard">
-  <div class="dashboard-header">
-    <div>
+  <div class="dashboard-ambient" aria-hidden="true"></div>
+
+  <header class="dashboard-hero">
+    <div class="hero-content">
       <h1>Dashboard</h1>
       <p>Görevlerinin genel durumunu buradan takip edebilirsin.</p>
     </div>
-  </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <span class="hero-orbit"></span>
+      <span class="hero-icon">
+        <mat-icon>insights</mat-icon>
+      </span>
+    </div>
+  </header>
 
   <div class="loading-container" *ngIf="isLoading">
     <mat-spinner diameter="48"></mat-spinner>
@@ -16,13 +25,10 @@
     <span>{{ errorMessage }}</span>
   </div>
 
-  <div
-    class="statistics-grid"
-    *ngIf="statistics && !isLoading && !errorMessage"
-  >
-    <mat-card class="stat-card">
+  <div class="statistics-grid" *ngIf="statistics && !isLoading && !errorMessage">
+    <mat-card class="stat-card stat-card--total">
       <mat-card-content>
-        <div class="stat-icon total">
+        <div class="stat-icon">
           <mat-icon>assignment</mat-icon>
         </div>
 
@@ -30,12 +36,14 @@
           <span class="stat-label">Toplam Görev</span>
           <strong>{{ statistics.totalTasks }}</strong>
         </div>
+
+        <mat-icon class="stat-watermark" aria-hidden="true">assignment</mat-icon>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card">
+    <mat-card class="stat-card stat-card--pending">
       <mat-card-content>
-        <div class="stat-icon pending">
+        <div class="stat-icon">
           <mat-icon>schedule</mat-icon>
         </div>
 
@@ -43,12 +51,14 @@
           <span class="stat-label">Bekleyen</span>
           <strong>{{ statistics.pendingTasks }}</strong>
         </div>
+
+        <mat-icon class="stat-watermark" aria-hidden="true">schedule</mat-icon>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card">
+    <mat-card class="stat-card stat-card--progress">
       <mat-card-content>
-        <div class="stat-icon progress">
+        <div class="stat-icon">
           <mat-icon>autorenew</mat-icon>
         </div>
 
@@ -56,12 +66,14 @@
           <span class="stat-label">Devam Eden</span>
           <strong>{{ statistics.inProgressTasks }}</strong>
         </div>
+
+        <mat-icon class="stat-watermark" aria-hidden="true">autorenew</mat-icon>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card">
+    <mat-card class="stat-card stat-card--completed">
       <mat-card-content>
-        <div class="stat-icon completed">
+        <div class="stat-icon">
           <mat-icon>check_circle</mat-icon>
         </div>
 
@@ -69,12 +81,14 @@
           <span class="stat-label">Tamamlanan</span>
           <strong>{{ statistics.completedTasks }}</strong>
         </div>
+
+        <mat-icon class="stat-watermark" aria-hidden="true">check_circle</mat-icon>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card">
+    <mat-card class="stat-card stat-card--cancelled">
       <mat-card-content>
-        <div class="stat-icon cancelled">
+        <div class="stat-icon">
           <mat-icon>cancel</mat-icon>
         </div>
 
@@ -82,12 +96,14 @@
           <span class="stat-label">İptal Edilen</span>
           <strong>{{ statistics.cancelledTasks }}</strong>
         </div>
+
+        <mat-icon class="stat-watermark" aria-hidden="true">cancel</mat-icon>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card">
+    <mat-card class="stat-card stat-card--overdue">
       <mat-card-content>
-        <div class="stat-icon overdue">
+        <div class="stat-icon">
           <mat-icon>warning</mat-icon>
         </div>
 
@@ -95,14 +111,13 @@
           <span class="stat-label">Vadesi Geçen</span>
           <strong>{{ statistics.overdueTasks }}</strong>
         </div>
+
+        <mat-icon class="stat-watermark" aria-hidden="true">warning</mat-icon>
       </mat-card-content>
     </mat-card>
   </div>
 
-  <mat-card
-    class="progress-card"
-    *ngIf="statistics && !isLoading && !errorMessage"
-  >
+  <mat-card class="progress-card" *ngIf="statistics && !isLoading && !errorMessage">
     <mat-card-content>
       <div class="progress-header">
         <div>
@@ -113,8 +128,7 @@
         <strong>
           {{
             statistics.totalTasks > 0
-              ? ((statistics.completedTasks / statistics.totalTasks) * 100
-                | number: '1.0-0')
+              ? ((statistics.completedTasks / statistics.totalTasks) * 100 | number: '1.0-0')
               : 0
           }}%
         </strong>

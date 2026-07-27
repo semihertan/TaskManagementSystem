@@ -20,6 +20,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
 
 import {
   ConfirmDialog,
@@ -50,6 +51,7 @@ import { PRIORITY_OPTIONS } from '../../shared/constants/priority.constants';
     MatButtonModule,
     MatSnackBarModule,
     MatPaginatorModule,
+    MatIconModule,
     DragDropModule
   ],
   templateUrl: './tasks.html',
@@ -184,8 +186,10 @@ export class Tasks implements OnInit {
 
   openCreateTaskDialog(): void {
     const dialogRef = this.dialog.open(TaskForm, {
-      width: '600px',
-      maxWidth: '95vw',
+      width: '760px',
+      maxWidth: 'calc(100vw - 32px)',
+      maxHeight: 'calc(100dvh - 32px)',
+      panelClass: 'task-form-dialog',
       disableClose: true
     });
 
@@ -203,8 +207,10 @@ export class Tasks implements OnInit {
       TaskItem,
       TaskItem
     >(TaskForm, {
-      width: '600px',
-      maxWidth: '95vw',
+      width: '760px',
+      maxWidth: 'calc(100vw - 32px)',
+      maxHeight: 'calc(100dvh - 32px)',
+      panelClass: 'task-form-dialog',
       disableClose: true,
       data: task
     });

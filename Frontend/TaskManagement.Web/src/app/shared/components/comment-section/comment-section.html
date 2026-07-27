@@ -17,28 +17,22 @@
       (keydown)="onCommentKeydown($event)"
       [disabled]="isCreating"
       maxlength="2000"
+      aria-label="Yeni yorum"
       placeholder="Yorumunuzu yazın..."
-      rows="4">
+      rows="4"
+    >
     </textarea>
 
     <div class="comment-form-footer">
-      <span class="character-count">
-        {{ newCommentContent.length }}/2000
-      </span>
+      <span class="character-count"> {{ newCommentContent.length }}/2000 </span>
 
       <button
         mat-flat-button
         type="button"
-        [disabled]="
-          !newCommentContent.trim() ||
-          isCreating
-        "
-        (click)="createComment()">
-
-        <mat-spinner
-          *ngIf="isCreating"
-          diameter="20">
-        </mat-spinner>
+        [disabled]="!newCommentContent.trim() || isCreating"
+        (click)="createComment()"
+      >
+        <mat-spinner *ngIf="isCreating" diameter="20"> </mat-spinner>
 
         <ng-container *ngIf="!isCreating">
           <mat-icon>send</mat-icon>
@@ -47,46 +41,24 @@
       </button>
     </div>
 
-    <small class="keyboard-hint">
-      Enter ile gönder, Shift + Enter ile yeni satır
-    </small>
+    <small class="keyboard-hint"> Enter ile gönder, Shift + Enter ile yeni satır </small>
   </div>
 
-  <div
-    *ngIf="isLoading"
-    class="comment-loading">
-
+  <div *ngIf="isLoading" class="comment-loading" role="status" aria-live="polite">
     <mat-spinner diameter="34"></mat-spinner>
     <span>Yorumlar yükleniyor...</span>
   </div>
 
-  <div
-    *ngIf="
-      !isLoading &&
-      comments.length === 0
-    "
-    class="comment-empty">
-
+  <div *ngIf="!isLoading && comments.length === 0" class="comment-empty" role="status">
     <mat-icon>chat_bubble_outline</mat-icon>
 
     <h3>Henüz yorum yok</h3>
 
-    <p>
-      Bu görev için ilk yorumu siz ekleyebilirsiniz.
-    </p>
+    <p>Bu görev için ilk yorumu siz ekleyebilirsiniz.</p>
   </div>
 
-  <div
-    *ngIf="
-      !isLoading &&
-      comments.length > 0
-    "
-    class="comment-list">
-
-    <article
-      *ngFor="let comment of comments"
-      class="comment-card">
-
+  <div *ngIf="!isLoading && comments.length > 0" class="comment-list">
+    <article *ngFor="let comment of comments" class="comment-card">
       <div class="comment-avatar">
         <mat-icon>person</mat-icon>
       </div>
@@ -100,11 +72,7 @@
               {{ formatDate(comment.createdAt) }}
             </span>
 
-            <span
-              *ngIf="comment.updatedAt"
-              class="edited-label">
-              Düzenlendi
-            </span>
+            <span *ngIf="comment.updatedAt" class="edited-label"> Düzenlendi </span>
           </div>
 
           <div class="comment-actions">
@@ -112,12 +80,10 @@
               mat-icon-button
               type="button"
               matTooltip="Yorumu düzenle"
-              [disabled]="
-                editingCommentId !== null ||
-                deletingCommentId === comment.id
-              "
-              (click)="startEditing(comment)">
-
+              aria-label="Yorumu düzenle"
+              [disabled]="editingCommentId !== null || deletingCommentId === comment.id"
+              (click)="startEditing(comment)"
+            >
               <mat-icon>edit</mat-icon>
             </button>
 
@@ -125,75 +91,53 @@
               mat-icon-button
               type="button"
               matTooltip="Yorumu sil"
-              [disabled]="
-                deletingCommentId === comment.id ||
-                updatingCommentId === comment.id
-              "
-              (click)="deleteComment(comment.id)">
+              aria-label="Yorumu sil"
+              class="delete-comment-button"
+              [disabled]="deletingCommentId === comment.id || updatingCommentId === comment.id"
+              (click)="deleteComment(comment.id)"
+            >
+              <mat-spinner *ngIf="deletingCommentId === comment.id" diameter="18"> </mat-spinner>
 
-              <mat-spinner
-                *ngIf="deletingCommentId === comment.id"
-                diameter="18">
-              </mat-spinner>
-
-              <mat-icon
-                *ngIf="deletingCommentId !== comment.id">
-                delete
-              </mat-icon>
+              <mat-icon *ngIf="deletingCommentId !== comment.id"> delete </mat-icon>
             </button>
           </div>
         </div>
 
-        <ng-container
-          *ngIf="editingCommentId !== comment.id">
-
+        <ng-container *ngIf="editingCommentId !== comment.id">
           <p class="comment-text">
             {{ comment.content }}
           </p>
         </ng-container>
 
-        <div
-          *ngIf="editingCommentId === comment.id"
-          class="comment-edit-form">
-
+        <div *ngIf="editingCommentId === comment.id" class="comment-edit-form">
           <textarea
             [(ngModel)]="editingContent"
-            [disabled]="
-              updatingCommentId === comment.id
-            "
+            [disabled]="updatingCommentId === comment.id"
             maxlength="2000"
-            rows="4">
+            aria-label="Yorumu düzenle"
+            rows="4"
+          >
           </textarea>
 
           <div class="comment-edit-actions">
             <button
               mat-button
               type="button"
-              [disabled]="
-                updatingCommentId === comment.id
-              "
-              (click)="cancelEditing()">
+              [disabled]="updatingCommentId === comment.id"
+              (click)="cancelEditing()"
+            >
               Vazgeç
             </button>
 
             <button
               mat-flat-button
               type="button"
-              [disabled]="
-                !editingContent.trim() ||
-                updatingCommentId === comment.id
-              "
-              (click)="updateComment(comment.id)">
+              [disabled]="!editingContent.trim() || updatingCommentId === comment.id"
+              (click)="updateComment(comment.id)"
+            >
+              <mat-spinner *ngIf="updatingCommentId === comment.id" diameter="18"> </mat-spinner>
 
-              <mat-spinner
-                *ngIf="updatingCommentId === comment.id"
-                diameter="18">
-              </mat-spinner>
-
-              <span
-                *ngIf="updatingCommentId !== comment.id">
-                Kaydet
-              </span>
+              <span *ngIf="updatingCommentId !== comment.id"> Kaydet </span>
             </button>
           </div>
         </div>

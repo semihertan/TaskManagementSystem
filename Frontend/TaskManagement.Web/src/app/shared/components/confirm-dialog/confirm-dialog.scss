@@ -1,11 +1,22 @@
 h2 {
   display: flex;
+  margin: 0;
+  padding-bottom: 18px;
   align-items: center;
   gap: 10px;
+  border-bottom: 1px solid var(--destructive-border);
+  background: var(--destructive-surface);
+  color: var(--text-primary);
+
+  mat-icon {
+    color: var(--danger-color);
+  }
 }
 
 mat-dialog-content {
   min-width: min(320px, 90vw);
+  padding-top: 22px;
+  color: var(--text-secondary);
 }
 
 p {
@@ -14,7 +25,13 @@ p {
 }
 
 mat-dialog-actions {
+  gap: 8px;
   padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+
+  button {
+    min-width: 96px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -24,7 +41,7 @@ mat-dialog-actions {
     gap: 8px;
     padding: 16px 0 0;
   }
-  
+
   mat-dialog-actions button {
     width: 100%;
     margin-left: 0 !important;

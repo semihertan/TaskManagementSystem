@@ -4,8 +4,7 @@
   gap: 24px;
   padding: 24px;
   border-radius: 18px;
-  background: var(--surface-card, #ffffff);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  background: var(--surface-elevated);
 }
 
 .comment-header {
@@ -22,15 +21,20 @@
 
   p {
     margin: 4px 0 0;
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 14px;
   }
 
   > mat-icon {
     width: 42px;
     height: 42px;
-    font-size: 42px;
-    color: #475569;
+    padding: 9px;
+    border: 1px solid var(--page-panel-border);
+    border-radius: 13px;
+    background: var(--page-decoration-surface);
+    color: var(--primary-color);
+    font-size: 24px;
+    box-sizing: border-box;
   }
 }
 
@@ -39,28 +43,29 @@
   flex-direction: column;
   gap: 12px;
   padding: 18px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--page-panel-border);
   border-radius: 14px;
-  background: #f8fafc;
+  background: var(--surface-subtle);
 
   textarea {
     width: 100%;
     min-height: 110px;
     padding: 14px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     outline: none;
     resize: vertical;
     box-sizing: border-box;
     font: inherit;
-    background: #ffffff;
+    background: var(--input-background);
+    color: var(--text-primary);
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
 
     &:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
     &:disabled {
@@ -85,7 +90,7 @@
 
 .character-count,
 .keyboard-hint {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -97,8 +102,11 @@
   justify-content: center;
   gap: 12px;
   min-height: 180px;
+  border: 1px dashed var(--border-color);
+  border-radius: 14px;
+  background: var(--surface-subtle);
   text-align: center;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .comment-empty {
@@ -110,7 +118,7 @@
 
   h3 {
     margin: 0;
-    color: #334155;
+    color: var(--text-primary);
     font-size: 18px;
   }
 
@@ -130,9 +138,19 @@
   grid-template-columns: 44px minmax(0, 1fr);
   gap: 14px;
   padding: 18px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 14px;
-  background: #ffffff;
+  background: var(--surface-subtle);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+
+  &:hover {
+    border-color: var(--page-panel-border);
+    box-shadow: 0 8px 20px var(--shadow-color);
+    transform: translateY(-1px);
+  }
 }
 
 .comment-avatar {
@@ -142,8 +160,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
 }
 
 .comment-content {
@@ -164,11 +182,11 @@
   }
 
   strong {
-    color: #0f172a;
+    color: var(--text-primary);
   }
 
   span {
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 12px;
   }
 }
@@ -176,7 +194,7 @@
 .edited-label {
   padding: 2px 7px;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: var(--surface-secondary);
 }
 
 .comment-actions {
@@ -187,7 +205,7 @@
 
 .comment-text {
   margin: 12px 0 0;
-  color: #334155;
+  color: var(--text-primary);
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -202,16 +220,18 @@
   textarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     outline: none;
     resize: vertical;
     box-sizing: border-box;
     font: inherit;
+    background: var(--input-background);
+    color: var(--text-primary);
 
     &:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--focus-ring);
     }
   }
 }
@@ -247,4 +267,18 @@
   .comment-meta {
     align-items: flex-start;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-card {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+.delete-comment-button {
+  color: var(--danger-color);
 }

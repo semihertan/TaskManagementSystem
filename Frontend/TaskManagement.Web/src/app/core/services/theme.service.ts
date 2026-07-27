@@ -51,11 +51,7 @@ export class ThemeService {
       return savedTheme;
     }
 
-    const prefersDark = this.document.defaultView?.matchMedia?.(
-      '(prefers-color-scheme: dark)'
-    ).matches;
-
-    return prefersDark ? 'dark' : 'light';
+    return 'light';
   }
 
   private readSavedTheme(): ThemeMode | null {

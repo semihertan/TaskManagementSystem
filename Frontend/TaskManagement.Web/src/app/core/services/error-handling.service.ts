@@ -28,6 +28,12 @@ export class ErrorHandlingService {
       ) {
         return backendMessage;
       }
+
+      const validationMessage = this.getValidationMessage(error.error);
+
+      if (validationMessage) {
+        return validationMessage;
+      }
     }
 
     if (typeof error.error === 'string' && error.error.trim()) {
@@ -56,5 +62,30 @@ export class ErrorHandlingService {
       default:
         return `Bir hata oluştu. Hata kodu: ${error.status}`;
     }
+  }
+
+  private getValidationMessage(payload: object): string | null {
+    const errors = (payload as { errors?: unknown }).errors;
+
+    if (typeof errors !== 'object' || errors === null) {
+      return null;
+    }
+
+    for (const value of Object.values(errors)) {
+      if (!Array.isArray(value)) {
+        continue;
+      }
+
+      const message = value.find(
+        (item): item is string =>
+          typeof item === 'string' && item.trim().length > 0
+      );
+
+      if (message) {
+        return message;
+      }
+    }
+
+    return null;
   }
 }

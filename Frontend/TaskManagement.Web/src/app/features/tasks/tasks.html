@@ -1,191 +1,157 @@
 <section class="tasks-page">
-
-  <div class="tasks-header">
-    <div>
+  <header class="tasks-header">
+    <div class="tasks-heading">
       <h1>Görevlerim</h1>
       <p>Tüm görevlerini buradan takip edebilirsin.</p>
     </div>
 
-    <button
-      mat-flat-button
-      type="button"
-      class="new-task-button"
-      (click)="openCreateTaskDialog()"
-    >
+    <button mat-flat-button type="button" class="new-task-button" (click)="openCreateTaskDialog()">
+      <mat-icon aria-hidden="true">add_task</mat-icon>
       Yeni Görev
     </button>
-  </div>
+  </header>
 
   @if (isLoading) {
-    <div class="loading-container">
+    <div class="loading-container" role="status" aria-live="polite">
+      <span class="loading-indicator" aria-hidden="true"></span>
       <p>Görevler yükleniyor...</p>
     </div>
   }
 
   @if (errorMessage && !isLoading) {
-    <div class="error-message">
+    <div class="error-message" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
       {{ errorMessage }}
     </div>
   }
 
   <section class="task-filters">
+    <div class="filter-panel-header">
+      <div>
+        <h2>Filtreler ve sıralama</h2>
+        <p>Aradığın görevlere hızlıca ulaş.</p>
+      </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Görev ara</mat-label>
-
-      <input
-        matInput
-        [(ngModel)]="searchText"
-        placeholder="Başlık veya açıklama"
-        (keyup.enter)="applyFilters()"
-      />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Öncelik</mat-label>
-
-      <mat-select [(ngModel)]="selectedPriority">
-        <mat-option [value]="null">
-          Tümü
-        </mat-option>
-
-        @for (priority of priorities; track priority.value) {
-          <mat-option [value]="priority.value">
-            {{ priority.label }}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Durum</mat-label>
-
-      <mat-select [(ngModel)]="selectedStatus">
-        <mat-option [value]="null">
-          Tümü
-        </mat-option>
-
-        @for (status of statuses; track status.value) {
-          <mat-option [value]="status.value">
-            {{ status.label }}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Başlangıç tarihi</mat-label>
-
-      <input
-        matInput
-        [matDatepicker]="fromPicker"
-        [(ngModel)]="dueDateFrom"
-      />
-
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="fromPicker"
-      ></mat-datepicker-toggle>
-
-      <mat-datepicker #fromPicker></mat-datepicker>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Bitiş tarihi</mat-label>
-
-      <input
-        matInput
-        [matDatepicker]="toPicker"
-        [(ngModel)]="dueDateTo"
-      />
-
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="toPicker"
-      ></mat-datepicker-toggle>
-
-      <mat-datepicker #toPicker></mat-datepicker>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Sırala</mat-label>
-
-      <mat-select
-        [(ngModel)]="sortBy"
-        name="sortBy"
-        (selectionChange)="onSortingChanged()"
-      >
-        <mat-option value="createdAt">
-          Oluşturulma tarihi
-        </mat-option>
-
-        <mat-option value="updatedAt">
-          Güncellenme tarihi
-        </mat-option>
-
-        <mat-option value="dueDate">
-          Son tarih
-        </mat-option>
-
-        <mat-option value="priority">
-          Öncelik
-        </mat-option>
-
-        <mat-option value="title">
-          Başlık
-        </mat-option>
-
-        <mat-option value="status">
-          Durum
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Sıralama yönü</mat-label>
-
-      <mat-select
-        [(ngModel)]="sortDirection"
-        name="sortDirection"
-        (selectionChange)="onSortingChanged()"
-      >
-        <mat-option value="asc">
-          Artan
-        </mat-option>
-
-        <mat-option value="desc">
-          Azalan
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <div class="filter-actions">
-      <button
-        mat-flat-button
-        type="button"
-        (click)="applyFilters()"
-      >
-        Filtrele
-      </button>
-
-      <button
-        mat-button
-        type="button"
-        (click)="clearFilters()"
-      >
-        Temizle
-      </button>
+      <mat-icon aria-hidden="true">tune</mat-icon>
     </div>
 
+    <div class="filter-grid">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Görev ara</mat-label>
+
+        <input
+          matInput
+          [(ngModel)]="searchText"
+          placeholder="Başlık veya açıklama"
+          (keyup.enter)="applyFilters()"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Öncelik</mat-label>
+
+        <mat-select [(ngModel)]="selectedPriority">
+          <mat-option [value]="null"> Tümü </mat-option>
+
+          @for (priority of priorities; track priority.value) {
+            <mat-option [value]="priority.value">
+              {{ priority.label }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Durum</mat-label>
+
+        <mat-select [(ngModel)]="selectedStatus">
+          <mat-option [value]="null"> Tümü </mat-option>
+
+          @for (status of statuses; track status.value) {
+            <mat-option [value]="status.value">
+              {{ status.label }}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Başlangıç tarihi</mat-label>
+
+        <input matInput [matDatepicker]="fromPicker" [(ngModel)]="dueDateFrom" />
+
+        <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Bitiş tarihi</mat-label>
+
+        <input matInput [matDatepicker]="toPicker" [(ngModel)]="dueDateTo" />
+
+        <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Sırala</mat-label>
+
+        <mat-select [(ngModel)]="sortBy" name="sortBy" (selectionChange)="onSortingChanged()">
+          <mat-option value="createdAt"> Oluşturulma tarihi </mat-option>
+
+          <mat-option value="updatedAt"> Güncellenme tarihi </mat-option>
+
+          <mat-option value="dueDate"> Son tarih </mat-option>
+
+          <mat-option value="priority"> Öncelik </mat-option>
+
+          <mat-option value="title"> Başlık </mat-option>
+
+          <mat-option value="status"> Durum </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Sıralama yönü</mat-label>
+
+        <mat-select
+          [(ngModel)]="sortDirection"
+          name="sortDirection"
+          (selectionChange)="onSortingChanged()"
+        >
+          <mat-option value="asc"> Artan </mat-option>
+
+          <mat-option value="desc"> Azalan </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="filter-actions">
+        <button mat-flat-button type="button" (click)="applyFilters()">
+          <mat-icon aria-hidden="true">filter_alt</mat-icon>
+          Filtrele
+        </button>
+
+        <button mat-button type="button" (click)="clearFilters()">
+          <mat-icon aria-hidden="true">filter_alt_off</mat-icon>
+          Temizle
+        </button>
+      </div>
+    </div>
   </section>
 
-  <div class="kanban-board">
-
+  <div class="kanban-board" role="region" aria-label="Görev panosu">
     <!-- Bekliyor -->
 
-    <section class="kanban-column">
-      <div class="column-header pending-header">
-        <h2>Bekliyor</h2>
+    <section class="kanban-column kanban-column--pending">
+      <div class="column-header">
+        <div class="column-heading">
+          <span class="column-icon" aria-hidden="true">
+            <mat-icon>schedule</mat-icon>
+          </span>
+          <h2>Bekliyor</h2>
+        </div>
 
         <span class="task-count">
           {{ pendingTasks.length }}
@@ -199,12 +165,11 @@
         [cdkDropListData]="pendingTasks"
         [cdkDropListConnectedTo]="pendingConnectedLists"
         (cdkDropListDropped)="dropTask($event, 0)"
+        role="region"
+        aria-label="Bekleyen görevler"
       >
         @for (task of pendingTasks; track task.id) {
-          <div
-            class="drag-task"
-            cdkDrag
-          >
+          <div class="drag-task" cdkDrag>
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -213,15 +178,12 @@
             >
             </app-task-card>
 
-            <div
-              class="drag-placeholder"
-              *cdkDragPlaceholder
-            >
-            </div>
+            <div class="drag-placeholder" *cdkDragPlaceholder></div>
           </div>
         } @empty {
-          <div class="empty-column">
-            Görev bulunmuyor
+          <div class="empty-column" role="status">
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <span>Görev bulunmuyor</span>
           </div>
         }
       </div>
@@ -229,9 +191,14 @@
 
     <!-- Devam Ediyor -->
 
-    <section class="kanban-column">
-      <div class="column-header progress-header">
-        <h2>Devam Ediyor</h2>
+    <section class="kanban-column kanban-column--progress">
+      <div class="column-header">
+        <div class="column-heading">
+          <span class="column-icon" aria-hidden="true">
+            <mat-icon>autorenew</mat-icon>
+          </span>
+          <h2>Devam Ediyor</h2>
+        </div>
 
         <span class="task-count">
           {{ inProgressTasks.length }}
@@ -245,12 +212,11 @@
         [cdkDropListData]="inProgressTasks"
         [cdkDropListConnectedTo]="inProgressConnectedLists"
         (cdkDropListDropped)="dropTask($event, 1)"
+        role="region"
+        aria-label="Devam eden görevler"
       >
         @for (task of inProgressTasks; track task.id) {
-          <div
-            class="drag-task"
-            cdkDrag
-          >
+          <div class="drag-task" cdkDrag>
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -259,15 +225,12 @@
             >
             </app-task-card>
 
-            <div
-              class="drag-placeholder"
-              *cdkDragPlaceholder
-            >
-            </div>
+            <div class="drag-placeholder" *cdkDragPlaceholder></div>
           </div>
         } @empty {
-          <div class="empty-column">
-            Görev bulunmuyor
+          <div class="empty-column" role="status">
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <span>Görev bulunmuyor</span>
           </div>
         }
       </div>
@@ -275,9 +238,14 @@
 
     <!-- Tamamlandı -->
 
-    <section class="kanban-column">
-      <div class="column-header completed-header">
-        <h2>Tamamlandı</h2>
+    <section class="kanban-column kanban-column--completed">
+      <div class="column-header">
+        <div class="column-heading">
+          <span class="column-icon" aria-hidden="true">
+            <mat-icon>check_circle</mat-icon>
+          </span>
+          <h2>Tamamlandı</h2>
+        </div>
 
         <span class="task-count">
           {{ completedTasks.length }}
@@ -291,12 +259,11 @@
         [cdkDropListData]="completedTasks"
         [cdkDropListConnectedTo]="completedConnectedLists"
         (cdkDropListDropped)="dropTask($event, 2)"
+        role="region"
+        aria-label="Tamamlanan görevler"
       >
         @for (task of completedTasks; track task.id) {
-          <div
-            class="drag-task"
-            cdkDrag
-          >
+          <div class="drag-task" cdkDrag>
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -305,15 +272,12 @@
             >
             </app-task-card>
 
-            <div
-              class="drag-placeholder"
-              *cdkDragPlaceholder
-            >
-            </div>
+            <div class="drag-placeholder" *cdkDragPlaceholder></div>
           </div>
         } @empty {
-          <div class="empty-column">
-            Görev bulunmuyor
+          <div class="empty-column" role="status">
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <span>Görev bulunmuyor</span>
           </div>
         }
       </div>
@@ -321,9 +285,14 @@
 
     <!-- İptal Edildi -->
 
-    <section class="kanban-column">
-      <div class="column-header cancelled-header">
-        <h2>İptal Edildi</h2>
+    <section class="kanban-column kanban-column--cancelled">
+      <div class="column-header">
+        <div class="column-heading">
+          <span class="column-icon" aria-hidden="true">
+            <mat-icon>cancel</mat-icon>
+          </span>
+          <h2>İptal Edildi</h2>
+        </div>
 
         <span class="task-count">
           {{ cancelledTasks.length }}
@@ -337,12 +306,11 @@
         [cdkDropListData]="cancelledTasks"
         [cdkDropListConnectedTo]="cancelledConnectedLists"
         (cdkDropListDropped)="dropTask($event, 3)"
+        role="region"
+        aria-label="İptal edilen görevler"
       >
         @for (task of cancelledTasks; track task.id) {
-          <div
-            class="drag-task"
-            cdkDrag
-          >
+          <div class="drag-task" cdkDrag>
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -351,20 +319,16 @@
             >
             </app-task-card>
 
-            <div
-              class="drag-placeholder"
-              *cdkDragPlaceholder
-            >
-            </div>
+            <div class="drag-placeholder" *cdkDragPlaceholder></div>
           </div>
         } @empty {
-          <div class="empty-column">
-            Görev bulunmuyor
+          <div class="empty-column" role="status">
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <span>Görev bulunmuyor</span>
           </div>
         }
       </div>
     </section>
-
   </div>
 
   @if (totalCount > 0) {
@@ -379,5 +343,4 @@
     >
     </mat-paginator>
   }
-
 </section>

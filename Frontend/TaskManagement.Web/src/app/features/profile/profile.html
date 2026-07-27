@@ -1,0 +1,281 @@
+<section class="profile-page">
+  <header class="profile-page-header">
+    <div>
+      <h1>Profilim</h1>
+      <p>Hesap bilgilerinizi ve şifrenizi güvenle yönetin.</p>
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading-state" role="status" aria-live="polite">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Profil bilgileriniz yükleniyor...</span>
+    </div>
+  } @else if (!profile) {
+    <mat-card class="state-card error-state" appearance="outlined" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ profileError || 'Profil bilgileriniz yüklenemedi.' }}</p>
+      <button mat-stroked-button type="button" (click)="loadProfile()">Tekrar Dene</button>
+    </mat-card>
+  } @else {
+    <mat-card class="profile-hero" appearance="outlined" aria-labelledby="profile-name">
+      <div class="profile-hero__decoration" aria-hidden="true">
+        <span></span>
+        <mat-icon>verified_user</mat-icon>
+      </div>
+
+      <div class="profile-hero__identity">
+        <div class="avatar" aria-hidden="true">{{ initials }}</div>
+
+        <div class="identity">
+          <span class="profile-eyebrow">Hesap Profili</span>
+          <h2 id="profile-name">{{ fullName }}</h2>
+          <span class="username">&#64;{{ profile.username }}</span>
+        </div>
+      </div>
+
+      <div class="summary-details">
+        <span>
+          <mat-icon aria-hidden="true">mail_outline</mat-icon>
+          {{ profile.email }}
+        </span>
+        <span>
+          <mat-icon aria-hidden="true">calendar_today</mat-icon>
+          {{ profile.createdAt | date: 'dd.MM.yyyy' }} tarihinde oluşturuldu
+        </span>
+      </div>
+    </mat-card>
+
+    <div class="content-grid">
+      <mat-card class="form-card profile-details-card" appearance="outlined">
+        <mat-icon class="card-watermark" aria-hidden="true"> manage_accounts </mat-icon>
+        <mat-card-header>
+          <mat-icon mat-card-avatar aria-hidden="true">manage_accounts</mat-icon>
+          <mat-card-title>Profil Bilgileri</mat-card-title>
+          <mat-card-subtitle> Kişisel ve iletişim bilgilerinizi güncelleyin. </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form class="profile-form" [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Ad</mat-label>
+                <mat-icon matPrefix>badge</mat-icon>
+                <input matInput formControlName="firstName" autocomplete="given-name" />
+                @if (profileForm.controls.firstName.hasError('required')) {
+                  <mat-error>Ad alanı zorunludur.</mat-error>
+                } @else if (profileForm.controls.firstName.hasError('maxlength')) {
+                  <mat-error>Ad en fazla 50 karakter olabilir.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Soyad</mat-label>
+                <mat-icon matPrefix>badge</mat-icon>
+                <input matInput formControlName="lastName" autocomplete="family-name" />
+                @if (profileForm.controls.lastName.hasError('required')) {
+                  <mat-error>Soyad alanı zorunludur.</mat-error>
+                } @else if (profileForm.controls.lastName.hasError('maxlength')) {
+                  <mat-error>Soyad en fazla 50 karakter olabilir.</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Kullanıcı adı</mat-label>
+              <mat-icon matPrefix>person_outline</mat-icon>
+              <input matInput formControlName="username" autocomplete="username" />
+              @if (profileForm.controls.username.hasError('required')) {
+                <mat-error>Kullanıcı adı alanı zorunludur.</mat-error>
+              } @else if (profileForm.controls.username.hasError('maxlength')) {
+                <mat-error>Kullanıcı adı en fazla 50 karakter olabilir.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>E-posta</mat-label>
+              <mat-icon matPrefix>mail_outline</mat-icon>
+              <input matInput type="email" formControlName="email" autocomplete="email" />
+              @if (profileForm.controls.email.hasError('required')) {
+                <mat-error>E-posta alanı zorunludur.</mat-error>
+              } @else if (profileForm.controls.email.hasError('email')) {
+                <mat-error>Geçerli bir e-posta adresi giriniz.</mat-error>
+              } @else if (profileForm.controls.email.hasError('maxlength')) {
+                <mat-error>E-posta en fazla 100 karakter olabilir.</mat-error>
+              }
+            </mat-form-field>
+
+            @if (profileError) {
+              <p class="form-error" role="alert">
+                <mat-icon>error_outline</mat-icon>
+                {{ profileError }}
+              </p>
+            }
+
+            <div class="form-actions">
+              <button
+                mat-flat-button
+                type="submit"
+                [disabled]="profileForm.invalid || profileUnchanged || isUpdating"
+              >
+                @if (isUpdating) {
+                  <span class="button-content">
+                    <mat-spinner diameter="20"></mat-spinner>
+                    Güncelleniyor...
+                  </span>
+                } @else {
+                  <span class="button-content">
+                    <mat-icon>save</mat-icon>
+                    Bilgileri Güncelle
+                  </span>
+                }
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="form-card security-card" appearance="outlined">
+        <mat-icon class="card-watermark" aria-hidden="true"> shield </mat-icon>
+        <mat-card-header>
+          <mat-icon mat-card-avatar aria-hidden="true">lock_reset</mat-icon>
+          <mat-card-title>Şifre Değiştirme</mat-card-title>
+          <mat-card-subtitle>
+            Hesabınız için güçlü ve yeni bir şifre belirleyin.
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form
+            #passwordFormDirective="ngForm"
+            class="password-form"
+            [formGroup]="passwordForm"
+            (ngSubmit)="changePassword(passwordFormDirective)"
+          >
+            <mat-form-field appearance="outline">
+              <mat-label>Mevcut Şifre</mat-label>
+              <mat-icon matPrefix>lock_outline</mat-icon>
+              <input
+                matInput
+                [type]="hideCurrentPassword ? 'password' : 'text'"
+                formControlName="currentPassword"
+                autocomplete="current-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                [attr.aria-label]="hideCurrentPassword ? 'Şifreyi göster' : 'Şifreyi gizle'"
+                (click)="hideCurrentPassword = !hideCurrentPassword"
+              >
+                <mat-icon>{{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+              </button>
+              @if (
+                passwordForm.controls.currentPassword.hasError('required') &&
+                (passwordForm.controls.currentPassword.touched ||
+                  passwordForm.controls.currentPassword.dirty)
+              ) {
+                <mat-error>Mevcut şifre alanı zorunludur.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Yeni Şifre</mat-label>
+              <mat-icon matPrefix>key</mat-icon>
+              <input
+                matInput
+                [type]="hideNewPassword ? 'password' : 'text'"
+                formControlName="newPassword"
+                autocomplete="new-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                [attr.aria-label]="hideNewPassword ? 'Şifreyi göster' : 'Şifreyi gizle'"
+                (click)="hideNewPassword = !hideNewPassword"
+              >
+                <mat-icon>{{ hideNewPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+              </button>
+              @if (
+                passwordForm.controls.newPassword.hasError('required') &&
+                (passwordForm.controls.newPassword.touched ||
+                  passwordForm.controls.newPassword.dirty)
+              ) {
+                <mat-error>Yeni şifre alanı zorunludur.</mat-error>
+              } @else if (
+                passwordForm.controls.newPassword.hasError('minlength') &&
+                (passwordForm.controls.newPassword.touched ||
+                  passwordForm.controls.newPassword.dirty)
+              ) {
+                <mat-error>Yeni şifre en az 6 karakter olmalıdır.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Yeni Şifre Tekrar</mat-label>
+              <mat-icon matPrefix>key</mat-icon>
+              <input
+                matInput
+                [type]="hideConfirmPassword ? 'password' : 'text'"
+                formControlName="confirmNewPassword"
+                autocomplete="new-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                [attr.aria-label]="hideConfirmPassword ? 'Şifreyi göster' : 'Şifreyi gizle'"
+                (click)="hideConfirmPassword = !hideConfirmPassword"
+              >
+                <mat-icon>{{ hideConfirmPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+              </button>
+              @if (
+                passwordForm.controls.confirmNewPassword.hasError('required') &&
+                (passwordForm.controls.confirmNewPassword.touched ||
+                  passwordForm.controls.confirmNewPassword.dirty)
+              ) {
+                <mat-error>Yeni şifre tekrar alanı zorunludur.</mat-error>
+              }
+            </mat-form-field>
+
+            @if (
+              passwordForm.hasError('passwordsMismatch') &&
+              passwordForm.controls.confirmNewPassword.touched &&
+              !passwordForm.controls.confirmNewPassword.hasError('required')
+            ) {
+              <p class="validation-error">Yeni şifreler eşleşmiyor.</p>
+            }
+
+            @if (passwordError) {
+              <p class="form-error" role="alert">
+                <mat-icon>error_outline</mat-icon>
+                {{ passwordError }}
+              </p>
+            }
+
+            <div class="form-actions">
+              <button
+                mat-flat-button
+                type="submit"
+                [disabled]="passwordForm.invalid || isChangingPassword"
+              >
+                @if (isChangingPassword) {
+                  <span class="button-content">
+                    <mat-spinner diameter="20"></mat-spinner>
+                    Değiştiriliyor...
+                  </span>
+                } @else {
+                  <span class="button-content">
+                    <mat-icon>lock_reset</mat-icon>
+                    Şifreyi Değiştir
+                  </span>
+                }
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</section>

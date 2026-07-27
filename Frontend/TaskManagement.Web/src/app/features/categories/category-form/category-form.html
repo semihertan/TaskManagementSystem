@@ -1,122 +1,125 @@
-<h2 mat-dialog-title>
-  {{ isEditMode ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur' }}
-</h2>
+<header mat-dialog-title class="dialog-header">
+  <span class="dialog-icon material-icons" aria-hidden="true">
+    {{ isEditMode ? 'edit_note' : 'create_new_folder' }}
+  </span>
 
-<mat-dialog-content>
-  <form
-    class="category-form"
-    [formGroup]="categoryForm"
-  >
-    <mat-form-field appearance="outline">
-      <mat-label>Kategori adı</mat-label>
+  <div>
+    <span class="dialog-eyebrow">Kategori yönetimi</span>
+    <h2>{{ isEditMode ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur' }}</h2>
+    <p>
+      {{
+        isEditMode
+          ? 'Kategori bilgilerini ve renk vurgusunu güncelleyin.'
+          : 'Görevlerinizi gruplandırmak için bir kategori oluşturun.'
+      }}
+    </p>
+  </div>
+</header>
 
-      <input
-        matInput
-        formControlName="name"
-        maxlength="100"
-        placeholder="Örneğin: İş"
-      />
+<mat-dialog-content class="dialog-content">
+  <form class="category-form" [formGroup]="categoryForm">
+    <section class="form-section" aria-labelledby="category-information-title">
+      <div class="section-heading">
+        <span class="material-icons" aria-hidden="true">notes</span>
 
-      <mat-error
-        *ngIf="categoryForm.controls.name.hasError('required')"
-      >
-        Kategori adı zorunludur.
-      </mat-error>
+        <div>
+          <h3 id="category-information-title">Kategori bilgileri</h3>
+          <p>Görev listelerinde görünecek ad ve açıklamayı belirleyin.</p>
+        </div>
+      </div>
 
-      <mat-error
-        *ngIf="categoryForm.controls.name.hasError('maxlength')"
-      >
-        Kategori adı en fazla 100 karakter olabilir.
-      </mat-error>
-    </mat-form-field>
+      <mat-form-field class="name-field" appearance="outline">
+        <mat-label>Kategori adı</mat-label>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Açıklama</mat-label>
+        <input matInput formControlName="name" maxlength="100" placeholder="Örneğin: İş" />
 
-      <textarea
-        matInput
-        formControlName="description"
-        maxlength="500"
-        rows="4"
-        placeholder="Kategori hakkında kısa bir açıklama yazın"
-      ></textarea>
+        <mat-error *ngIf="categoryForm.controls.name.hasError('required')">
+          Kategori adı zorunludur.
+        </mat-error>
 
-      <mat-error
-        *ngIf="categoryForm.controls.description.hasError('maxlength')"
-      >
-        Açıklama en fazla 500 karakter olabilir.
-      </mat-error>
-    </mat-form-field>
+        <mat-error *ngIf="categoryForm.controls.name.hasError('maxlength')">
+          Kategori adı en fazla 100 karakter olabilir.
+        </mat-error>
+      </mat-form-field>
 
-    <div class="color-picker-section">
-      <label
-        class="color-picker-label"
-        for="categoryColor"
-      >
-        Kategori rengi
-      </label>
+      <mat-form-field appearance="outline">
+        <mat-label>Açıklama</mat-label>
+
+        <textarea
+          matInput
+          formControlName="description"
+          maxlength="500"
+          rows="4"
+          placeholder="Kategori hakkında kısa bir açıklama yazın"
+        ></textarea>
+
+        <mat-error *ngIf="categoryForm.controls.description.hasError('maxlength')">
+          Açıklama en fazla 500 karakter olabilir.
+        </mat-error>
+      </mat-form-field>
+    </section>
+
+    <section class="form-section color-picker-section" aria-labelledby="category-color-title">
+      <div class="section-heading">
+        <span class="material-icons" aria-hidden="true">palette</span>
+
+        <div>
+          <h3 id="category-color-title">Kategori rengi</h3>
+          <p>Kartlarda kullanılacak ayırt edici vurgu rengini seçin.</p>
+        </div>
+      </div>
 
       <div class="color-picker-row">
-        <input
-          id="categoryColor"
-          class="color-picker"
-          type="color"
-          formControlName="color"
-        />
+        <label class="color-picker-label" for="categoryColor"> Renk seç </label>
+
+        <input id="categoryColor" class="color-picker" type="color" formControlName="color" />
 
         <span
           class="color-preview"
+          aria-hidden="true"
           [style.backgroundColor]="categoryForm.controls.color.value"
         ></span>
 
-        <span class="color-code">
+        <output class="color-code" for="categoryColor">
           {{ categoryForm.controls.color.value }}
-        </span>
+        </output>
       </div>
 
       <div
         class="color-error"
+        role="alert"
         *ngIf="
-          categoryForm.controls.color.touched &&
-          categoryForm.controls.color.hasError('required')
+          categoryForm.controls.color.touched && categoryForm.controls.color.hasError('required')
         "
       >
         Renk seçimi zorunludur.
       </div>
-    </div>
+    </section>
 
-    <div
-      class="error-message"
-      *ngIf="errorMessage"
-    >
-      {{ errorMessage }}
+    <div class="error-message" role="alert" aria-live="assertive" *ngIf="errorMessage">
+      <span class="material-icons" aria-hidden="true">error_outline</span>
+      <span>{{ errorMessage }}</span>
     </div>
   </form>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button
-    mat-button
-    type="button"
-    [disabled]="isSaving"
-    (click)="cancel()"
-  >
+<mat-dialog-actions class="dialog-actions" align="end">
+  <button mat-button type="button" class="cancel-button" [disabled]="isSaving" (click)="cancel()">
     İptal
   </button>
 
   <button
     mat-flat-button
     type="button"
+    class="save-button"
     [disabled]="categoryForm.invalid || isSaving"
+    [attr.aria-busy]="isSaving"
     (click)="save()"
   >
-    <mat-spinner
-      *ngIf="isSaving"
-      diameter="20"
-    ></mat-spinner>
+    <mat-spinner *ngIf="isSaving" diameter="20" aria-hidden="true"></mat-spinner>
 
-    <span *ngIf="!isSaving">
-      {{ isEditMode ? 'Güncelle' : 'Kaydet' }}
+    <span>
+      {{ isSaving ? 'Kaydediliyor...' : isEditMode ? 'Güncelle' : 'Kaydet' }}
     </span>
   </button>
 </mat-dialog-actions>

@@ -1,95 +1,82 @@
-<mat-card class="task-card">
+@let dueWarning = getDueDateWarning();
 
-  <mat-card-header>
-    <div class="task-header">
-      <div>
-        <h2>{{ task.title }}</h2>
-      </div>
+<mat-card
+  class="task-card"
+  [class.task-card--pending]="task.status === 0"
+  [class.task-card--completed]="task.status === 2"
+  [class.task-card--cancelled]="task.status === 3"
+  [class.task-card--overdue]="dueWarning.type === 'overdue'"
+  role="group"
+  [attr.aria-label]="'Görev: ' + task.title"
+>
+  <mat-card-header class="task-card__header">
+    <div class="task-card__heading">
+      <h2 class="task-title">{{ task.title }}</h2>
 
       <app-priority-badge [priority]="task.priority"></app-priority-badge>
     </div>
   </mat-card-header>
 
-  <mat-card-content>
-
-    <p class="description" *ngIf="task.description">
-      {{ task.description }}
-    </p>
-
-    <div class="task-info">
-
-      <div class="info-item">
-        <mat-icon>flag</mat-icon>
-
-        <span
-          class="status"
-          [ngClass]="getStatusClass()"
-        >
-          {{ getStatusText() }}
-        </span>
-      </div>
-
-      <div class="info-item" *ngIf="task.dueDate">
-        <mat-icon>calendar_today</mat-icon>
-
-        <span>
-          {{ task.dueDate | date: 'dd.MM.yyyy' }}
-        </span>
-      </div>
-    </div>
-
-    @let dueWarning = getDueDateWarning();
-
-    @if (dueWarning.type !== 'none') {
-      <div
-        class="due-date-warning"
-        [ngClass]="'due-date-warning--' + dueWarning.type"
-      >
-        <mat-icon>warning_amber</mat-icon>
-        <span>{{ dueWarning.text }}</span>
-      </div>
+  <mat-card-content class="task-card__content">
+    @if (task.description) {
+      <p class="task-description">{{ task.description }}</p>
     }
 
-    <div class="task-progress">
-      <div class="task-progress-header">
-        <span>{{ getProgressText() }}</span>
-        <span>%{{ getProgressValue() }}</span>
-      </div>
+    <div class="task-metadata" [class.task-metadata--status-only]="!task.dueDate">
+      @if (task.dueDate) {
+        <div class="due-date" [ngClass]="'due-date--' + dueWarning.type">
+          <div class="due-date__value">
+            <mat-icon aria-hidden="true">calendar_today</mat-icon>
+            <span>{{ task.dueDate | date: 'dd.MM.yyyy' }}</span>
+          </div>
 
-      <mat-progress-bar
-        mode="determinate"
-        [value]="getProgressValue()">
-      </mat-progress-bar>
+          @if (dueWarning.type !== 'none') {
+            <span class="due-date__warning">
+              <mat-icon aria-hidden="true">warning_amber</mat-icon>
+              {{ dueWarning.text }}
+            </span>
+          }
+        </div>
+      }
+
+      <span class="task-status" [ngClass]="getStatusClass()">
+        {{ getStatusText() }}
+      </span>
     </div>
-
   </mat-card-content>
 
-  <mat-card-actions align="end">
-        <button
-            mat-button
-            type="button"
-            (click)="onView()"
-          >
-            <mat-icon>visibility</mat-icon>
-            Detay
-        </button>
-        <button
-            mat-button
-            type="button"
-            (click)="onEdit()"
-        >
-            <mat-icon>edit</mat-icon>
-            Düzenle
-        </button>
+  <mat-card-actions align="end" class="task-actions">
+    <button
+      mat-button
+      type="button"
+      class="task-action"
+      aria-label="Görev detayını görüntüle"
+      (click)="onView()"
+    >
+      <mat-icon aria-hidden="true">visibility</mat-icon>
+      Detay
+    </button>
 
-        <button
-          mat-button
-          type="button"
-          (click)="onDelete()"
-        >
-          <mat-icon>delete</mat-icon>
-          Sil
-        </button>
-    </mat-card-actions>
+    <button
+      mat-button
+      type="button"
+      class="task-action"
+      aria-label="Görevi düzenle"
+      (click)="onEdit()"
+    >
+      <mat-icon aria-hidden="true">edit</mat-icon>
+      Düzenle
+    </button>
 
+    <button
+      mat-button
+      type="button"
+      class="task-action task-action--danger"
+      aria-label="Görevi sil"
+      (click)="onDelete()"
+    >
+      <mat-icon aria-hidden="true">delete</mat-icon>
+      Sil
+    </button>
+  </mat-card-actions>
 </mat-card>

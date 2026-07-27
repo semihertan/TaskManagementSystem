@@ -1,90 +1,123 @@
-<div class="login-container">
-  <mat-card class="login-card" appearance="outlined">
-    <!-- Card Header -->
-    <div class="card-header">
-      <div class="logo-wrapper">
-        <mat-icon class="logo-icon">playlist_add_check</mat-icon>
+<main class="auth-page auth-page--login">
+  <section class="auth-shell" aria-label="Giriş">
+    <aside class="auth-showcase auth-showcase--login">
+      <div class="auth-showcase__decoration" aria-hidden="true">
+        <span class="auth-shape auth-shape--one"></span>
+        <span class="auth-shape auth-shape--two"></span>
+        <span class="auth-shape auth-shape--three"></span>
       </div>
-      <h1 class="title">Task Management</h1>
-      <p class="subtitle">Sign in to continue</p>
-    </div>
 
-    <!-- Login Form (Reactive Forms compatible) -->
-    <form class="login-form"
-    [formGroup]="loginForm"
-    (ngSubmit)="onSubmit()" >
-      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
-        <mat-label>Email Address</mat-label>
-        <mat-icon matPrefix>mail_outline</mat-icon>
-        <input 
-          matInput 
-          type="email" 
-          formControlName="email" 
-          required 
-          autocomplete="username"
-          aria-required="true"
-        >
-        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-          Email address is required
-        </mat-error>
-        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-          Please enter a valid email address
-        </mat-error>
-      </mat-form-field>
+      <div class="auth-showcase__content">
+        <div class="auth-brand">
+          <span class="auth-brand__mark" aria-hidden="true">
+            <mat-icon>playlist_add_check</mat-icon>
+          </span>
+          <span>Task Management</span>
+        </div>
 
-      <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
-        <mat-label>Password</mat-label>
-        <mat-icon matPrefix>lock_outline</mat-icon>
-        <input 
-          matInput 
-          type="password" 
-          formControlName="password" 
-          required 
-          autocomplete="current-password"
-          aria-required="true"
-        >
-        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-          Password is required
-        </mat-error>
-        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-          Password is required
-        </mat-error>
+        <div class="auth-copy auth-copy--showcase">
+          <span class="showcase-eyebrow">Düzenli çalış, odağını koru</span>
+          <h2>Görevlerini tek bir yerde güvenle yönet.</h2>
+          <p>Planlarını takip et, önceliklerini belirle ve ilerlemeni kolayca görüntüle.</p>
+        </div>
 
-        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
-          Password must be at least 6 characters
-        </mat-error>
-      </mat-form-field>
+        <div class="showcase-feature" aria-hidden="true">
+          <mat-icon>insights</mat-icon>
+          <span>Günün akışına net bir bakış</span>
+        </div>
+      </div>
+    </aside>
 
-      <div class="form-actions">
-        <button 
-          mat-flat-button 
-          class="submit-btn" 
-          type="submit" 
-          [disabled]="loginForm.invalid || isLoading"
-        >
-          <span *ngIf="!isLoading">Sign In</span>
-          <mat-spinner 
-            *ngIf="isLoading" 
-            diameter="20" 
-            class="btn-spinner"
-            role="status"
-            aria-live="polite"
-          ></mat-spinner>
-        </button>
-        @if(errorMessage){
+    <mat-card class="auth-form-panel" appearance="outlined">
+      <div class="auth-heading">
+        <div class="auth-brand auth-brand--compact">
+          <span class="auth-brand__mark" aria-hidden="true">
+            <mat-icon>playlist_add_check</mat-icon>
+          </span>
+          <span>Task Management</span>
+        </div>
 
-          <p class="error-message">
-            {{ errorMessage }}
+        <div class="auth-copy auth-copy--form">
+          <span class="auth-heading__eyebrow">Hesabınıza giriş yapın</span>
+          <h1 id="login-heading">Tekrar hoş geldiniz</h1>
+          <p>Görevlerinize kaldığınız yerden devam edin.</p>
+        </div>
+      </div>
+
+      <form
+        class="auth-form login-form"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        aria-labelledby="login-heading"
+      >
+        <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
+          <mat-label>E-posta adresi</mat-label>
+          <mat-icon matPrefix>mail_outline</mat-icon>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            required
+            autocomplete="username"
+            aria-required="true"
+          />
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            E-posta adresi zorunludur.
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Geçerli bir e-posta adresi giriniz.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" floatLabel="auto" class="form-field">
+          <mat-label>Şifre</mat-label>
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            required
+            autocomplete="current-password"
+            aria-required="true"
+          />
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Şifre alanı zorunludur.
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+            Şifre en az 6 karakter olmalıdır.
+          </mat-error>
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <p class="auth-error" role="alert">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            <span>{{ errorMessage }}</span>
           </p>
-
         }
-      </div>
-    </form>
 
-    <!-- Card Footer -->
-    <div class="card-footer">
-      <span class="prompt-text">Don't have an account?</span>
-      <a class="register-link" routerLink="/register">Register</a>
-    </div>
-  </mat-card>
-</div>
+        <div class="form-actions">
+          <button
+            mat-flat-button
+            class="submit-btn"
+            type="submit"
+            [disabled]="loginForm.invalid || isLoading"
+          >
+            @if (!isLoading) {
+              <span>Giriş Yap</span>
+            } @else {
+              <span class="button-loading" role="status" aria-live="polite">
+                <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+                <span>Giriş yapılıyor...</span>
+              </span>
+            }
+          </button>
+        </div>
+      </form>
+
+      <footer class="auth-footer">
+        <span>Henüz hesabınız yok mu?</span>
+        <a class="register-link" routerLink="/register">Kayıt Ol</a>
+      </footer>
+    </mat-card>
+  </section>
+</main>

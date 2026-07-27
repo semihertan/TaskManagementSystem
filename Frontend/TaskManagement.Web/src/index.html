@@ -20,12 +20,12 @@
         try {
           savedTheme = window.localStorage.getItem(storageKey);
         } catch {
-          // Fall back to the operating system preference.
+          // Storage kullanılamıyorsa açık tema ile devam et.
         }
 
         const theme = savedTheme === 'light' || savedTheme === 'dark'
           ? savedTheme
-          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          : 'light';
 
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.colorScheme = theme;
