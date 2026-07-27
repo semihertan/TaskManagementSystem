@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { TaskService } from '../../core/services/task.service';
 import { TaskItem } from '../../shared/interfaces/task/task.interface';
@@ -60,6 +61,7 @@ export class Tasks implements OnInit {
   private dialog = inject(MatDialog);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
   tasks: TaskItem[] = [];
   isLoading = false;
@@ -91,7 +93,10 @@ export class Tasks implements OnInit {
   cancelledTasks: TaskItem[] = [];
 
   ngOnInit(): void {
-    this.taskService.tasks$
+    this.taskService.tasks$.
+    pipe(
+      takeUntilDestroyed(this.destroyRef)
+    )
       .subscribe(data => {
         if (!data) {
           return;
@@ -163,10 +168,6 @@ export class Tasks implements OnInit {
       if(!createdTask)
         return;
 
-      this.tasks = [createdTask, ...this.tasks];
-
-      this.refreshTaskView();
-
       this.showSuccess('Görev başarıyla oluşturuldu.');
     });
   }
@@ -188,14 +189,6 @@ export class Tasks implements OnInit {
         if (!updatedTask) {
           return;
         }
-
-        this.tasks = this.tasks.map((currentTask) =>
-          currentTask.id === updatedTask.id
-            ? updatedTask
-            : currentTask
-        );
-
-        this.refreshTaskView();
 
         this.showSuccess('Görev başarıyla düzenlendi.');
       }
@@ -227,13 +220,6 @@ export class Tasks implements OnInit {
 
       this.taskService.deleteTask(task.id).subscribe({
         next: () => {
-          this.tasks = this.tasks.filter(
-            (currentTask) =>
-              currentTask.id !== task.id
-          );
-
-          this.refreshTaskView();
-          
           this.showSuccess(
             'Görev başarıyla silindi.'
           );
@@ -379,17 +365,7 @@ export class Tasks implements OnInit {
     };
 
     this.taskService.updateTask(task.id, request).subscribe({
-      next: (response) => {
-        const updatedTask = response.data;
-
-        this.tasks = this.tasks.map((currentTask) =>
-          currentTask.id === updatedTask.id
-            ? updatedTask
-            : currentTask
-        );
-
-        this.distributeTasksByStatus();
-
+      next: () => {
         this.showSuccess(
           'Görev durumu başarıyla güncellendi.'
         );
@@ -415,10 +391,5 @@ export class Tasks implements OnInit {
         this.cdr.markForCheck();
       }
     });
-  }
-
-  private refreshTaskView(): void {
-    this.distributeTasksByStatus();
-    this.cdr.markForCheck();
   }
 }

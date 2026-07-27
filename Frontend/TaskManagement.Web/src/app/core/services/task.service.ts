@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, map, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TaskItem } from '../../shared/interfaces/task/task.interface';
 import { CreateTask } from '../../shared/interfaces/task/create-task.interface';
@@ -23,9 +23,12 @@ export class TaskService {
   readonly tasks$ =
     this.tasksSubject.asObservable();
 
+  private currentFilter: TaskFilter = {};
+
   getTasks(
     filter: TaskFilter = {}
   ): Observable<ApiResponse<PagedData<TaskItem>>> {
+    this.currentFilter = {...filter};
     let params = new HttpParams();
 
     if (filter.search?.trim()) {
@@ -100,6 +103,10 @@ export class TaskService {
     );
   }
 
+  refreshTasks(): Observable<ApiResponse<PagedData<TaskItem>>> {
+    return this.getTasks(this.currentFilter);
+  }
+
   getTaskById(id: string): Observable<ApiResponse<TaskItem>> {
     return this.http.get<ApiResponse<TaskItem>>(
       `${this.apiUrl}/${id}`
@@ -107,15 +114,36 @@ export class TaskService {
   }
 
   createTask(taskData: CreateTask): Observable<ApiResponse<TaskItem>> {
-    return this.http.post<ApiResponse<TaskItem>>(this.apiUrl, taskData);
+    return this.http.post<ApiResponse<TaskItem>>(this.apiUrl, taskData)
+    .pipe(
+      switchMap((createResponse) =>
+        this.refreshTasks().pipe(
+          map(() => createResponse)
+        )
+      )
+    );
   }
 
   updateTask(id: string, taskData: UpdateTask): Observable<ApiResponse<TaskItem>> {
-    return this.http.put<ApiResponse<TaskItem>>(`${this.apiUrl}/${id}`, taskData);
+    return this.http.put<ApiResponse<TaskItem>>(`${this.apiUrl}/${id}`, taskData)
+    .pipe(
+      switchMap((updateResponse) =>
+        this.refreshTasks().pipe(
+          map(() => updateResponse)
+        )
+      )
+    );;
   }
 
   deleteTask(id: string): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`)
+    .pipe(
+      switchMap((deleteResponse) =>
+        this.refreshTasks().pipe(
+          map(() => deleteResponse)
+        )
+      )
+    );;
   }
 
   getStatistics(): Observable<ApiResponse<TaskStatistics>> {
