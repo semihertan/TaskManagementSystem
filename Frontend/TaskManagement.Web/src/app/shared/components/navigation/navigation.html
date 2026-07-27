@@ -8,75 +8,139 @@
   <span class="spacer"></span>
 
   <div class="nav-links">
-    <button mat-button routerLink="/dashboard">
+
+    <button
+      mat-button
+      routerLink="/dashboard"
+    >
       <mat-icon>dashboard</mat-icon>
       Dashboard
     </button>
 
-    <button mat-button routerLink="/tasks">
+    <button
+      mat-button
+      routerLink="/tasks"
+    >
       <mat-icon>assignment</mat-icon>
       Tasks
     </button>
 
-    <button mat-button routerLink="/categories">
+    <button
+      mat-button
+      routerLink="/categories"
+    >
       <mat-icon>folder</mat-icon>
       Categories
     </button>
 
-    <button mat-button>
+    <button
+      mat-button
+      type="button"
+      (click)="logout()"
+    >
       <mat-icon>logout</mat-icon>
-      Logout
+      Çıkış Yap
     </button>
 
     <button
       mat-icon-button
       type="button"
       class="theme-toggle"
-      [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
-      [attr.title]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
-      (click)="toggleTheme()">
+      [attr.aria-label]="
+        themeService.currentTheme() === 'dark'
+          ? 'Açık temaya geç'
+          : 'Koyu temaya geç'
+      "
+      [attr.title]="
+        themeService.currentTheme() === 'dark'
+          ? 'Açık temaya geç'
+          : 'Koyu temaya geç'
+      "
+      (click)="toggleTheme()"
+    >
       <mat-icon>
-        {{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}
+        {{
+          themeService.currentTheme() === 'dark'
+            ? 'light_mode'
+            : 'dark_mode'
+        }}
       </mat-icon>
     </button>
+
   </div>
 
   <button
     mat-icon-button
     class="mobile-menu-btn"
     type="button"
-    aria-label="Open navigation menu"
-    [matMenuTriggerFor]="menu">
+    aria-label="Navigasyon menüsünü aç"
+    [matMenuTriggerFor]="menu"
+  >
     <mat-icon>menu</mat-icon>
   </button>
 
   <mat-menu #menu="matMenu">
-    <button mat-menu-item routerLink="/dashboard">
+
+    <button
+      mat-menu-item
+      routerLink="/dashboard"
+    >
       <mat-icon>dashboard</mat-icon>
       <span>Dashboard</span>
     </button>
-    <button mat-menu-item routerLink="/tasks">
+
+    <button
+      mat-menu-item
+      routerLink="/tasks"
+    >
       <mat-icon>assignment</mat-icon>
       <span>Tasks</span>
     </button>
-    <button mat-menu-item routerLink="/categories">
+
+    <button
+      mat-menu-item
+      routerLink="/categories"
+    >
       <mat-icon>folder</mat-icon>
       <span>Categories</span>
     </button>
-    <button mat-menu-item>
+
+    <button
+      mat-menu-item
+      type="button"
+      (click)="logout()"
+    >
       <mat-icon>logout</mat-icon>
-      <span>Logout</span>
+      <span>Çıkış Yap</span>
     </button>
+
     <button
       mat-menu-item
       type="button"
       (click)="toggleTheme()"
-      [attr.aria-label]="themeService.currentTheme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'">
+      [attr.aria-label]="
+        themeService.currentTheme() === 'dark'
+          ? 'Açık temaya geç'
+          : 'Koyu temaya geç'
+      "
+    >
       <mat-icon>
-        {{ themeService.currentTheme() === 'dark' ? 'light_mode' : 'dark_mode' }}
+        {{
+          themeService.currentTheme() === 'dark'
+            ? 'light_mode'
+            : 'dark_mode'
+        }}
       </mat-icon>
-      <span>{{ themeService.currentTheme() === 'dark' ? 'Light theme' : 'Dark theme' }}</span>
+
+      <span>
+        {{
+          themeService.currentTheme() === 'dark'
+            ? 'Açık Tema'
+            : 'Koyu Tema'
+        }}
+      </span>
     </button>
+
   </mat-menu>
 
 </mat-toolbar>

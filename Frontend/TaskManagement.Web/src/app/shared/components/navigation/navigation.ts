@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
 import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 
 @Component({
@@ -27,8 +28,13 @@ import { ThemeService } from '../../../core/services/theme.service';
 })
 export class Navigation {
   readonly themeService = inject(ThemeService);
+  private authService = inject(AuthService);
 
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }
