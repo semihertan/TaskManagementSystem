@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { getPriorityDefinition } from '../../constants/priority.constants';
 
@@ -7,6 +7,7 @@ import { getPriorityDefinition } from '../../constants/priority.constants';
   standalone: true,
   templateUrl: './priority-badge.html',
   styleUrl: './priority-badge.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PriorityBadge {
   readonly priority = input<number>(0);

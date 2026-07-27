@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -21,7 +21,9 @@ import { PriorityBadge } from '../priority-badge/priority-badge';
   ],
   templateUrl: './task-card.html',
   styleUrl: './task-card.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
+
 export class TaskCard {
   @Input({ required: true })
   task!: TaskItem;

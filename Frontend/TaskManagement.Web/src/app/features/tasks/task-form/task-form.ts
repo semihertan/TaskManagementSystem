@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -50,26 +50,28 @@ import { PRIORITY_OPTIONS } from '../../../shared/constants/priority.constants';
   ],
   templateUrl: './task-form.html',
   styleUrl: './task-form.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskForm {
   private formBuilder = inject(FormBuilder);
   private taskService = inject(TaskService);
   private dialogRef = inject(MatDialogRef<TaskForm>);
   private categoryService = inject(CategoryService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   categories: Category[] = [];
   isCategoriesLoading = false;
 
-  task = inject<TaskItem | null>(MAT_DIALOG_DATA, {
+  readonly task = inject<TaskItem | null>(MAT_DIALOG_DATA, {
     optional: true
   });
 
-  isEditMode = !!this.task;
+  readonly isEditMode = !!this.task;
   
   isSaving = false;
   errorMessage = '';
 
-  taskForm = this.formBuilder.group({
+  readonly taskForm = this.formBuilder.group({
     title: ['', [
       Validators.required,
       Validators.maxLength(200)
@@ -93,14 +95,14 @@ export class TaskForm {
     categoryId: [null as string | null]
   });
 
-  statuses = [
+  readonly statuses = [
     { value: 0, label: 'Bekliyor' },
     { value: 1, label: 'Devam Ediyor' },
     { value: 2, label: 'Tamamlandı' },
     { value: 3, label: 'İptal Edildi' }
   ];
 
-  priorities = PRIORITY_OPTIONS;
+  readonly priorities = PRIORITY_OPTIONS;
 
   constructor() {
     this.loadCategories();
@@ -116,7 +118,8 @@ export class TaskForm {
       status: this.task.status,
       dueDate: this.task.dueDate
         ? new Date(this.task.dueDate)
-        : null
+        : null,
+      categoryId: this.task.categoryId ?? null
     });
   }
 
@@ -155,7 +158,8 @@ export class TaskForm {
       .createTask(request)
       .pipe(
         finalize(() => {
-              this.isSaving = false;
+              this.isSaving = false
+              this.cdr.markForCheck();
     })
     )
     .subscribe({
@@ -183,6 +187,7 @@ export class TaskForm {
       .pipe(
         finalize(() => {
           this.isSaving = false;
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
@@ -206,7 +211,6 @@ export class TaskForm {
 
   private loadCategories(): void {
     this.isCategoriesLoading = true;
-
     this.taskForm.controls.categoryId.disable();
 
     this.categoryService
@@ -215,6 +219,7 @@ export class TaskForm {
         finalize(() => {
           this.isCategoriesLoading = false;
           this.taskForm.controls.categoryId.enable();
+          this.cdr.markForCheck();
         })
       )
       .subscribe({

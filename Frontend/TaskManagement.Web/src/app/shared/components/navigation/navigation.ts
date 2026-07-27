@@ -1,4 +1,4 @@
-import { Component , inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component , inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -25,6 +25,7 @@ import { AuthService } from '../../../core/services/auth.service';
   ],
   templateUrl: './navigation.html',
   styleUrl: './navigation.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Navigation {
   readonly themeService = inject(ThemeService);

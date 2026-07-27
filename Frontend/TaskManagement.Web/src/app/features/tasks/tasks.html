@@ -6,7 +6,7 @@
       <p>Tüm görevlerini buradan takip edebilirsin.</p>
     </div>
 
-    <button 
+    <button
       mat-flat-button
       type="button"
       class="new-task-button"
@@ -16,15 +16,20 @@
     </button>
   </div>
 
-  <div class="loading-container" *ngIf="isLoading">
-    <p>Görevler yükleniyor...</p>
-  </div>
+  @if (isLoading) {
+    <div class="loading-container">
+      <p>Görevler yükleniyor...</p>
+    </div>
+  }
 
-  <div class="error-message" *ngIf="errorMessage && !isLoading">
-    {{ errorMessage }}
-  </div>
+  @if (errorMessage && !isLoading) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
 
   <section class="task-filters">
+
     <mat-form-field appearance="outline">
       <mat-label>Görev ara</mat-label>
 
@@ -44,12 +49,11 @@
           Tümü
         </mat-option>
 
-        <mat-option
-          *ngFor="let priority of priorities"
-          [value]="priority.value"
-        >
-          {{ priority.label }}
-        </mat-option>
+        @for (priority of priorities; track priority.value) {
+          <mat-option [value]="priority.value">
+            {{ priority.label }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -61,12 +65,11 @@
           Tümü
         </mat-option>
 
-        <mat-option
-          *ngFor="let status of statuses"
-          [value]="status.value"
-        >
-          {{ status.label }}
-        </mat-option>
+        @for (status of statuses; track status.value) {
+          <mat-option [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -105,56 +108,56 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-    <mat-label>Sırala</mat-label>
+      <mat-label>Sırala</mat-label>
 
-    <mat-select
-      [(ngModel)]="sortBy"
-      name="sortBy"
-      (selectionChange)="onSortingChanged()"
-    >
-      <mat-option value="createdAt">
-        Oluşturulma tarihi
-      </mat-option>
+      <mat-select
+        [(ngModel)]="sortBy"
+        name="sortBy"
+        (selectionChange)="onSortingChanged()"
+      >
+        <mat-option value="createdAt">
+          Oluşturulma tarihi
+        </mat-option>
 
-      <mat-option value="updatedAt">
-        Güncellenme tarihi
-      </mat-option>
+        <mat-option value="updatedAt">
+          Güncellenme tarihi
+        </mat-option>
 
-      <mat-option value="dueDate">
-        Son tarih
-      </mat-option>
+        <mat-option value="dueDate">
+          Son tarih
+        </mat-option>
 
-      <mat-option value="priority">
-        Öncelik
-      </mat-option>
+        <mat-option value="priority">
+          Öncelik
+        </mat-option>
 
-      <mat-option value="title">
-        Başlık
-      </mat-option>
+        <mat-option value="title">
+          Başlık
+        </mat-option>
 
-      <mat-option value="status">
-        Durum
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+        <mat-option value="status">
+          Durum
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Sıralama yönü</mat-label>
+    <mat-form-field appearance="outline">
+      <mat-label>Sıralama yönü</mat-label>
 
-    <mat-select
-      [(ngModel)]="sortDirection"
-      name="sortDirection"
-      (selectionChange)="onSortingChanged()"
-    >
-      <mat-option value="asc">
-        Artan
-      </mat-option>
+      <mat-select
+        [(ngModel)]="sortDirection"
+        name="sortDirection"
+        (selectionChange)="onSortingChanged()"
+      >
+        <mat-option value="asc">
+          Artan
+        </mat-option>
 
-      <mat-option value="desc">
-        Azalan
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+        <mat-option value="desc">
+          Azalan
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <div class="filter-actions">
       <button
@@ -173,6 +176,7 @@
         Temizle
       </button>
     </div>
+
   </section>
 
   <div class="kanban-board">
@@ -193,36 +197,33 @@
         cdkDropList
         id="pendingList"
         [cdkDropListData]="pendingTasks"
-        [cdkDropListConnectedTo]="[
-          'inProgressList',
-          'completedList',
-          'cancelledList'
-        ]"
-        (cdkDropListDropped)="dropTask($event, 0)">
-
-        <div
-          class="drag-task"
-          *ngFor="let task of pendingTasks"
-          cdkDrag>
-
-          <app-task-card
-            [task]="task"
-            (editTask)="openEditTaskDialog($event)"
-            (deleteTask)="deleteTask($event)"
-            (viewTask)="openTaskDetail($event)">
-          </app-task-card>
-
+        [cdkDropListConnectedTo]="pendingConnectedLists"
+        (cdkDropListDropped)="dropTask($event, 0)"
+      >
+        @for (task of pendingTasks; track task.id) {
           <div
-            class="drag-placeholder"
-            *cdkDragPlaceholder>
-          </div>
-        </div>
+            class="drag-task"
+            cdkDrag
+          >
+            <app-task-card
+              [task]="task"
+              (editTask)="openEditTaskDialog($event)"
+              (deleteTask)="deleteTask($event)"
+              (viewTask)="openTaskDetail($event)"
+            >
+            </app-task-card>
 
-        <div
-          class="empty-column"
-          *ngIf="pendingTasks.length === 0">
-          Görev bulunmuyor
-        </div>
+            <div
+              class="drag-placeholder"
+              *cdkDragPlaceholder
+            >
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-column">
+            Görev bulunmuyor
+          </div>
+        }
       </div>
     </section>
 
@@ -242,31 +243,33 @@
         cdkDropList
         id="inProgressList"
         [cdkDropListData]="inProgressTasks"
-        [cdkDropListConnectedTo]="[
-          'pendingList',
-          'completedList',
-          'cancelledList'
-        ]"
-        (cdkDropListDropped)="dropTask($event, 1)">
+        [cdkDropListConnectedTo]="inProgressConnectedLists"
+        (cdkDropListDropped)="dropTask($event, 1)"
+      >
+        @for (task of inProgressTasks; track task.id) {
+          <div
+            class="drag-task"
+            cdkDrag
+          >
+            <app-task-card
+              [task]="task"
+              (editTask)="openEditTaskDialog($event)"
+              (deleteTask)="deleteTask($event)"
+              (viewTask)="openTaskDetail($event)"
+            >
+            </app-task-card>
 
-        <div
-          class="drag-task"
-          *ngFor="let task of inProgressTasks"
-          cdkDrag>
-
-          <app-task-card
-            [task]="task"
-            (editTask)="openEditTaskDialog($event)"
-            (deleteTask)="deleteTask($event)"
-            (viewTask)="openTaskDetail($event)">
-          </app-task-card>  
-        </div>
-
-        <div
-          class="empty-column"
-          *ngIf="inProgressTasks.length === 0">
-          Görev bulunmuyor
-        </div>
+            <div
+              class="drag-placeholder"
+              *cdkDragPlaceholder
+            >
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-column">
+            Görev bulunmuyor
+          </div>
+        }
       </div>
     </section>
 
@@ -286,31 +289,33 @@
         cdkDropList
         id="completedList"
         [cdkDropListData]="completedTasks"
-        [cdkDropListConnectedTo]="[
-          'pendingList',
-          'inProgressList',
-          'cancelledList'
-        ]"
-        (cdkDropListDropped)="dropTask($event, 2)">
+        [cdkDropListConnectedTo]="completedConnectedLists"
+        (cdkDropListDropped)="dropTask($event, 2)"
+      >
+        @for (task of completedTasks; track task.id) {
+          <div
+            class="drag-task"
+            cdkDrag
+          >
+            <app-task-card
+              [task]="task"
+              (editTask)="openEditTaskDialog($event)"
+              (deleteTask)="deleteTask($event)"
+              (viewTask)="openTaskDetail($event)"
+            >
+            </app-task-card>
 
-        <div
-          class="drag-task"
-          *ngFor="let task of completedTasks"
-          cdkDrag>
-
-          <app-task-card
-            [task]="task"
-            (editTask)="openEditTaskDialog($event)"
-            (deleteTask)="deleteTask($event)"
-            (viewTask)="openTaskDetail($event)">
-          </app-task-card>
-        </div>
-
-        <div
-          class="empty-column"
-          *ngIf="completedTasks.length === 0">
-          Görev bulunmuyor
-        </div>
+            <div
+              class="drag-placeholder"
+              *cdkDragPlaceholder
+            >
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-column">
+            Görev bulunmuyor
+          </div>
+        }
       </div>
     </section>
 
@@ -330,45 +335,49 @@
         cdkDropList
         id="cancelledList"
         [cdkDropListData]="cancelledTasks"
-        [cdkDropListConnectedTo]="[
-          'pendingList',
-          'inProgressList',
-          'completedList'
-        ]"
-        (cdkDropListDropped)="dropTask($event, 3)">
+        [cdkDropListConnectedTo]="cancelledConnectedLists"
+        (cdkDropListDropped)="dropTask($event, 3)"
+      >
+        @for (task of cancelledTasks; track task.id) {
+          <div
+            class="drag-task"
+            cdkDrag
+          >
+            <app-task-card
+              [task]="task"
+              (editTask)="openEditTaskDialog($event)"
+              (deleteTask)="deleteTask($event)"
+              (viewTask)="openTaskDetail($event)"
+            >
+            </app-task-card>
 
-        <div
-          class="drag-task"
-          *ngFor="let task of cancelledTasks"
-          cdkDrag>
-
-          <app-task-card
-            [task]="task"
-            (editTask)="openEditTaskDialog($event)"
-            (deleteTask)="deleteTask($event)"
-            (viewTask)="openTaskDetail($event)">
-          </app-task-card>
-        </div>
-
-        <div
-          class="empty-column"
-          *ngIf="cancelledTasks.length === 0">
-          Görev bulunmuyor
-        </div>
+            <div
+              class="drag-placeholder"
+              *cdkDragPlaceholder
+            >
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-column">
+            Görev bulunmuyor
+          </div>
+        }
       </div>
     </section>
 
   </div>
 
-  <mat-paginator
-  *ngIf="totalCount > 0"
-  [length]="totalCount"
-  [pageIndex]="currentPage - 1"
-  [pageSize]="pageSize"
-  [pageSizeOptions]="pageSizeOptions"
-  [showFirstLastButtons]="true"
-  aria-label="Görev sayfaları"
-  (page)="onPageChange($event)">
-</mat-paginator>
+  @if (totalCount > 0) {
+    <mat-paginator
+      [length]="totalCount"
+      [pageIndex]="currentPage - 1"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [showFirstLastButtons]="true"
+      aria-label="Görev sayfaları"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
+  }
 
 </section>

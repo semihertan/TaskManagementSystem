@@ -92,6 +92,31 @@ export class Tasks implements OnInit {
   completedTasks: TaskItem[] = [];
   cancelledTasks: TaskItem[] = [];
 
+
+    readonly pendingConnectedLists = [
+    'inProgressList',
+    'completedList',
+    'cancelledList'
+  ];
+
+  readonly inProgressConnectedLists = [
+    'pendingList',
+    'completedList',
+    'cancelledList'
+  ];
+
+  readonly completedConnectedLists = [
+    'pendingList',
+    'inProgressList',
+    'cancelledList'
+  ];
+
+  readonly cancelledConnectedLists = [
+    'pendingList',
+    'inProgressList',
+    'completedList'
+  ];
+
   ngOnInit(): void {
     this.taskService.tasks$.
     pipe(
