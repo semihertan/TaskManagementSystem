@@ -25,7 +25,7 @@ public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Property(x => x.Description);
 
         builder.Property(x => x.Priority)
-            .HasDefaultValue(Priority.Normal);
+            .IsRequired();;
 
         builder.Property(x => x.Status)
             .HasDefaultValue(TaskItemStatus.Pending);
