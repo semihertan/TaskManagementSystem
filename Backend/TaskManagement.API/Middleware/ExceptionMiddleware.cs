@@ -1,10 +1,14 @@
 using System.Text.Json;
+using TaskManagement.API.Exceptions;
 using TaskManagement.API.Responses;
 
 namespace TaskManagement.API.Middleware;
 
 public class ExceptionMiddleware
 {
+    private static readonly JsonSerializerOptions JsonOptions =
+        new(JsonSerializerDefaults.Web);
+
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
 
@@ -29,6 +33,15 @@ public class ExceptionMiddleware
             await WriteResponse(
                 context,
                 StatusCodes.Status404NotFound,
+                ex.Message);
+        }
+        catch (ConflictException ex)
+        {
+            _logger.LogWarning(ex, "Conflicting request.");
+
+            await WriteResponse(
+                context,
+                StatusCodes.Status409Conflict,
                 ex.Message);
         }
         catch (ArgumentException ex)
@@ -76,6 +89,6 @@ public class ExceptionMiddleware
         };
 
         await context.Response.WriteAsync(
-            JsonSerializer.Serialize(response));
+            JsonSerializer.Serialize(response, JsonOptions));
     }
 }

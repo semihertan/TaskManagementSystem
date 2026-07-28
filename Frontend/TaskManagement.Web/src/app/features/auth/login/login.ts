@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -40,40 +41,43 @@ export class Login {
   private errorHandlingService = inject(ErrorHandlingService);
   
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-onSubmit(): void {
-  if (this.loginForm.invalid) {
-    this.loginForm.markAllAsTouched();
-    return;
-  }
-
-  this.errorMessage = '';
-  this.isLoading = true;
-
-  const loginData = this.loginForm.getRawValue();
-
-  this.authService.login(loginData).subscribe({
-    next: (response) => {
-      this.authService.saveToken(response.data);
-      this.router.navigate(['/dashboard']);
-    },
-
-    error: (error) => {
-      this.isLoading = false;
-
-      this.errorMessage = this.errorHandlingService.getErrorMessage(error);
-
-      console.error(error);
-    },
-
-    complete: () => {
-      this.isLoading = false;
+  onSubmit(): void {
+    if (this.loginForm.invalid || this.isLoading) {
+      this.loginForm.markAllAsTouched();
+      return;
     }
-  });
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const loginData = this.loginForm.getRawValue();
+
+    this.authService
+      .login(loginData)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/dashboard']);
+        },
+
+        error: (error) => {
+          this.errorMessage =
+            this.errorHandlingService.getErrorMessage(error);
+
+          this.cdr.detectChanges();
+        }
+      });
   }
 }

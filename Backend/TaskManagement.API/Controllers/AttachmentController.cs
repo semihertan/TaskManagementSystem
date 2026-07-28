@@ -13,16 +13,32 @@ public class TaskAttachmentsController : ControllerBase
 {
     private readonly ITaskAttachmentService _attachmentService;
 
-    public TaskAttachmentsController(ITaskAttachmentService attachmentService)
+    public TaskAttachmentsController(
+        ITaskAttachmentService attachmentService)
     {
         _attachmentService = attachmentService;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Upload(Guid taskId, [FromForm] CreateTaskAttachmentDto dto)
+    private Guid GetUserId()
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userIdValue = User.FindFirstValue(
+            ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdValue, out var userId))
+        {
+            throw new UnauthorizedAccessException(
+                "Geçersiz kullanıcı bilgisi.");
+        }
+
+        return userId;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Upload(
+        Guid taskId,
+        [FromForm] CreateTaskAttachmentDto dto)
+    {
+        var userId = GetUserId();
 
         var attachment = await _attachmentService.UploadAsync(
             taskId,
@@ -35,8 +51,7 @@ public class TaskAttachmentsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get(Guid taskId)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
         var attachments = await _attachmentService.GetByTaskIdAsync(
             taskId,
@@ -46,10 +61,11 @@ public class TaskAttachmentsController : ControllerBase
     }
 
     [HttpDelete("{attachmentId:guid}")]
-    public async Task<IActionResult> Delete(Guid taskId, Guid attachmentId)
+    public async Task<IActionResult> Delete(
+        Guid taskId,
+        Guid attachmentId)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
         await _attachmentService.DeleteAsync(
             attachmentId,
@@ -63,8 +79,7 @@ public class TaskAttachmentsController : ControllerBase
         Guid taskId,
         Guid attachmentId)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
         var result = await _attachmentService.DownloadAsync(
             attachmentId,

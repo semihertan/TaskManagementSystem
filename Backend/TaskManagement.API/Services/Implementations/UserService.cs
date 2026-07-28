@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs.User;
 using TaskManagement.API.Entities;
+using TaskManagement.API.Exceptions;
 using TaskManagement.API.Services.Interfaces;
 
 namespace TaskManagement.API.Services.Implementations;
@@ -48,18 +49,107 @@ public class UserService : IUserService
 
         return _mapper.Map<UserDto>(user);
     }
-    public async Task<UserDto?> GetProfileAsync(Guid userId)
+    public async Task<UserDto> GetProfileAsync(Guid userId)
     {
         var user = await _context.Users
-        .AsNoTracking()
-        .FirstOrDefaultAsync(u => u.Id == userId);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (user == null)
+        if (user is null)
         {
-            return null;
+            throw new KeyNotFoundException("Kullanıcı bulunamadı.");
         }
 
         return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<UserDto> UpdateProfileAsync(
+        Guid userId,
+        UpdateUserDto updateUserDto)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+        }
+
+        var username = updateUserDto.Username.Trim();
+        var email = updateUserDto.Email.Trim();
+
+        var usernameInUse = await _context.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Id != userId && u.Username == username);
+
+        if (usernameInUse)
+        {
+            throw new ConflictException(
+                "Bu kullanıcı adı başka bir kullanıcı tarafından kullanılıyor.");
+        }
+
+        var emailInUse = await _context.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Id != userId && u.Email == email);
+
+        if (emailInUse)
+        {
+            throw new ConflictException(
+                "Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor.");
+        }
+
+        user.FirstName = updateUserDto.FirstName.Trim();
+        user.LastName = updateUserDto.LastName.Trim();
+        user.Username = username;
+        user.Email = email;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task ChangePasswordAsync(
+        Guid userId,
+        ChangePasswordDto changePasswordDto)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+        }
+
+        var currentPasswordIsValid = BCrypt.Net.BCrypt.Verify(
+            changePasswordDto.CurrentPassword,
+            user.PasswordHash);
+
+        if (!currentPasswordIsValid)
+        {
+            throw new ArgumentException("Mevcut şifre hatalı.");
+        }
+
+        if (changePasswordDto.NewPassword != changePasswordDto.ConfirmNewPassword)
+        {
+            throw new ArgumentException("Yeni şifreler eşleşmiyor.");
+        }
+
+        var passwordIsUnchanged = BCrypt.Net.BCrypt.Verify(
+            changePasswordDto.NewPassword,
+            user.PasswordHash);
+
+        if (passwordIsUnchanged)
+        {
+            throw new ArgumentException(
+                "Yeni şifre mevcut şifreyle aynı olamaz.");
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(
+            changePasswordDto.NewPassword);
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)
@@ -78,7 +168,7 @@ public class UserService : IUserService
                 "Login failed. User not found: {Email}",
                 loginDto.Email);
 
-            throw new Exception("Email veya şifre hatalı.");
+            throw new UnauthorizedAccessException("Email veya şifre hatalı.");
         }
 
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(
@@ -90,7 +180,13 @@ public class UserService : IUserService
             _logger.LogWarning(
                 "Login failed. Invalid password for {Email}",
                 loginDto.Email);
-            throw new Exception("Email veya şifre hatalı");
+            throw new UnauthorizedAccessException("Email veya şifre hatalı");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new UnauthorizedAccessException(
+                "Kullanıcı hesabı aktif değil.");
         }
 
         _logger.LogInformation(

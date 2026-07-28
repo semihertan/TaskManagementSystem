@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using TaskManagement.API.DTOs.User;
-using TaskManagement.API.Services.Interfaces;
-namespace TaskManagement.API.Controllers;
-
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using TaskManagement.API.DTOs.User;
 using TaskManagement.API.Responses;
+using TaskManagement.API.Services.Interfaces;
+
+namespace TaskManagement.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -64,31 +64,9 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("profile")]
-    public async Task<IActionResult> Profile()
+    public async Task<ActionResult<ApiResponse<UserDto>>> GetProfile()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (!Guid.TryParse(userId, out Guid id))
-        {
-            return Unauthorized(new ApiResponse<object>
-            {
-                Success = false,
-                Message = "Geçersiz kullanıcı bilgisi.",
-                Data = null
-            });
-        }
-
-        var user = await _userService.GetProfileAsync(id);
-
-        if (user == null)
-        {
-            return NotFound(new ApiResponse<object>
-            {
-                Success = false,
-                Message = "Kullanıcı bulunamadı.",
-                Data = null
-            });
-        }
+        var user = await _userService.GetProfileAsync(GetAuthenticatedUserId());
 
         return Ok(new ApiResponse<UserDto>
         {
@@ -96,5 +74,51 @@ public class AuthController : ControllerBase
             Message = "Profil başarıyla getirildi.",
             Data = user
         });
+    }
+
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<ActionResult<ApiResponse<UserDto>>> UpdateProfile(
+        [FromBody] UpdateUserDto updateUserDto)
+    {
+        var user = await _userService.UpdateProfileAsync(
+            GetAuthenticatedUserId(),
+            updateUserDto);
+
+        return Ok(new ApiResponse<UserDto>
+        {
+            Success = true,
+            Message = "Profil bilgileriniz güncellendi.",
+            Data = user
+        });
+    }
+
+    [Authorize]
+    [HttpPut("change-password")]
+    public async Task<ActionResult<ApiResponse<object>>> ChangePassword(
+        [FromBody] ChangePasswordDto changePasswordDto)
+    {
+        await _userService.ChangePasswordAsync(
+            GetAuthenticatedUserId(),
+            changePasswordDto);
+
+        return Ok(new ApiResponse<object>
+        {
+            Success = true,
+            Message = "Şifreniz başarıyla değiştirildi.",
+            Data = null
+        });
+    }
+
+    private Guid GetAuthenticatedUserId()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userId, out var id))
+        {
+            throw new UnauthorizedAccessException("Geçersiz kullanıcı bilgisi.");
+        }
+
+        return id;
     }
 }

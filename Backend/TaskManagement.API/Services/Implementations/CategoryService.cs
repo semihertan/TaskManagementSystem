@@ -1,7 +1,5 @@
-using System.Reflection.Metadata;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs.Category;
 using TaskManagement.API.Entities;
@@ -13,17 +11,24 @@ public class CategoryService : ICategoryService
     private readonly IMapper _mapper;
     private readonly ILogger<CategoryService> _logger;
 
-    public CategoryService(ApplicationDbContext context, IMapper mapper, ILogger<CategoryService> logger)
+    public CategoryService(
+        ApplicationDbContext context,
+        IMapper mapper,
+        ILogger<CategoryService> logger)
     {
         _context = context;
         _mapper = mapper;
         _logger = logger;
     }
-    public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto, Guid userId)
+
+    public async Task<CategoryDto> CreateAsync(
+        CreateCategoryDto dto,
+        Guid userId)
     {
         _logger.LogInformation(
             "Creating category: {CategoryName}",
             dto.Name);
+
         var category = _mapper.Map<Category>(dto);
 
         category.UserId = userId;
@@ -39,72 +44,96 @@ public class CategoryService : ICategoryService
         return _mapper.Map<CategoryDto>(category);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, Guid userId)
+    public async Task DeleteAsync(
+        Guid id,
+        Guid userId)
     {
         _logger.LogInformation(
             "Deleting category. Id: {CategoryId}",
             id);
 
         var category = await _context.Categories
-            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+            .FirstOrDefaultAsync(c =>
+                c.Id == id &&
+                c.UserId == userId);
 
-        if (category == null)
+        if (category is null)
         {
             _logger.LogWarning(
                 "Category not found for delete. Id: {CategoryId}",
                 id);
-            return false;
+
+            throw new KeyNotFoundException(
+                "Kategori bulunamadı.");
         }
 
         _context.Categories.Remove(category);
-
         await _context.SaveChangesAsync();
 
         _logger.LogInformation(
             "Category deleted successfully. Id: {CategoryId}",
             id);
-
-        return true;
     }
 
-    public async Task<IEnumerable<CategoryDto>> GetAllAsync(Guid userId)
+    public async Task<IEnumerable<CategoryDto>> GetAllAsync(
+        Guid userId)
     {
         var categories = await _context.Categories
-        .AsNoTracking()
-        .Where(c => c.UserId == userId)
-        .ToListAsync();
+            .AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .OrderBy(c => c.Name)
+            .ToListAsync();
 
-        return _mapper.Map<IEnumerable<CategoryDto>>(categories);
+        return _mapper.Map<IEnumerable<CategoryDto>>(
+            categories);
     }
 
-    public async Task<CategoryDto?> GetByIdAsync(Guid id, Guid userId)
+    public async Task<CategoryDto> GetByIdAsync(
+        Guid id,
+        Guid userId)
     {
         var category = await _context.Categories
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+            .FirstOrDefaultAsync(c =>
+                c.Id == id &&
+                c.UserId == userId);
 
-        if (category == null)
-            return null;
+        if (category is null)
+        {
+            throw new KeyNotFoundException(
+                "Kategori bulunamadı.");
+        }
 
         return _mapper.Map<CategoryDto>(category);
     }
 
-    public async Task<CategoryDto> UpdateAsync(Guid id, UpdateCategoryDto updateCategoryDto, Guid userId)
+    public async Task<CategoryDto> UpdateAsync(
+        Guid id,
+        UpdateCategoryDto updateCategoryDto,
+        Guid userId)
     {
         _logger.LogInformation(
             "Updating category. Id: {CategoryId}",
             id);
+
         var category = await _context.Categories
-            .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+            .FirstOrDefaultAsync(c =>
+                c.Id == id &&
+                c.UserId == userId);
 
         if (category is null)
         {
-            throw new KeyNotFoundException("Kategori bulunamadı.");
+            throw new KeyNotFoundException(
+                "Kategori bulunamadı.");
         }
 
         _mapper.Map(updateCategoryDto, category);
 
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Category updated successfully. Id: {CategoryId}",
+            id);
 
         return _mapper.Map<CategoryDto>(category);
     }

@@ -11,7 +11,9 @@ public class TaskCommentService : ITaskCommentService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public TaskCommentService(ApplicationDbContext context, IMapper mapper)
+    public TaskCommentService(
+        ApplicationDbContext context,
+        IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -23,11 +25,14 @@ public class TaskCommentService : ITaskCommentService
         Guid userId)
     {
         var task = await _context.Tasks
-            .FirstOrDefaultAsync(x => x.Id == taskId && x.UserId == userId);
+            .FirstOrDefaultAsync(x =>
+                x.Id == taskId &&
+                x.UserId == userId);
 
-        if (task == null)
+        if (task is null)
         {
-            throw new Exception("Görev bulunamadı.");
+            throw new KeyNotFoundException(
+                "Görev bulunamadı.");
         }
 
         var comment = _mapper.Map<TaskComment>(createDto);
@@ -37,46 +42,57 @@ public class TaskCommentService : ITaskCommentService
         comment.CreatedAt = DateTime.UtcNow;
 
         _context.TaskComments.Add(comment);
-
         await _context.SaveChangesAsync();
 
         return _mapper.Map<TaskCommentDto>(comment);
     }
 
-    public async Task DeleteAsync(Guid commentId, Guid userId)
+    public async Task DeleteAsync(
+        Guid commentId,
+        Guid userId)
     {
         var comment = await _context.TaskComments
+            .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == commentId &&
-                x.UserId == userId);
+                x.UserId == userId &&
+                x.Task.UserId == userId);
 
-        if (comment == null)
+        if (comment is null)
         {
-            throw new Exception("Yorum bulunamadı.");
+            throw new KeyNotFoundException(
+                "Yorum bulunamadı.");
         }
 
         _context.TaskComments.Remove(comment);
-
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<TaskCommentDto>> GetByTaskIdAsync(Guid taskId, Guid userId)
+    public async Task<IEnumerable<TaskCommentDto>>
+        GetByTaskIdAsync(
+            Guid taskId,
+            Guid userId)
     {
-        var task = await _context.Tasks
+        var taskExists = await _context.Tasks
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == taskId && x.UserId == userId);
+            .AnyAsync(x =>
+                x.Id == taskId &&
+                x.UserId == userId);
 
-        if (task == null)
+        if (!taskExists)
         {
-            throw new Exception("Görev bulunamadı.");
+            throw new KeyNotFoundException(
+                "Görev bulunamadı.");
         }
 
         var comments = await _context.TaskComments
+            .AsNoTracking()
             .Where(x => x.TaskId == taskId)
             .OrderBy(x => x.CreatedAt)
             .ToListAsync();
 
-        return _mapper.Map<IEnumerable<TaskCommentDto>>(comments);
+        return _mapper.Map<IEnumerable<TaskCommentDto>>(
+            comments);
     }
 
     public async Task<TaskCommentDto> UpdateAsync(
@@ -85,13 +101,16 @@ public class TaskCommentService : ITaskCommentService
         Guid userId)
     {
         var comment = await _context.TaskComments
+            .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == commentId &&
-                x.UserId == userId);
+                x.UserId == userId &&
+                x.Task.UserId == userId);
 
-        if (comment == null)
+        if (comment is null)
         {
-            throw new Exception("Yorum bulunamadı.");
+            throw new KeyNotFoundException(
+                "Yorum bulunamadı.");
         }
 
         _mapper.Map(updateDto, comment);

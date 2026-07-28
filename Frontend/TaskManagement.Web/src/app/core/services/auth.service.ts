@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 
 import { environment } from '../../../environments/environment';
@@ -40,6 +40,15 @@ export class AuthService {
     return this.http.post<ApiResponse<string>>(
       `${this.apiUrl}/login`,
       loginData
+    )
+    .pipe(
+      tap(response => {
+        if(!response.data){
+          throw new Error("Sunucudan token alınamadı");
+        }
+
+        this.saveToken(response.data);
+      })
     );
   }
 

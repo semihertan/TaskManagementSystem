@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManagement.API.Services;
 using TaskManagement.API.Middleware;
+using TaskManagement.API.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +49,27 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var message = context.ModelState.Values
+                .SelectMany(value => value.Errors)
+                .Select(error => error.ErrorMessage)
+                .FirstOrDefault(error => !string.IsNullOrWhiteSpace(error))
+                ?? "Gönderilen bilgiler geçersiz.";
+
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(
+                new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = message,
+                    Data = null
+                });
+        };
+    });
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -103,12 +124,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     }
 });
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
         policy
-            .WithOrigins("http://localhost:4200")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

@@ -14,7 +14,6 @@ public class MappingProfile : AutoMapper.Profile
         // User
         CreateMap<User, UserDto>();
         CreateMap<CreateUserDto, User>();
-        CreateMap<UpdateUserDto, User>();
 
         // Task
         CreateMap<TaskItem, TaskItemDto>();

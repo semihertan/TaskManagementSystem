@@ -9,75 +9,96 @@ namespace TaskManagement.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-
 public class CategoriesController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
 
-    public CategoriesController(ICategoryService categoryService)
+    public CategoriesController(
+        ICategoryService categoryService)
     {
         _categoryService = categoryService;
+    }
+
+    private Guid GetUserId()
+    {
+        var userIdValue = User.FindFirstValue(
+            ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdValue, out var userId))
+        {
+            throw new UnauthorizedAccessException(
+                "Geçersiz kullanıcı bilgisi.");
+        }
+
+        return userId;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
-        var categories = await _categoryService.GetAllAsync(userId);
+        var categories =
+            await _categoryService.GetAllAsync(userId);
 
-    return Ok(new ApiResponse<IEnumerable<CategoryDto>>
-    {
-        Success = true,
-        Message = "Kategoriler başarıyla getirildi.",
-        Data = categories
-    });
+        return Ok(new ApiResponse<IEnumerable<CategoryDto>>
+        {
+            Success = true,
+            Message = "Kategoriler başarıyla getirildi.",
+            Data = categories
+        });
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
-        var category = await _categoryService.GetByIdAsync(id, userId);
+        var category =
+            await _categoryService.GetByIdAsync(id, userId);
 
-    if (category == null)
-    {
-        return NotFound(new ApiResponse<object>
+        return Ok(new ApiResponse<CategoryDto>
         {
-            Success = false,
-            Message = "Kategori bulunamadı.",
-            Data = null
+            Success = true,
+            Message = "Kategori başarıyla getirildi.",
+            Data = category
         });
-    }
-
-        return Ok(category);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateCategoryDto createCategoryDto)
+    public async Task<IActionResult> Create(
+        CreateCategoryDto createCategoryDto)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
-        var createdCategory = await _categoryService.CreateAsync(createCategoryDto, userId);
+        var createdCategory =
+            await _categoryService.CreateAsync(
+                createCategoryDto,
+                userId);
 
-    return CreatedAtAction(
-        nameof(GetById),
-        new { id = createdCategory.Id },
-        new ApiResponse<CategoryDto>
-        {
-            Success = true,
-            Message = "Kategori başarıyla oluşturuldu.",
-            Data = createdCategory
-        });
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = createdCategory.Id },
+            new ApiResponse<CategoryDto>
+            {
+                Success = true,
+                Message = "Kategori başarıyla oluşturuldu.",
+                Data = createdCategory
+            });
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<CategoryDto>>> Update(Guid id, UpdateCategoryDto updateCategoryDto)
+    public async Task<ActionResult<ApiResponse<CategoryDto>>> Update(
+        Guid id,
+        UpdateCategoryDto updateCategoryDto)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
-        var updated = await _categoryService.UpdateAsync(id, updateCategoryDto, userId);
+        var updated =
+            await _categoryService.UpdateAsync(
+                id,
+                updateCategoryDto,
+                userId);
 
         return Ok(new ApiResponse<CategoryDto>
         {
@@ -90,12 +111,9 @@ public class CategoriesController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = GetUserId();
 
-        var deleted = await _categoryService.DeleteAsync(id, userId);
-
-        if (!deleted)
-            return NotFound();
+        await _categoryService.DeleteAsync(id, userId);
 
         return NoContent();
     }

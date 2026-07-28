@@ -29,41 +29,52 @@ public class TaskAttachmentService : ITaskAttachmentService
                 x.Id == attachmentId &&
                 x.Task.UserId == userId);
 
-        if(attachment == null)
+        if (attachment is null)
         {
-            throw new Exception("Dosya bulunamadı");   
+            throw new KeyNotFoundException("Dosya bulunamadı.");
         }
 
-        if (File.Exists(attachment.FilePath))
+        var fullPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            attachment.FilePath);
+
+        if (File.Exists(fullPath))
         {
-            File.Delete(attachment.FilePath);
+            File.Delete(fullPath);
         }
 
         _context.TaskAttachments.Remove(attachment);
-
         await _context.SaveChangesAsync();
     }
 
-    public async Task<(byte[] FileBytes, string ContentType, string FileName)> DownloadAsync(Guid attachmentId, Guid userId)
+    public async Task<(
+        byte[] FileBytes,
+        string ContentType,
+        string FileName)> DownloadAsync(
+            Guid attachmentId,
+            Guid userId)
     {
         var attachment = await _context.TaskAttachments
+            .AsNoTracking()
             .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == attachmentId &&
                 x.Task.UserId == userId);
 
-        if (attachment == null)
+        if (attachment is null)
         {
-            throw new Exception("Dosya bulunamadı.");
+            throw new KeyNotFoundException("Dosya bulunamadı.");
         }
 
-        if (!File.Exists(attachment.FilePath))
-        {
-            throw new Exception("Dosya diskte bulunamadı.");
-        }
-
-        var fullPath = Path.Combine(Directory.GetCurrentDirectory(),
+        var fullPath = Path.Combine(
+            Directory.GetCurrentDirectory(),
             attachment.FilePath);
+
+        if (!File.Exists(fullPath))
+        {
+            throw new KeyNotFoundException(
+                "Dosya diskte bulunamadı.");
+        }
 
         var fileBytes = await File.ReadAllBytesAsync(fullPath);
 
@@ -74,25 +85,44 @@ public class TaskAttachmentService : ITaskAttachmentService
         );
     }
 
-    public async Task<IEnumerable<TaskAttachmentDto>> GetByTaskIdAsync(Guid taskId, Guid userId)
+    public async Task<IEnumerable<TaskAttachmentDto>> GetByTaskIdAsync(
+        Guid taskId,
+        Guid userId)
     {
+        var taskExists = await _context.Tasks
+            .AsNoTracking()
+            .AnyAsync(x =>
+                x.Id == taskId &&
+                x.UserId == userId);
+
+        if (!taskExists)
+        {
+            throw new KeyNotFoundException("Görev bulunamadı.");
+        }
+
         var attachments = await _context.TaskAttachments
             .AsNoTracking()
-            .Include(x => x.Task)
-            .Where(x => x.TaskId == taskId && x.Task.UserId == userId)
+            .Where(x => x.TaskId == taskId)
+            .OrderByDescending(x => x.UploadedAt)
             .ToListAsync();
 
-        return _mapper.Map<IEnumerable<TaskAttachmentDto>>(attachments);
+        return _mapper.Map<IEnumerable<TaskAttachmentDto>>(
+            attachments);
     }
 
-    public async Task<TaskAttachmentDto> UploadAsync(Guid taskId, CreateTaskAttachmentDto dto, Guid userId)
+    public async Task<TaskAttachmentDto> UploadAsync(
+        Guid taskId,
+        CreateTaskAttachmentDto dto,
+        Guid userId)
     {
         var task = await _context.Tasks
-            .FirstOrDefaultAsync(t => t.Id == taskId && t.UserId == userId);
+            .FirstOrDefaultAsync(x =>
+                x.Id == taskId &&
+                x.UserId == userId);
 
-        if (task == null)
+        if (task is null)
         {
-            throw new Exception("Görev bulunamadı.");
+            throw new KeyNotFoundException("Görev bulunamadı.");
         }
 
         var uploadsFolder = Path.Combine(
@@ -112,7 +142,7 @@ public class TaskAttachmentService : ITaskAttachmentService
             Directory.GetCurrentDirectory(),
             relativePath);
 
-        using var stream = new FileStream(
+        await using var stream = new FileStream(
             fullPath,
             FileMode.Create);
 
