@@ -7,16 +7,12 @@ public interface ITaskAttachmentService
 {
     Task<TaskAttachmentDto> UploadAsync(
         Guid taskId,
-        CreateTaskAttachmentDto dto,
-        Guid userId);
+        CreateTaskAttachmentDto dto);
 
     Task<IEnumerable<TaskAttachmentDto>> GetByTaskIdAsync(
-        Guid taskId,
-        Guid userId);
+        Guid taskId);
 
-    Task DeleteAsync(
-        Guid attachmentId,
-        Guid userId);
+    Task DeleteAsync(Guid attachmentId);
 
-    Task<(byte[] FileBytes, string ContentType, string FileName)>DownloadAsync(Guid attachmentId, Guid userId);
+    Task<(byte[] FileBytes, string ContentType, string FileName)> DownloadAsync(Guid attachmentId);
 }

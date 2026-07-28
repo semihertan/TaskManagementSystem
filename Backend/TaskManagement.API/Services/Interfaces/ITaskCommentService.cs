@@ -2,19 +2,15 @@ using TaskManagement.API.DTOs.Task.TaskComment;
 
 public interface ITaskCommentService
 {
-    Task<IEnumerable<TaskCommentDto>> GetByTaskIdAsync(Guid taskId, Guid userId);
+    Task<IEnumerable<TaskCommentDto>> GetByTaskIdAsync(Guid taskId);
 
     Task<TaskCommentDto> CreateAsync(
         Guid taskId,
-        CreateTaskCommentDto createDto,
-        Guid userId);
+        CreateTaskCommentDto createDto);
 
     Task<TaskCommentDto> UpdateAsync(
         Guid commentId,
-        UpdateTaskCommentDto updateDto,
-        Guid userId);
+        UpdateTaskCommentDto updateDto);
 
-    Task DeleteAsync(
-        Guid commentId,
-        Guid userId);
+    Task DeleteAsync(Guid commentId);
 }

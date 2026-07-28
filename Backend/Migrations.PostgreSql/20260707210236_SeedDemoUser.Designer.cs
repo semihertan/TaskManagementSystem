@@ -9,7 +9,7 @@ using TaskManagement.API.Data;
 
 #nullable disable
 
-namespace TaskManagement.API.Migrations
+namespace TaskManagement.API.Migrations.PostgreSql
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20260707210236_SeedDemoUser")]
@@ -244,19 +244,6 @@ namespace TaskManagement.API.Migrations
 
                     b.ToTable("Users", (string)null);
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "demo@taskmanagement.com",
-                            FirstName = "Demo",
-                            IsActive = true,
-                            LastName = "User",
-                            PasswordHash = "$2a$11$demoHashWillBeChangedLater",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Username = "demo"
-                        });
                 });
 
             modelBuilder.Entity("TaskManagement.API.Entities.Category", b =>

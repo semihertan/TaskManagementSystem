@@ -18,9 +18,12 @@ import { ApiResponse } from '../../shared/interfaces/api-response.interface';
 
 import { StorageService } from './storage.service';
 import { STORAGE_KEYS } from '../constants/storage-keys';
+import { UserRole } from '../../shared/interfaces/auth/user-role.enum';
 
 interface JwtPayload {
   exp?: number;
+  role?: string;
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'?: string;
 }
 
 @Injectable({
@@ -114,6 +117,36 @@ export class AuthService {
     return this.storageService.getItem<User>(
       STORAGE_KEYS.currentUser
     );
+  }
+
+  get currentUserRole(): UserRole | null {
+    const token = this.getToken();
+
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      const role = decoded.role ??
+        decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+      if (role === 'Admin' || role === String(UserRole.Admin)) {
+        return UserRole.Admin;
+      }
+
+      if (role === 'User' || role === String(UserRole.User)) {
+        return UserRole.User;
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.isLoggedIn() && this.currentUserRole === UserRole.Admin;
   }
 
   isLoggedIn(): boolean {

@@ -1,3 +1,5 @@
+using TaskManagement.API.Enums;
+
 namespace TaskManagement.API.DTOs.User;
 
 public class UserDto
@@ -13,6 +15,8 @@ public class UserDto
     public string LastName { get; set; } = string.Empty;
 
     public bool IsActive { get; set; }
+
+    public UserRole Role { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

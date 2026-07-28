@@ -15,20 +15,28 @@ public class TaskService : ITaskService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly ILogger<TaskService> _logger;
+    private readonly ICurrentUserService _currentUser;
 
-    public TaskService(ApplicationDbContext context, IMapper mapper, ILogger<TaskService> logger)
+    public TaskService(
+        ApplicationDbContext context,
+        IMapper mapper,
+        ILogger<TaskService> logger,
+        ICurrentUserService currentUser)
     {
         _context = context;
         _mapper = mapper;
         _logger = logger;
+        _currentUser = currentUser;
     }
-    public async Task<TaskItemDto> CreateAsync(CreateTaskDto createTaskDto, Guid userId)
+    public async Task<TaskItemDto> CreateAsync(CreateTaskDto createTaskDto)
     {
         _logger.LogInformation("Creating task: {Title}", createTaskDto.Title);
 
+        await EnsureCategoryAccessAsync(createTaskDto.CategoryId);
+
         var task = _mapper.Map<TaskItem>(createTaskDto);
 
-        task.UserId = userId;
+        task.UserId = _currentUser.UserId;
         task.CreatedAt = DateTime.UtcNow;
         task.UpdatedAt = DateTime.UtcNow;
 
@@ -43,14 +51,16 @@ public class TaskService : ITaskService
         return _mapper.Map<TaskItemDto>(task);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, Guid userId)
+    public async Task<bool> DeleteAsync(Guid id)
     {
         _logger.LogInformation(
             "Deleting task with id: {TaskId}",
             id);
 
         var task = await _context.Tasks
-            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            .FirstOrDefaultAsync(t =>
+                t.Id == id &&
+                (_currentUser.IsAdmin || t.UserId == _currentUser.UserId));
 
         if (task == null)
         {
@@ -72,11 +82,15 @@ public class TaskService : ITaskService
         return true;
     }
 
-    public async Task<PagedResponse<TaskItemDto>> GetAllAsync(Guid userId, TaskFilterDto filterDto)
+    public async Task<PagedResponse<TaskItemDto>> GetAllAsync(TaskFilterDto filterDto)
     {
         IQueryable<TaskItem> query = _context.Tasks
-            .AsNoTracking()
-            .Where(t => t.UserId == userId);
+            .AsNoTracking();
+
+        if (!_currentUser.IsAdmin)
+        {
+            query = query.Where(t => t.UserId == _currentUser.UserId);
+        }
 
         if (filterDto.Priority.HasValue)
         {
@@ -229,13 +243,15 @@ public class TaskService : ITaskService
         };
     }
 
-    public async Task<TaskItemDto?> GetByIdAsync(Guid id, Guid userId)
+    public async Task<TaskItemDto?> GetByIdAsync(Guid id)
     {
         _logger.LogInformation("Getting task with id: {TaskId}", id);
 
         var task = await _context.Tasks
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            .FirstOrDefaultAsync(t =>
+                t.Id == id &&
+                (_currentUser.IsAdmin || t.UserId == _currentUser.UserId));
 
         if(task == null)
         {
@@ -244,7 +260,7 @@ public class TaskService : ITaskService
         return _mapper.Map<TaskItemDto>(task);
     }
 
-    public async Task<TaskItemDto> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto, Guid userId)
+    public async Task<TaskItemDto> UpdateAsync(Guid id, UpdateTaskDto updateTaskDto)
     {
         _logger.LogInformation(
             "Updating task. Id: {TaskId}",
@@ -253,7 +269,7 @@ public class TaskService : ITaskService
         var task = await _context.Tasks
             .FirstOrDefaultAsync(t =>
                 t.Id == id &&
-                t.UserId == userId);
+                (_currentUser.IsAdmin || t.UserId == _currentUser.UserId));
 
         if (task == null)
         {
@@ -265,6 +281,8 @@ public class TaskService : ITaskService
                 "Görev bulunamadı."
             );
         }
+
+        await EnsureCategoryAccessAsync(updateTaskDto.CategoryId);
 
         _mapper.Map(updateTaskDto, task);
 
@@ -296,13 +314,19 @@ public class TaskService : ITaskService
         return _mapper.Map<TaskItemDto>(task);
     }
 
-    public async Task<TaskStatisticsDto> GetStatisticsAsync(Guid userId)
+    public async Task<TaskStatisticsDto> GetStatisticsAsync()
     {
         var today = DateTime.UtcNow.Date;
         var now = DateTime.UtcNow;
 
-        var statistics = await _context.Tasks
-            .Where(x => x.UserId == userId)
+        IQueryable<TaskItem> query = _context.Tasks;
+
+        if (!_currentUser.IsAdmin)
+        {
+            query = query.Where(x => x.UserId == _currentUser.UserId);
+        }
+
+        var statistics = await query
             .GroupBy(x => 1)
             .Select(g => new TaskStatisticsDto
             {
@@ -333,12 +357,17 @@ public class TaskService : ITaskService
         return statistics ?? new TaskStatisticsDto();
     }
     
-    public async Task<IEnumerable<TaskItemDto>> GetOverdueTasksAsync(Guid userId)
+    public async Task<IEnumerable<TaskItemDto>> GetOverdueTasksAsync()
     {
-        var tasks = await _context.Tasks
-            .AsNoTracking()
+        IQueryable<TaskItem> query = _context.Tasks.AsNoTracking();
+
+        if (!_currentUser.IsAdmin)
+        {
+            query = query.Where(x => x.UserId == _currentUser.UserId);
+        }
+
+        var tasks = await query
             .Where(x =>
-                x.UserId == userId &&
                 x.DueDate.HasValue &&
                 x.DueDate.Value < DateTime.UtcNow &&
                 x.Status != TaskItemStatus.Completed &&
@@ -347,5 +376,24 @@ public class TaskService : ITaskService
             .ToListAsync();
 
         return _mapper.Map<IEnumerable<TaskItemDto>>(tasks);
+    }
+
+    private async Task EnsureCategoryAccessAsync(Guid? categoryId)
+    {
+        if (!categoryId.HasValue)
+        {
+            return;
+        }
+
+        var categoryExists = await _context.Categories
+            .AsNoTracking()
+            .AnyAsync(category =>
+                category.Id == categoryId.Value &&
+                (_currentUser.IsAdmin || category.UserId == _currentUser.UserId));
+
+        if (!categoryExists)
+        {
+            throw new KeyNotFoundException("Kategori bulunamadı.");
+        }
     }
 }

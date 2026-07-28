@@ -29,7 +29,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class Navigation {
   readonly themeService = inject(ThemeService);
-  private authService = inject(AuthService);
+  readonly authService = inject(AuthService);
 
   toggleTheme(): void {
     this.themeService.toggleTheme();

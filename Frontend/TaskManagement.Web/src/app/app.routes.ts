@@ -5,6 +5,7 @@ import { Register } from './features/auth/register/register';
 
 import { AppLayout } from './shared/components/app-layout/app-layout';
 import { authGuard } from './core/guards/auth-guard';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
   {
@@ -69,6 +70,13 @@ export const routes: Routes = [
           import('./features/profile/profile')
             .then((m) => m.Profile),
         canActivate: [authGuard]
+      },
+      {
+        path: 'admin/users',
+        loadComponent: () =>
+          import('./features/admin/users/admin-users')
+            .then((m) => m.AdminUsers),
+        canActivate: [adminGuard]
       },
     ],
   },

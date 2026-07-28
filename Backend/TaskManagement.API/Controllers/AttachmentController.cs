@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.API.DTOs.TaskAttachment;
@@ -19,31 +18,14 @@ public class TaskAttachmentsController : ControllerBase
         _attachmentService = attachmentService;
     }
 
-    private Guid GetUserId()
-    {
-        var userIdValue = User.FindFirstValue(
-            ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdValue, out var userId))
-        {
-            throw new UnauthorizedAccessException(
-                "Geçersiz kullanıcı bilgisi.");
-        }
-
-        return userId;
-    }
-
     [HttpPost]
     public async Task<IActionResult> Upload(
         Guid taskId,
         [FromForm] CreateTaskAttachmentDto dto)
     {
-        var userId = GetUserId();
-
         var attachment = await _attachmentService.UploadAsync(
             taskId,
-            dto,
-            userId);
+            dto);
 
         return Ok(attachment);
     }
@@ -51,11 +33,8 @@ public class TaskAttachmentsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get(Guid taskId)
     {
-        var userId = GetUserId();
-
         var attachments = await _attachmentService.GetByTaskIdAsync(
-            taskId,
-            userId);
+            taskId);
 
         return Ok(attachments);
     }
@@ -65,11 +44,7 @@ public class TaskAttachmentsController : ControllerBase
         Guid taskId,
         Guid attachmentId)
     {
-        var userId = GetUserId();
-
-        await _attachmentService.DeleteAsync(
-            attachmentId,
-            userId);
+        await _attachmentService.DeleteAsync(attachmentId);
 
         return NoContent();
     }
@@ -79,11 +54,7 @@ public class TaskAttachmentsController : ControllerBase
         Guid taskId,
         Guid attachmentId)
     {
-        var userId = GetUserId();
-
-        var result = await _attachmentService.DownloadAsync(
-            attachmentId,
-            userId);
+        var result = await _attachmentService.DownloadAsync(attachmentId);
 
         return File(
             result.FileBytes,

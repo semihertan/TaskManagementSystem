@@ -32,17 +32,12 @@
 
 /* Görev bilgileri */
 
-.detail-card {
-  animation-delay: 60ms;
-}
-
 .attachments-card {
   animation-delay: 120ms;
 }
 
 .comments-card {
   grid-column: 1 / -1;
-  animation-delay: 180ms;
 
   mat-card-content {
     padding: 0;
@@ -97,6 +92,7 @@
     color: var(--text-primary);
     line-height: 1.6;
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -116,6 +112,7 @@
 }
 
 .detail-item {
+  min-width: 0;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -131,7 +128,12 @@
 
   > div {
     display: flex;
+    min-width: 0;
     flex-direction: column;
+
+    span {
+      overflow-wrap: anywhere;
+    }
   }
 }
 
@@ -202,6 +204,7 @@
 
 .attachments-title {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 14px;
 
@@ -216,6 +219,7 @@
     margin: 4px 0 0;
     color: var(--text-secondary);
     font-size: 14px;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -286,6 +290,7 @@
 .upload-description {
   color: var(--text-secondary);
   font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
 .upload-actions {
@@ -491,7 +496,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .task-detail-page {
     padding: 20px 14px;
   }
@@ -533,7 +538,7 @@
   }
 
   .attachment-count {
-    margin-left: 56px;
+    align-self: flex-start;
   }
 
   .upload-content {

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using TaskManagement.API.DTOs.Task;
 using TaskManagement.API.Responses;
 
@@ -21,10 +20,7 @@ public class TasksController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] TaskFilterDto filterDto)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var tasks = await _taskService.GetAllAsync(userId, filterDto);
+        var tasks = await _taskService.GetAllAsync(filterDto);
 
         return Ok(new ApiResponse<PagedResponse<TaskItemDto>>
         {
@@ -37,9 +33,7 @@ public class TasksController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ApiResponse<TaskItemDto>>> GetById(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var task = await _taskService.GetByIdAsync(id, userId);
+        var task = await _taskService.GetByIdAsync(id);
 
         return Ok(new ApiResponse<TaskItemDto>
         {
@@ -52,9 +46,7 @@ public class TasksController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateTaskDto createTaskDto)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var createdTask = await _taskService.CreateAsync(createTaskDto, userId);
+        var createdTask = await _taskService.CreateAsync(createTaskDto);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -70,9 +62,7 @@ public class TasksController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, UpdateTaskDto updateTaskDto)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var updated = await _taskService.UpdateAsync(id, updateTaskDto, userId);
+        var updated = await _taskService.UpdateAsync(id, updateTaskDto);
 
         return Ok(new ApiResponse<TaskItemDto>
         {
@@ -85,9 +75,7 @@ public class TasksController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var deleted = await _taskService.DeleteAsync(id, userId);
+        var deleted = await _taskService.DeleteAsync(id);
 
         if (!deleted)
             return NotFound();
@@ -98,10 +86,7 @@ public class TasksController : ControllerBase
     [HttpGet("statistics")]
     public async Task<IActionResult> GetStatistics()
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var statistics = await _taskService.GetStatisticsAsync(userId);
+        var statistics = await _taskService.GetStatisticsAsync();
 
         return Ok(new ApiResponse<TaskStatisticsDto>
         {
@@ -114,10 +99,7 @@ public class TasksController : ControllerBase
     [HttpGet("overdue")]
     public async Task<IActionResult> GetOverdueTasks()
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var tasks = await _taskService.GetOverdueTasksAsync(userId);
+        var tasks = await _taskService.GetOverdueTasksAsync();
 
         return Ok(tasks);
     }

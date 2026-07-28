@@ -1,3 +1,5 @@
+using TaskManagement.API.Enums;
+
 namespace TaskManagement.API.Entities;
 
 public class User
@@ -20,9 +22,11 @@ public class User
 
     public bool IsActive { get; set; } = true;
 
-    public ICollection<Category> Categories { get; set; }
+    public UserRole Role { get; set; } = UserRole.User;
 
-    public ICollection<TaskItem> Tasks { get; set; }
+    public ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 
     public ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
 }

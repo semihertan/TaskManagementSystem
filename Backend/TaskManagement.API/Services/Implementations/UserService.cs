@@ -1,9 +1,11 @@
 using AutoMapper;
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs.User;
 using TaskManagement.API.Entities;
 using TaskManagement.API.Exceptions;
+using TaskManagement.API.Enums;
 using TaskManagement.API.Services.Interfaces;
 
 namespace TaskManagement.API.Services.Implementations;
@@ -36,6 +38,7 @@ public class UserService : IUserService
          
         // entity oluşturma
         var user = _mapper.Map<User>(createUserDto);
+        user.Role = UserRole.User;
         // şifre hashle
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
 
@@ -205,5 +208,104 @@ public class UserService : IUserService
             .AnyAsync(x =>
                 x.Email == email ||
                 x.Username == username);
+    }
+
+    public async Task<IReadOnlyList<UserDto>> GetAllUsersAsync()
+    {
+        var users = await _context.Users
+            .AsNoTracking()
+            .OrderBy(user => user.FirstName)
+            .ThenBy(user => user.LastName)
+            .ThenBy(user => user.Username)
+            .ToListAsync();
+
+        return _mapper.Map<IReadOnlyList<UserDto>>(users);
+    }
+
+    public async Task<UserDto> GetUserByIdAsync(Guid userId)
+    {
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(item => item.Id == userId);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+        }
+
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<UserDto> UpdateUserRoleAsync(Guid userId, UserRole role)
+    {
+        if (!Enum.IsDefined(role))
+        {
+            throw new ArgumentException("Geçerli bir rol seçiniz.");
+        }
+
+        await using var transaction = await _context.Database.BeginTransactionAsync(
+            IsolationLevel.Serializable);
+
+        var user = await _context.Users.FirstOrDefaultAsync(item => item.Id == userId);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+        }
+
+        if (user.Role == UserRole.Admin && role != UserRole.Admin)
+        {
+            await EnsureAnotherActiveAdminExistsAsync(user.Id);
+        }
+
+        user.Role = role;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<UserDto> UpdateUserStatusAsync(Guid userId, bool isActive)
+    {
+        await using var transaction = await _context.Database.BeginTransactionAsync(
+            IsolationLevel.Serializable);
+
+        var user = await _context.Users.FirstOrDefaultAsync(item => item.Id == userId);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+        }
+
+        if (user.Role == UserRole.Admin && user.IsActive && !isActive)
+        {
+            await EnsureAnotherActiveAdminExistsAsync(user.Id);
+        }
+
+        user.IsActive = isActive;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return _mapper.Map<UserDto>(user);
+    }
+
+    private async Task EnsureAnotherActiveAdminExistsAsync(Guid excludedUserId)
+    {
+        var anotherAdminExists = await _context.Users
+            .AsNoTracking()
+            .AnyAsync(user =>
+                user.Id != excludedUserId &&
+                user.Role == UserRole.Admin &&
+                user.IsActive);
+
+        if (!anotherAdminExists)
+        {
+            throw new ConflictException(
+                "Sistemde en az bir aktif admin bulunmalıdır.");
+        }
     }
 }

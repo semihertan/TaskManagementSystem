@@ -459,8 +459,9 @@ select {
 }
 
 .cdk-overlay-pane.task-form-dialog {
-  max-width: calc(100vw - 32px) !important;
-  max-height: calc(100dvh - 32px) !important;
+  width: min(760px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  max-height: calc(100dvh - 24px) !important;
 }
 
 .task-form-dialog .mat-mdc-dialog-container,
@@ -486,7 +487,7 @@ select {
   max-height: inherit;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .cdk-overlay-pane.task-form-dialog {
     width: calc(100vw - 24px) !important;
     max-width: calc(100vw - 24px) !important;
@@ -495,12 +496,6 @@ select {
 }
 
 @media (max-width: 480px) {
-  .cdk-overlay-pane.task-form-dialog {
-    width: calc(100vw - 16px) !important;
-    max-width: calc(100vw - 16px) !important;
-    max-height: calc(100dvh - 16px) !important;
-  }
-
   .task-form-dialog .mat-mdc-dialog-surface {
     border-radius: 16px;
   }
@@ -871,7 +866,7 @@ select {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
   .auth-shell {
     width: min(560px, 100%);
     min-height: auto;
@@ -902,6 +897,19 @@ select {
   .auth-form-panel.mat-mdc-card {
     min-height: 100vh;
     padding: 28px 20px;
+  }
+
+  .auth-heading,
+  .auth-form,
+  .auth-form-panel > * {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .auth-form .mat-mdc-form-field {
+    width: 100%;
+    min-width: 0;
   }
 
   .auth-footer {

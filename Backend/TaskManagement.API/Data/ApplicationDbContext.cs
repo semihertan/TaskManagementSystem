@@ -26,24 +26,5 @@ public class ApplicationDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
-        var demoUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-
-        modelBuilder.Entity<User>().HasData(new User
-        {
-            Id = demoUserId,
-            Username = "demo",
-            Email = "demo@taskmanagement.com",
-            PasswordHash = "$2a$11$demoHashWillBeChangedLater",
-            FirstName = "Demo",
-            LastName = "User",
-            CreatedAt = DateTime.SpecifyKind(
-                new DateTime(2026, 1, 1),
-                DateTimeKind.Utc),
-            UpdatedAt = DateTime.SpecifyKind(
-                new DateTime(2026, 1, 1),
-                DateTimeKind.Utc),
-            IsActive = true
-        });
     }
 }

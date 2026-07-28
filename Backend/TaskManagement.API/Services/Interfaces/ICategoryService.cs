@@ -2,18 +2,16 @@ using TaskManagement.API.DTOs.Category;
 
 public interface ICategoryService
 {
-    Task<IEnumerable<CategoryDto>> GetAllAsync(Guid userId);
+    Task<IEnumerable<CategoryDto>> GetAllAsync();
 
-    Task<CategoryDto> GetByIdAsync(Guid id, Guid userId);
+    Task<CategoryDto> GetByIdAsync(Guid id);
 
     Task<CategoryDto> CreateAsync(
-        CreateCategoryDto dto,
-        Guid userId);
+        CreateCategoryDto dto);
 
     Task<CategoryDto> UpdateAsync(
         Guid id,
-        UpdateCategoryDto dto,
-        Guid userId);
+        UpdateCategoryDto dto);
 
-    Task DeleteAsync(Guid id, Guid userId);
+    Task DeleteAsync(Guid id);
 }

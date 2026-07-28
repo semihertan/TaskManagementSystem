@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TaskManagement.API.Entities;
+using TaskManagement.API.Enums;
 
 namespace TaskManagement.API.Data.Configurations;
 
@@ -46,5 +47,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.IsActive)
             .HasDefaultValue(true);
+
+        builder.Property(x => x.Role)
+            .HasConversion<int>()
+            .HasDefaultValue(UserRole.User)
+            .IsRequired();
     }
 }

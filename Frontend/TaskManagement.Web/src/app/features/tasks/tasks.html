@@ -164,12 +164,18 @@
         id="pendingList"
         [cdkDropListData]="pendingTasks"
         [cdkDropListConnectedTo]="pendingConnectedLists"
+        [cdkDropListAutoScrollStep]="kanbanAutoScrollStep"
         (cdkDropListDropped)="dropTask($event, 0)"
         role="region"
         aria-label="Bekleyen görevler"
       >
         @for (task of pendingTasks; track task.id) {
-          <div class="drag-task" cdkDrag>
+          <div
+            class="drag-task"
+            cdkDrag
+            (cdkDragMoved)="onTaskDragMoved($event)"
+            (cdkDragEnded)="stopKanbanAutoScroll()"
+          >
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -211,12 +217,18 @@
         id="inProgressList"
         [cdkDropListData]="inProgressTasks"
         [cdkDropListConnectedTo]="inProgressConnectedLists"
+        [cdkDropListAutoScrollStep]="kanbanAutoScrollStep"
         (cdkDropListDropped)="dropTask($event, 1)"
         role="region"
         aria-label="Devam eden görevler"
       >
         @for (task of inProgressTasks; track task.id) {
-          <div class="drag-task" cdkDrag>
+          <div
+            class="drag-task"
+            cdkDrag
+            (cdkDragMoved)="onTaskDragMoved($event)"
+            (cdkDragEnded)="stopKanbanAutoScroll()"
+          >
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -258,12 +270,18 @@
         id="completedList"
         [cdkDropListData]="completedTasks"
         [cdkDropListConnectedTo]="completedConnectedLists"
+        [cdkDropListAutoScrollStep]="kanbanAutoScrollStep"
         (cdkDropListDropped)="dropTask($event, 2)"
         role="region"
         aria-label="Tamamlanan görevler"
       >
         @for (task of completedTasks; track task.id) {
-          <div class="drag-task" cdkDrag>
+          <div
+            class="drag-task"
+            cdkDrag
+            (cdkDragMoved)="onTaskDragMoved($event)"
+            (cdkDragEnded)="stopKanbanAutoScroll()"
+          >
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"
@@ -305,12 +323,18 @@
         id="cancelledList"
         [cdkDropListData]="cancelledTasks"
         [cdkDropListConnectedTo]="cancelledConnectedLists"
+        [cdkDropListAutoScrollStep]="kanbanAutoScrollStep"
         (cdkDropListDropped)="dropTask($event, 3)"
         role="region"
         aria-label="İptal edilen görevler"
       >
         @for (task of cancelledTasks; track task.id) {
-          <div class="drag-task" cdkDrag>
+          <div
+            class="drag-task"
+            cdkDrag
+            (cdkDragMoved)="onTaskDragMoved($event)"
+            (cdkDragEnded)="stopKanbanAutoScroll()"
+          >
             <app-task-card
               [task]="task"
               (editTask)="openEditTaskDialog($event)"

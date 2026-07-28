@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,10 +18,7 @@ public class TaskCommentsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(Guid taskId)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        var comments = await _commentService.GetByTaskIdAsync(taskId, userId);
+        var comments = await _commentService.GetByTaskIdAsync(taskId);
 
         return Ok(comments);
     }
@@ -32,13 +28,9 @@ public class TaskCommentsController : ControllerBase
         Guid taskId,
         CreateTaskCommentDto dto)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
         var comment = await _commentService.CreateAsync(
             taskId,
-            dto,
-            userId);
+            dto);
 
         return Ok(comment);
     }
@@ -49,13 +41,9 @@ public class TaskCommentsController : ControllerBase
         Guid commentId,
         UpdateTaskCommentDto dto)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
         var comment = await _commentService.UpdateAsync(
             commentId,
-            dto,
-            userId);
+            dto);
 
         return Ok(comment);
     }
@@ -65,12 +53,7 @@ public class TaskCommentsController : ControllerBase
         Guid taskId,
         Guid commentId)
     {
-        var userId = Guid.Parse(
-            User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-        await _commentService.DeleteAsync(
-            commentId,
-            userId);
+        await _commentService.DeleteAsync(commentId);
 
         return NoContent();
     }

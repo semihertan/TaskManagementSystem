@@ -23,4 +23,18 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\ApplicationDbContext.cs" />
+    <Compile Remove="Data\Configurations\**\*.cs" />
+    <Compile Remove="Entities\**\*.cs" />
+    <Compile Remove="Enums\**\*.cs" />
+    <Compile Remove="Migrations\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskManagement.Data\TaskManagement.Data.csproj" />
+    <ProjectReference Include="..\Migrations.PostgreSql\TaskManagement.API.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\TaskManagement.API.Migrations.Oracle\TaskManagement.API.Migrations.Oracle.csproj" />
+  </ItemGroup>
+
 </Project>

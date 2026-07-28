@@ -1,0 +1,97 @@
+<section class="admin-users-page">
+  <header class="admin-header">
+    <div>
+      <span class="admin-eyebrow">Admin</span>
+      <h1>Kullanıcı Yönetimi</h1>
+      <p>Kullanıcı rollerini ve hesapların aktiflik durumunu yönetin.</p>
+    </div>
+
+    <span class="admin-header-icon" aria-hidden="true">
+      <mat-icon>manage_accounts</mat-icon>
+    </span>
+  </header>
+
+  @if (isLoading) {
+    <div class="state-panel" role="status" aria-live="polite">
+      <mat-spinner diameter="42"></mat-spinner>
+      <span>Kullanıcılar yükleniyor...</span>
+    </div>
+  } @else if (errorMessage) {
+    <div class="state-panel state-panel--error" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button mat-stroked-button type="button" (click)="loadUsers()">Tekrar Dene</button>
+    </div>
+  } @else {
+    <div class="users-summary">
+      <strong>{{ users.length }}</strong>
+      <span>kullanıcı</span>
+    </div>
+
+    <div class="users-grid" role="list">
+      @for (user of users; track user.id) {
+        <mat-card class="user-card" role="listitem" appearance="outlined">
+          <mat-card-header>
+            <span mat-card-avatar class="user-avatar" aria-hidden="true">
+              {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+            </span>
+
+            <mat-card-title>{{ user.firstName }} {{ user.lastName }}</mat-card-title>
+            <mat-card-subtitle>&#64;{{ user.username }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="user-detail">
+              <mat-icon aria-hidden="true">mail_outline</mat-icon>
+              <span>{{ user.email }}</span>
+            </div>
+
+            <div class="user-detail">
+              <mat-icon aria-hidden="true">badge</mat-icon>
+              <span>{{ user.role === UserRole.Admin ? 'Admin' : 'User' }}</span>
+            </div>
+
+            <div class="user-detail">
+              <mat-icon aria-hidden="true">
+                {{ user.isActive ? 'check_circle' : 'block' }}
+              </mat-icon>
+              <span>{{ user.isActive ? 'Aktif' : 'Pasif' }}</span>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions class="user-actions">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Rol</mat-label>
+              <mat-select
+                [value]="user.role"
+                [disabled]="updatingUserId !== null"
+                (selectionChange)="updateRole(user, $event.value)"
+              >
+                @for (role of roleOptions; track role.value) {
+                  <mat-option [value]="role.value">{{ role.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-slide-toggle
+              [checked]="user.isActive"
+              [disabled]="updatingUserId !== null"
+              (change)="updateStatus(user, $event.checked)"
+            >
+              {{ user.isActive ? 'Aktif' : 'Pasif' }}
+            </mat-slide-toggle>
+
+            @if (updatingUserId === user.id) {
+              <mat-spinner diameter="22" aria-label="Kullanıcı güncelleniyor"></mat-spinner>
+            }
+          </mat-card-actions>
+        </mat-card>
+      } @empty {
+        <div class="state-panel">
+          <mat-icon>person_off</mat-icon>
+          <span>Kullanıcı bulunamadı.</span>
+        </div>
+      }
+    </div>
+  }
+</section>

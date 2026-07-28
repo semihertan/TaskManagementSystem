@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace TaskManagement.API.Migrations
+namespace TaskManagement.API.Migrations.PostgreSql
 {
     /// <inheritdoc />
     public partial class AddTaskAttachments : Migration

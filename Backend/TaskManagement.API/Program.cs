@@ -9,6 +9,7 @@ using System.Text;
 using TaskManagement.API.Services;
 using TaskManagement.API.Middleware;
 using TaskManagement.API.Responses;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IAdminSeedService, AdminSeedService>();
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
 builder.Services
@@ -104,23 +109,42 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtSettings["Key"]!)),
 
+            NameClaimType = ClaimTypes.Name,
+            RoleClaimType = ClaimTypes.Role,
+
             ClockSkew = TimeSpan.Zero
         };
     });
 
 builder.Services.AddAuthorization();
 
-var databaseProvider = builder.Configuration["DatabaseProvider"];
+var databaseProvider = builder.Configuration["DatabaseProvider"]?.Trim();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    if (databaseProvider == "Oracle")
+    if (string.Equals(databaseProvider, "Oracle", StringComparison.OrdinalIgnoreCase))
     {
-        options.UseOracle(builder.Configuration.GetConnectionString("Oracle"));
+        options.UseOracle(
+            builder.Configuration.GetConnectionString("Oracle"),
+            provider => provider
+                .MigrationsAssembly("TaskManagement.API.Migrations.Oracle")
+                .MigrationsHistoryTable("__EFMigrationsHistory"));
+    }
+    else if (string.Equals(
+                 databaseProvider,
+                 "PostgreSql",
+                 StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseNpgsql(
+            builder.Configuration.GetConnectionString("PostgreSql"),
+            provider => provider
+                .MigrationsAssembly("TaskManagement.API.Migrations.PostgreSql")
+                .MigrationsHistoryTable("__EFMigrationsHistory"));
     }
     else
     {
-        options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"));
+        throw new InvalidOperationException(
+            "DatabaseProvider değeri 'PostgreSql' veya 'Oracle' olmalıdır.");
     }
 });
 
@@ -143,6 +167,10 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    await using var scope = app.Services.CreateAsyncScope();
+    var adminSeedService = scope.ServiceProvider.GetRequiredService<IAdminSeedService>();
+    await adminSeedService.SeedAsync();
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }

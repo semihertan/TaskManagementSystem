@@ -9,7 +9,7 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  max-height: min(880px, calc(100dvh - 32px));
+  max-height: min(880px, calc(100dvh - 24px));
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
@@ -40,6 +40,7 @@
     color: var(--text-primary);
     font-size: 1.3rem;
     line-height: 1.25;
+    overflow-wrap: anywhere;
   }
 
   p {
@@ -47,6 +48,7 @@
     color: var(--text-secondary);
     font-size: 0.84rem;
     line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -198,7 +200,7 @@ mat-form-field,
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .task-dialog__header {
     padding: 18px 18px 14px;
   }
@@ -222,7 +224,7 @@ mat-form-field,
 
 @media (max-width: 480px) {
   .task-dialog {
-    max-height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 24px);
   }
 
   .task-dialog__header {

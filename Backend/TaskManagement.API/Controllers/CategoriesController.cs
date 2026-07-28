@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using TaskManagement.API.DTOs.Category;
 using TaskManagement.API.Responses;
 
@@ -19,27 +18,11 @@ public class CategoriesController : ControllerBase
         _categoryService = categoryService;
     }
 
-    private Guid GetUserId()
-    {
-        var userIdValue = User.FindFirstValue(
-            ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userIdValue, out var userId))
-        {
-            throw new UnauthorizedAccessException(
-                "Geçersiz kullanıcı bilgisi.");
-        }
-
-        return userId;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var userId = GetUserId();
-
         var categories =
-            await _categoryService.GetAllAsync(userId);
+            await _categoryService.GetAllAsync();
 
         return Ok(new ApiResponse<IEnumerable<CategoryDto>>
         {
@@ -52,10 +35,8 @@ public class CategoriesController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var userId = GetUserId();
-
         var category =
-            await _categoryService.GetByIdAsync(id, userId);
+            await _categoryService.GetByIdAsync(id);
 
         return Ok(new ApiResponse<CategoryDto>
         {
@@ -69,12 +50,9 @@ public class CategoriesController : ControllerBase
     public async Task<IActionResult> Create(
         CreateCategoryDto createCategoryDto)
     {
-        var userId = GetUserId();
-
         var createdCategory =
             await _categoryService.CreateAsync(
-                createCategoryDto,
-                userId);
+                createCategoryDto);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -92,13 +70,10 @@ public class CategoriesController : ControllerBase
         Guid id,
         UpdateCategoryDto updateCategoryDto)
     {
-        var userId = GetUserId();
-
         var updated =
             await _categoryService.UpdateAsync(
                 id,
-                updateCategoryDto,
-                userId);
+                updateCategoryDto);
 
         return Ok(new ApiResponse<CategoryDto>
         {
@@ -111,9 +86,7 @@ public class CategoriesController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userId = GetUserId();
-
-        await _categoryService.DeleteAsync(id, userId);
+        await _categoryService.DeleteAsync(id);
 
         return NoContent();
     }

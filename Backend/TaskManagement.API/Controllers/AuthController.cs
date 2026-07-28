@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.API.DTOs.User;
@@ -12,10 +11,14 @@ namespace TaskManagement.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ICurrentUserService _currentUser;
 
-    public AuthController(IUserService userService)
+    public AuthController(
+        IUserService userService,
+        ICurrentUserService currentUser)
     {
         _userService = userService;
+        _currentUser = currentUser;
     }
 
     [HttpPost("register")]
@@ -66,7 +69,7 @@ public class AuthController : ControllerBase
     [HttpGet("profile")]
     public async Task<ActionResult<ApiResponse<UserDto>>> GetProfile()
     {
-        var user = await _userService.GetProfileAsync(GetAuthenticatedUserId());
+        var user = await _userService.GetProfileAsync(_currentUser.UserId);
 
         return Ok(new ApiResponse<UserDto>
         {
@@ -82,7 +85,7 @@ public class AuthController : ControllerBase
         [FromBody] UpdateUserDto updateUserDto)
     {
         var user = await _userService.UpdateProfileAsync(
-            GetAuthenticatedUserId(),
+            _currentUser.UserId,
             updateUserDto);
 
         return Ok(new ApiResponse<UserDto>
@@ -99,7 +102,7 @@ public class AuthController : ControllerBase
         [FromBody] ChangePasswordDto changePasswordDto)
     {
         await _userService.ChangePasswordAsync(
-            GetAuthenticatedUserId(),
+            _currentUser.UserId,
             changePasswordDto);
 
         return Ok(new ApiResponse<object>
@@ -110,15 +113,4 @@ public class AuthController : ControllerBase
         });
     }
 
-    private Guid GetAuthenticatedUserId()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(userId, out var id))
-        {
-            throw new UnauthorizedAccessException("Geçersiz kullanıcı bilgisi.");
-        }
-
-        return id;
-    }
 }

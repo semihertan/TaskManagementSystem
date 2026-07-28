@@ -10,20 +10,22 @@ public class CategoryService : ICategoryService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly ILogger<CategoryService> _logger;
+    private readonly ICurrentUserService _currentUser;
 
     public CategoryService(
         ApplicationDbContext context,
         IMapper mapper,
-        ILogger<CategoryService> logger)
+        ILogger<CategoryService> logger,
+        ICurrentUserService currentUser)
     {
         _context = context;
         _mapper = mapper;
         _logger = logger;
+        _currentUser = currentUser;
     }
 
     public async Task<CategoryDto> CreateAsync(
-        CreateCategoryDto dto,
-        Guid userId)
+        CreateCategoryDto dto)
     {
         _logger.LogInformation(
             "Creating category: {CategoryName}",
@@ -31,7 +33,7 @@ public class CategoryService : ICategoryService
 
         var category = _mapper.Map<Category>(dto);
 
-        category.UserId = userId;
+        category.UserId = _currentUser.UserId;
         category.CreatedAt = DateTime.UtcNow;
 
         await _context.Categories.AddAsync(category);
@@ -45,8 +47,7 @@ public class CategoryService : ICategoryService
     }
 
     public async Task DeleteAsync(
-        Guid id,
-        Guid userId)
+        Guid id)
     {
         _logger.LogInformation(
             "Deleting category. Id: {CategoryId}",
@@ -55,7 +56,7 @@ public class CategoryService : ICategoryService
         var category = await _context.Categories
             .FirstOrDefaultAsync(c =>
                 c.Id == id &&
-                c.UserId == userId);
+                (_currentUser.IsAdmin || c.UserId == _currentUser.UserId));
 
         if (category is null)
         {
@@ -75,12 +76,16 @@ public class CategoryService : ICategoryService
             id);
     }
 
-    public async Task<IEnumerable<CategoryDto>> GetAllAsync(
-        Guid userId)
+    public async Task<IEnumerable<CategoryDto>> GetAllAsync()
     {
-        var categories = await _context.Categories
-            .AsNoTracking()
-            .Where(c => c.UserId == userId)
+        IQueryable<Category> query = _context.Categories.AsNoTracking();
+
+        if (!_currentUser.IsAdmin)
+        {
+            query = query.Where(c => c.UserId == _currentUser.UserId);
+        }
+
+        var categories = await query
             .OrderBy(c => c.Name)
             .ToListAsync();
 
@@ -89,14 +94,13 @@ public class CategoryService : ICategoryService
     }
 
     public async Task<CategoryDto> GetByIdAsync(
-        Guid id,
-        Guid userId)
+        Guid id)
     {
         var category = await _context.Categories
             .AsNoTracking()
             .FirstOrDefaultAsync(c =>
                 c.Id == id &&
-                c.UserId == userId);
+                (_currentUser.IsAdmin || c.UserId == _currentUser.UserId));
 
         if (category is null)
         {
@@ -109,8 +113,7 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryDto> UpdateAsync(
         Guid id,
-        UpdateCategoryDto updateCategoryDto,
-        Guid userId)
+        UpdateCategoryDto updateCategoryDto)
     {
         _logger.LogInformation(
             "Updating category. Id: {CategoryId}",
@@ -119,7 +122,7 @@ public class CategoryService : ICategoryService
         var category = await _context.Categories
             .FirstOrDefaultAsync(c =>
                 c.Id == id &&
-                c.UserId == userId);
+                (_currentUser.IsAdmin || c.UserId == _currentUser.UserId));
 
         if (category is null)
         {

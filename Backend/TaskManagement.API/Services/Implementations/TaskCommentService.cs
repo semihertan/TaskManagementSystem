@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs.Task.TaskComment;
 using TaskManagement.API.Entities;
+using TaskManagement.API.Services.Interfaces;
 
 namespace TaskManagement.API.Services.Implementations;
 
@@ -10,24 +11,26 @@ public class TaskCommentService : ITaskCommentService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUser;
 
     public TaskCommentService(
         ApplicationDbContext context,
-        IMapper mapper)
+        IMapper mapper,
+        ICurrentUserService currentUser)
     {
         _context = context;
         _mapper = mapper;
+        _currentUser = currentUser;
     }
 
     public async Task<TaskCommentDto> CreateAsync(
         Guid taskId,
-        CreateTaskCommentDto createDto,
-        Guid userId)
+        CreateTaskCommentDto createDto)
     {
         var task = await _context.Tasks
             .FirstOrDefaultAsync(x =>
                 x.Id == taskId &&
-                x.UserId == userId);
+                (_currentUser.IsAdmin || x.UserId == _currentUser.UserId));
 
         if (task is null)
         {
@@ -38,7 +41,7 @@ public class TaskCommentService : ITaskCommentService
         var comment = _mapper.Map<TaskComment>(createDto);
 
         comment.TaskId = taskId;
-        comment.UserId = userId;
+        comment.UserId = _currentUser.UserId;
         comment.CreatedAt = DateTime.UtcNow;
 
         _context.TaskComments.Add(comment);
@@ -47,16 +50,15 @@ public class TaskCommentService : ITaskCommentService
         return _mapper.Map<TaskCommentDto>(comment);
     }
 
-    public async Task DeleteAsync(
-        Guid commentId,
-        Guid userId)
+    public async Task DeleteAsync(Guid commentId)
     {
         var comment = await _context.TaskComments
             .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == commentId &&
-                x.UserId == userId &&
-                x.Task.UserId == userId);
+                (_currentUser.IsAdmin ||
+                    (x.UserId == _currentUser.UserId &&
+                     x.Task.UserId == _currentUser.UserId)));
 
         if (comment is null)
         {
@@ -70,14 +72,13 @@ public class TaskCommentService : ITaskCommentService
 
     public async Task<IEnumerable<TaskCommentDto>>
         GetByTaskIdAsync(
-            Guid taskId,
-            Guid userId)
+            Guid taskId)
     {
         var taskExists = await _context.Tasks
             .AsNoTracking()
             .AnyAsync(x =>
                 x.Id == taskId &&
-                x.UserId == userId);
+                (_currentUser.IsAdmin || x.UserId == _currentUser.UserId));
 
         if (!taskExists)
         {
@@ -97,15 +98,15 @@ public class TaskCommentService : ITaskCommentService
 
     public async Task<TaskCommentDto> UpdateAsync(
         Guid commentId,
-        UpdateTaskCommentDto updateDto,
-        Guid userId)
+        UpdateTaskCommentDto updateDto)
     {
         var comment = await _context.TaskComments
             .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == commentId &&
-                x.UserId == userId &&
-                x.Task.UserId == userId);
+                (_currentUser.IsAdmin ||
+                    (x.UserId == _currentUser.UserId &&
+                     x.Task.UserId == _currentUser.UserId)));
 
         if (comment is null)
         {

@@ -12,22 +12,25 @@ public class TaskAttachmentService : ITaskAttachmentService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUser;
 
     public TaskAttachmentService(
         ApplicationDbContext context,
-        IMapper mapper)
+        IMapper mapper,
+        ICurrentUserService currentUser)
     {
         _context = context;
         _mapper = mapper;
+        _currentUser = currentUser;
     }
 
-    public async Task DeleteAsync(Guid attachmentId, Guid userId)
+    public async Task DeleteAsync(Guid attachmentId)
     {
         var attachment = await _context.TaskAttachments
             .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == attachmentId &&
-                x.Task.UserId == userId);
+                (_currentUser.IsAdmin || x.Task.UserId == _currentUser.UserId));
 
         if (attachment is null)
         {
@@ -51,15 +54,14 @@ public class TaskAttachmentService : ITaskAttachmentService
         byte[] FileBytes,
         string ContentType,
         string FileName)> DownloadAsync(
-            Guid attachmentId,
-            Guid userId)
+            Guid attachmentId)
     {
         var attachment = await _context.TaskAttachments
             .AsNoTracking()
             .Include(x => x.Task)
             .FirstOrDefaultAsync(x =>
                 x.Id == attachmentId &&
-                x.Task.UserId == userId);
+                (_currentUser.IsAdmin || x.Task.UserId == _currentUser.UserId));
 
         if (attachment is null)
         {
@@ -86,14 +88,13 @@ public class TaskAttachmentService : ITaskAttachmentService
     }
 
     public async Task<IEnumerable<TaskAttachmentDto>> GetByTaskIdAsync(
-        Guid taskId,
-        Guid userId)
+        Guid taskId)
     {
         var taskExists = await _context.Tasks
             .AsNoTracking()
             .AnyAsync(x =>
                 x.Id == taskId &&
-                x.UserId == userId);
+                (_currentUser.IsAdmin || x.UserId == _currentUser.UserId));
 
         if (!taskExists)
         {
@@ -112,13 +113,12 @@ public class TaskAttachmentService : ITaskAttachmentService
 
     public async Task<TaskAttachmentDto> UploadAsync(
         Guid taskId,
-        CreateTaskAttachmentDto dto,
-        Guid userId)
+        CreateTaskAttachmentDto dto)
     {
         var task = await _context.Tasks
             .FirstOrDefaultAsync(x =>
                 x.Id == taskId &&
-                x.UserId == userId);
+                (_currentUser.IsAdmin || x.UserId == _currentUser.UserId));
 
         if (task is null)
         {

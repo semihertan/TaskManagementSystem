@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -29,6 +29,7 @@ import {
 
 import {
   CdkDragDrop,
+  CdkDragMove,
   DragDropModule,
   transferArrayItem
 } from '@angular/cdk/drag-drop';
@@ -57,7 +58,7 @@ import { PRIORITY_OPTIONS } from '../../shared/constants/priority.constants';
   templateUrl: './tasks.html',
   styleUrl: './tasks.scss',
 })
-export class Tasks implements OnInit {
+export class Tasks implements OnInit, OnDestroy {
   private taskService = inject(TaskService);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
@@ -79,6 +80,11 @@ export class Tasks implements OnInit {
   pageSize = 10;
   totalCount = 0;
   pageSizeOptions = [5, 10, 20, 50];
+  readonly kanbanAutoScrollStep = 12;
+
+  private readonly autoScrollEdgeDistance = 140;
+  private autoScrollVelocity = 0;
+  private autoScrollFrameId: number | null = null;
 
   priorities = PRIORITY_OPTIONS;
 
@@ -141,6 +147,66 @@ export class Tasks implements OnInit {
     this.loadTasks();
   }
 
+  ngOnDestroy(): void {
+    this.stopKanbanAutoScroll();
+  }
+
+  onTaskDragMoved(event: CdkDragMove<TaskItem>): void {
+    const viewportHeight = window.innerHeight;
+    const edgeDistance = Math.min(
+      this.autoScrollEdgeDistance,
+      viewportHeight * 0.2
+    );
+    const pointerY = event.pointerPosition.y;
+
+    if (pointerY < edgeDistance) {
+      this.autoScrollVelocity = -this.getAutoScrollSpeed(
+        edgeDistance - pointerY,
+        edgeDistance
+      );
+    } else if (pointerY > viewportHeight - edgeDistance) {
+      this.autoScrollVelocity = this.getAutoScrollSpeed(
+        pointerY - (viewportHeight - edgeDistance),
+        edgeDistance
+      );
+    } else {
+      this.autoScrollVelocity = 0;
+    }
+
+    if (this.autoScrollVelocity !== 0 && this.autoScrollFrameId === null) {
+      this.autoScrollFrameId = window.requestAnimationFrame(
+        this.runKanbanAutoScroll
+      );
+    }
+  }
+
+  stopKanbanAutoScroll(): void {
+    this.autoScrollVelocity = 0;
+
+    if (this.autoScrollFrameId !== null) {
+      window.cancelAnimationFrame(this.autoScrollFrameId);
+      this.autoScrollFrameId = null;
+    }
+  }
+
+  private getAutoScrollSpeed(distanceInsideEdge: number, edgeDistance: number): number {
+    const intensity = Math.min(Math.max(distanceInsideEdge / edgeDistance, 0), 1);
+
+    return Math.round(6 + intensity * 18);
+  }
+
+  private readonly runKanbanAutoScroll = (): void => {
+    if (this.autoScrollVelocity === 0) {
+      this.autoScrollFrameId = null;
+      return;
+    }
+
+    window.scrollBy(0, this.autoScrollVelocity);
+    this.autoScrollFrameId = window.requestAnimationFrame(
+      this.runKanbanAutoScroll
+    );
+  };
+
   loadTasks(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -186,9 +252,9 @@ export class Tasks implements OnInit {
 
   openCreateTaskDialog(): void {
     const dialogRef = this.dialog.open(TaskForm, {
-      width: '760px',
-      maxWidth: 'calc(100vw - 32px)',
-      maxHeight: 'calc(100dvh - 32px)',
+      width: 'min(760px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)',
       panelClass: 'task-form-dialog',
       disableClose: true
     });
@@ -207,9 +273,9 @@ export class Tasks implements OnInit {
       TaskItem,
       TaskItem
     >(TaskForm, {
-      width: '760px',
-      maxWidth: 'calc(100vw - 32px)',
-      maxHeight: 'calc(100dvh - 32px)',
+      width: 'min(760px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)',
       panelClass: 'task-form-dialog',
       disableClose: true,
       data: task
@@ -232,8 +298,9 @@ export class Tasks implements OnInit {
       ConfirmDialogData,
       boolean
     >(ConfirmDialog, {
-      width: '420px',
-      maxWidth: '95vw',
+      width: 'min(420px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)',
       disableClose: true,
       data: {
         title: 'Görevi Sil',
@@ -367,6 +434,8 @@ export class Tasks implements OnInit {
     event: CdkDragDrop<TaskItem[]>,
     newStatus: number
   ): void {
+    this.stopKanbanAutoScroll();
+
     const task = event.previousContainer.data[event.previousIndex];
 
     if (task.status === newStatus) {

@@ -1,4 +1,6 @@
 .tasks-page {
+  width: 100%;
+  min-width: 0;
   min-height: calc(100vh - 64px);
   max-width: 1400px;
   margin: 0 auto;
@@ -43,6 +45,7 @@
 .tasks-heading {
   position: relative;
   z-index: 1;
+  min-width: 0;
 
   h1 {
     margin: 0;
@@ -163,6 +166,7 @@
   align-items: start;
 
   mat-form-field {
+    min-width: 0;
     width: 100%;
   }
 }
@@ -369,10 +373,11 @@
 }
 
 mat-paginator {
+  max-width: 100%;
   margin-top: 20px;
   border: 1px solid var(--border-color);
   border-radius: 14px;
-  overflow: hidden;
+  overflow: visible;
   background: var(--surface-elevated);
 }
 
@@ -406,9 +411,9 @@ mat-paginator {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   .tasks-page {
-    padding: 20px 14px 32px;
+    padding: 12px 0 28px;
   }
 
   .tasks-header {
@@ -428,20 +433,17 @@ mat-paginator {
   }
 
   .kanban-board {
-    display: flex;
-    overflow-x: auto;
-    scroll-padding-inline: 2px;
-    scroll-snap-type: x proximity;
-    overscroll-behavior-inline: contain;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    overflow-x: visible;
+    padding-bottom: 2px;
   }
 
   .kanban-column {
-    flex: 0 0 min(86vw, 340px);
-    scroll-snap-align: start;
+    width: 100%;
+    min-width: 0;
   }
-}
 
-@media (max-width: 600px) {
   .task-filters {
     padding: 18px 16px;
   }
@@ -466,6 +468,39 @@ mat-paginator {
 
   .filter-panel-header > mat-icon {
     display: none;
+  }
+
+  :host ::ng-deep .mat-mdc-paginator-container {
+    min-height: 64px;
+    padding: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 8px;
+  }
+
+  :host ::ng-deep .mat-mdc-paginator-page-size,
+  :host ::ng-deep .mat-mdc-paginator-range-actions {
+    margin: 0;
+  }
+
+  :host ::ng-deep .mat-mdc-paginator-range-label {
+    margin: 0 8px;
+    text-align: center;
+  }
+
+  .drag-task {
+    touch-action: pan-y;
+  }
+
+  .cdk-drag-preview {
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 420px) {
+  :host ::ng-deep .mat-mdc-paginator-range-actions {
+    width: 100%;
   }
 }
 

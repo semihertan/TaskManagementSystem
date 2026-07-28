@@ -50,6 +50,19 @@
       Profilim
     </button>
 
+    @if (authService.isAdmin()) {
+      <button
+        mat-button
+        routerLink="/admin/users"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+      >
+        <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+        Kullanıcılar
+      </button>
+    }
+
     <button mat-button type="button" class="logout-button" (click)="logout()">
       <mat-icon aria-hidden="true">logout</mat-icon>
       Çıkış Yap
@@ -125,6 +138,19 @@
       <mat-icon aria-hidden="true">account_circle</mat-icon>
       <span>Profilim</span>
     </button>
+
+    @if (authService.isAdmin()) {
+      <button
+        mat-menu-item
+        routerLink="/admin/users"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+      >
+        <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+        <span>Kullanıcılar</span>
+      </button>
+    }
 
     <button mat-menu-item type="button" class="logout-button" (click)="logout()">
       <mat-icon aria-hidden="true">logout</mat-icon>

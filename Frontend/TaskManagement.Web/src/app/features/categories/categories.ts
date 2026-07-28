@@ -76,8 +76,9 @@ export class Categories implements OnInit {
 
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(CategoryForm, {
-      width: '520px',
-      maxWidth: '95vw'
+      width: 'min(520px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)'
     });
 
     dialogRef.afterClosed().subscribe((createdCategory: Category | undefined) => {
@@ -104,8 +105,9 @@ export class Categories implements OnInit {
 
   openEditDialog(category: Category): void {
     const dialogRef = this.dialog.open(CategoryForm, {
-      width: '520px',
-      maxWidth: '95vw',
+      width: 'min(520px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)',
       data: category
     });
 
@@ -134,8 +136,9 @@ export class Categories implements OnInit {
 
   deleteCategory(category: Category): void {
     const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      maxWidth: '95vw',
+      width: 'min(420px, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)',
       data: {
         title: 'Kategori silinsin mi?',
         message: `"${category.name}" kategorisini silmek istediğinize emin misiniz?`,

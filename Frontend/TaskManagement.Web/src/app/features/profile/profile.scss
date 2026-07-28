@@ -4,6 +4,7 @@
 
 .profile-page {
   width: min(1180px, 100%);
+  min-width: 0;
   margin: 0 auto;
 }
 
@@ -23,6 +24,7 @@
     margin: 0;
     color: var(--text-secondary);
     line-height: 1.55;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -198,10 +200,12 @@
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   align-items: start;
   gap: 20px;
+  min-width: 0;
 }
 
 .form-card {
   position: relative;
+  min-width: 0;
   padding: 22px;
   overflow: hidden;
   border: 1px solid var(--border-color);
@@ -370,7 +374,7 @@ mat-icon[matPrefix] {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .profile-page-header {
     margin-bottom: 16px;
   }
